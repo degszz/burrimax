@@ -1,20 +1,42 @@
 ---
-import { CATEGORIAS } from '@burritos/shared';
-import { Button } from '@/components/ui/button';
+import Tienda from '@/components/Tienda';
 import Base from '@/layouts/Base.astro';
+import { cargarDatosTienda, type DatosTienda } from '@/lib/catalogo.server';
 
-// Placeholder de Fase 0: confirma que Astro, React, Tailwind, shadcn y
-// `packages/shared` funcionan juntos. La home real llega en la Fase 1.
-const pasos = ['tamaño', ...CATEGORIAS];
+// La home es el armador. El catálogo se lee en cada visita (cambia desde el admin).
+let datos: DatosTienda | null = null;
+try {
+  datos = await cargarDatosTienda();
+} catch (error) {
+  console.error(error);
+  Astro.response.status = 503;
+}
+
+// Precarga las tortillas: son lo primero que se ve.
+const tortillas = datos?.catalogo.ingredientes.filter((i) => i.categoria === 'tortilla' && i.imagenUrl) ?? [];
 ---
 
-<Base titulo="Burritos [A CONFIRMAR nombre]">
-  <main class="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
-    <h1 class="text-3xl font-bold">Armá tu burrito 🌯</h1>
-    <p class="text-lg">Muy pronto vas a poder armarlo paso a paso:</p>
-    <ol class="list-decimal space-y-1 pl-6 text-lg capitalize">
-      {pasos.map((paso) => <li>{paso}</li>)}
-    </ol>
-    <Button client:load size="lg" className="min-h-12 text-lg">Empezar</Button>
-  </main>
+<Base titulo="Armá tu burrito · [NOMBRE A CONFIRMAR]">
+  <Fragment slot="head">
+    {tortillas.map((t) => <link rel="preload" as="image" type="image/avif" href={t.imagenUrl} />)}
+  </Fragment>
+  {
+    datos ? (
+      <Tienda client:load catalogo={datos.catalogo} abierto={datos.abierto} />
+    ) : (
+      <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
+        <div>
+          <p class="text-5xl" aria-hidden="true">🌯</p>
+          <h1 class="mt-3 text-3xl font-extrabold">No pudimos cargar el menú</h1>
+          <p class="mt-2 text-lg text-tinta-suave">Puede ser la conexión. Probá de nuevo en un ratito.</p>
+          <a
+            href="/"
+            class="juguete mt-6 inline-flex min-h-14 items-center rounded-2xl bg-rojo px-6 font-heading text-xl font-extrabold text-white"
+          >
+            Probar de nuevo
+          </a>
+        </div>
+      </main>
+    )
+  }
 </Base>

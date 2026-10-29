@@ -1,13 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Baloo 2', ui-rounded, system-ui, sans-serif;
+    --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
+    --color-crema: var(--crema);
+    --color-tinta: var(--tinta);
+    --color-tinta-suave: var(--tinta-suave);
+    --color-amarillo: var(--amarillo);
+    --color-rojo: var(--rojo);
+    --color-rojo-oscuro: var(--rojo-oscuro);
+    --color-verde: var(--verde);
+    --color-verde-claro: var(--verde-claro);
+    --color-panel: var(--panel);
+    --color-beige: var(--beige);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,24 +58,36 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    /* Marca [A CONFIRMAR]: paleta del diseño de Claude Design. */
+    --crema: #FFF8EC;
+    --tinta: #2B1B12;
+    --tinta-suave: #6B5444;
+    --amarillo: #FFB703;
+    --rojo: #C9431F;
+    --rojo-oscuro: #8A2B12;
+    --verde: #2F7D32;
+    --verde-claro: #E4F1D7;
+    --panel: #F7E4B9;
+    --beige: #EADBC3;
+
+    --background: var(--crema);
+    --foreground: var(--tinta);
+    --card: #FFFFFF;
+    --card-foreground: var(--tinta);
+    --popover: var(--crema);
+    --popover-foreground: var(--tinta);
+    --primary: var(--rojo);
+    --primary-foreground: #FFFFFF;
+    --secondary: var(--amarillo);
+    --secondary-foreground: var(--tinta);
+    --muted: var(--beige);
+    --muted-foreground: var(--tinta-suave);
+    --accent: var(--panel);
+    --accent-foreground: var(--tinta);
+    --destructive: var(--rojo);
+    --border: var(--tinta);
+    --input: var(--tinta);
+    --ring: var(--amarillo);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -123,8 +144,68 @@
     }
   body {
     @apply bg-background text-foreground;
+    font-size: 1rem;
     }
   html {
     @apply font-sans;
     }
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    line-height: 1.1;
+    }
+}
+
+/* Botones y tarjetas "de juguete": borde tinta y sombra dura que se hunde al tocar. */
+@utility juguete {
+  border: 2.5px solid var(--tinta);
+  box-shadow: 0 4px 0 var(--tinta);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  &:active:not(:disabled):not([aria-disabled='true']) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--tinta);
+  }
+}
+
+@utility fondo-puntos {
+  background-color: var(--panel);
+  background-image: radial-gradient(color-mix(in srgb, var(--tinta) 12%, transparent) 1.2px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+
+@utility sin-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Cada ingrediente "cae" sobre la tortilla con un rebote. */
+@keyframes caer {
+  0% { transform: translate(-50%, -160%) scale(0.6); opacity: 0; }
+  60% { transform: translate(-50%, -44%) scale(1.08, 0.92); opacity: 1; }
+  80% { transform: translate(-50%, -54%) scale(0.97, 1.03); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.animate-caer {
+  animation: caer 480ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.animate-aparecer {
+  animation: aparecer 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-caer,
+  .animate-aparecer {
+    animation: none;
+  }
+  .juguete {
+    transition: none;
+  }
 }

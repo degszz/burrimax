@@ -69,6 +69,7 @@ export const useCarrito = create<EstadoCarrito>()(
     }),
     {
       name: 'burritos:carrito:v1',
+      skipHydration: true,
       storage: createJSONStorage(() => almacenSeguro),
       partialize: ({ items }) => ({ items }),
     },

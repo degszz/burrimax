@@ -104,6 +104,8 @@ export const useArmador = create<EstadoArmador>()(
     },
     {
       name: 'burritos:armador:v1',
+      // Se rehidrata al montar la isla, para que el HTML del servidor coincida.
+      skipHydration: true,
       storage: createJSONStorage(() => almacenSeguro),
       partialize: ({ paso, tamanoId, seleccion, cantidad, nombre, editandoItemId }) => ({
         paso,
