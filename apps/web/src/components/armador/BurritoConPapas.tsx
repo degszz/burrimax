@@ -13,7 +13,7 @@ const BASE = '/armador/burrito-cerrado';
 /**
  * El burrito cerrado con sus papas: cualquier combinación termina así.
  * Busca primero la foto específica (doble y/o maíz) y, si todavía no existe,
- * usa la foto base: más amarilla para maíz y más grande para la doble.
+ * usa la misma foto base para todos (pedido de Max, hasta tener las fotos).
  */
 export function BurritoConPapas({ doble, tortilla, className }: Props) {
   const maiz = tortilla === 'tortilla-maiz';
@@ -26,10 +26,6 @@ export function BurritoConPapas({ doble, tortilla, className }: Props) {
 
   const [indice, setIndice] = useState(0);
   const src = candidatos[Math.min(indice, candidatos.length - 1)]!;
-  const usandoBase = src === `${BASE}.avif`;
-  // Provisorio hasta tener las fotos de maíz y de la doble.
-  const tinteMaiz = maiz && usandoBase ? 'sepia-[.35] saturate-[1.7] hue-rotate-[-6deg]' : '';
-  const agrandarDoble = doble && !src.includes('-doble') ? 'scale-x-[1.12] scale-y-[1.18]' : '';
 
   return (
     <div className={cn('relative mx-auto flex w-full max-w-sm items-end justify-center', className)}>
@@ -40,7 +36,7 @@ export function BurritoConPapas({ doble, tortilla, className }: Props) {
         decoding="async"
         draggable={false}
         onError={() => setIndice((i) => i + 1)}
-        className={cn('relative z-10 w-[64%] -rotate-6 drop-shadow-[0_10px_10px_rgba(43,27,18,.28)]', tinteMaiz, agrandarDoble)}
+        className="relative z-10 w-[64%] -rotate-6 drop-shadow-[0_10px_10px_rgba(43,27,18,.28)]"
       />
       <img
         src="/armador/papas.avif"

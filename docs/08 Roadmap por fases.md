@@ -18,15 +18,15 @@ tags: [burritos, roadmap]
 - [x] Armador completo con los renders `.avif` de Max: grilla de opciones, escenario con caída, resumen flotante
 - [x] Diálogo doble → simple, resumen final con papas incluidas
 - [x] Carrito persistente y **Mis combos** guardados en el celular
-- [ ] Sección de prehechos y combos del menú (están en la base, falta mostrarlos)
+- [x] Combos de la casa en la home (con "Agregar" y "Cambiarle algo")
 - [x] Imágenes de las 14 salsas
 - [ ] Imagen real de cerdo (hoy SVG provisorio)
 
-## Fase 2 — Checkout y pedidos (2–3 días)
-- [ ] Formulario de datos con validación
-- [ ] `POST /api/pedidos` con recálculo en servidor
-- [ ] Efectivo y transferencia funcionando de punta a punta
-- [ ] Página de seguimiento con token
+## Fase 2 — Checkout y pedidos
+- [x] Formulario de datos con validación (`/checkout`)
+- [x] `POST /api/pedidos` con recálculo en servidor (`crear_pedido` en la base)
+- [ ] Efectivo y transferencia funcionando de punta a punta — código listo; **falta `SUPABASE_SECRET_KEY`** para guardar pedidos
+- [x] Página de seguimiento con token (`/pedido/[id]`), probada con un pedido de prueba
 
 ## Fase 3 — Admin (3 días)
 - [ ] Login + MFA + rol
@@ -34,10 +34,10 @@ tags: [burritos, roadmap]
 - [ ] Catálogo y configuración
 - [ ] Impresión de comanda
 
-## Fase 4 — Mercado Pago (2 días)
-- [ ] `PaymentProvider` + Checkout Pro
-- [ ] Webhook con firma e idempotencia
-- [ ] Pruebas con usuarios de prueba
+## Fase 4 — Mercado Pago
+- [x] Checkout Pro (SDK `mercadopago` 3.6.1): preferencia con `external_reference` = pedido
+- [x] Webhook con firma (validador oficial), idempotencia y control de monto
+- [ ] Pruebas con usuarios de prueba — **faltan `MP_ACCESS_TOKEN` (prueba), deploy y `MP_WEBHOOK_SECRET`**
 
 ## Fase 5 — Pulido visual del armador
 > [!note] El 3D real (WebGL) quedó descartado por ahora: el "3D" lo dan los renders de Max. Ver [[09 Decisiones]].

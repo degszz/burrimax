@@ -27,7 +27,9 @@ tags: [burritos, pendientes]
 ## Pagos
 - [ ] ¿Cuenta de Mercado Pago a nombre de quién? (credenciales de producción)
 - [ ] ¿Stripe se va a usar realmente? ¿Hay o habrá empresa en el exterior?
-- [ ] ¿La transferencia es al alias de MP o a un banco?
+- [ ] ¿La transferencia es al alias de MP o a un banco? Cargar **alias, CVU y titular** en `config_negocio` (hoy vacíos: el seguimiento dice "te pasamos el alias por WhatsApp")
+- [ ] **Número de WhatsApp** del local en `config_negocio.whatsapp` (hoy `[A CONFIRMAR]`: los botones de WhatsApp no aparecen)
+- [ ] Claves del servidor: `SUPABASE_SECRET_KEY`, `MP_ACCESS_TOKEN` (prueba) y después `MP_WEBHOOK_SECRET` (ver `.env.example`)
 
 ## Contenido con IA (Fase 8, secundaria) → [[Planes/Fase 8 - Contenido visual con IA]]
 - [ ] ¿Se crea la cuenta de Higgsfield? Presupuesto aprox. US$10–15

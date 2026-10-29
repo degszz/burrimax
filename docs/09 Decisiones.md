@@ -53,6 +53,9 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-29 · Pedidos por la función `crear_pedido` y Mercado Pago solo con credenciales
+`POST /api/pedidos` valida con `pedidoSchema`, recalcula con `calcularPedido` y guarda todo (pedido, ítems con snapshots, ingredientes con porciones e historial) en una sola transacción con la función `crear_pedido`, que solo puede ejecutar el servidor con la clave secreta. Mercado Pago aparece en el checkout solo si está prendido en `config_negocio` **y** el servidor tiene `MP_ACCESS_TOKEN`. El webhook marca un evento como procesado recién después de actualizar el pedido (si falla, responde 500 y Mercado Pago reintenta). Descartado: react-hook-form (el formulario es chico; alcanza con estado + Zod).
+
 ### 2026-10-29 · Home con el armador opcional y los combos de la casa abajo
 Pedido de Max: no obligar a armar. El hero invita ("Armar el mío") y el armador se abre en el mismo lugar; abajo van los combos propios guardados (fijados arriba) y los combos de la casa con papas, que se pueden agregar directo o abrir en el armador para cambiarles algo. Los combos de la casa se arman desde `productos` + `producto_ingredientes` y se ocultan si su receta deja de ser válida.
 

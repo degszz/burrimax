@@ -39,7 +39,9 @@ tags: [burritos, supabase, datos]
 `id` · `pedido_id` · `tipo` ('armado' | 'producto') · `producto_id` null · `tamano_id` null · `nombre` (snapshot) · `cantidad` · `precio_unitario` (snapshot) · `detalle` jsonb (snapshot completo de lo elegido)
 
 **pedido_item_ingredientes**
-`item_id` · `ingrediente_id` · `nombre` (snapshot) · `categoria` · `precio` (snapshot)
+`item_id` · `ingrediente_id` · `nombre` (snapshot) · `categoria` · `precio` (snapshot) · `porciones` (carne repetida)
+
+**Función `crear_pedido(p jsonb)`** — crea pedido + ítems + ingredientes + historial en una transacción. Solo `service_role` (la usa `POST /api/pedidos`).
 
 **pagos_eventos** (log e idempotencia de webhooks)
 `id` · `proveedor` · `evento_id` · `tipo` · `payload` jsonb · `procesado` bool · `created_at` — UNIQUE (`proveedor`, `evento_id`)
