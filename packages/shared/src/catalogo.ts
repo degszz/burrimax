@@ -9,18 +9,34 @@ export interface TamanoCatalogo {
   slug: string;
   nombre: string;
   cantTapas: number;
+  /** Incluye las papas fritas. */
   precioBase: number;
-  /** Máximo por categoría. La tapa siempre es 1: la doble usa dos del mismo tipo. */
+  /** Mínimo por categoría. Tortilla 1; carne según tamaño (2 simple, 4 doble). */
+  minimos: Record<CategoriaSlug, number>;
+  /** Máximo por categoría. La tortilla siempre es 1: la doble usa dos tapas iguales. */
   maximos: Record<CategoriaSlug, number>;
   activo: boolean;
+  orden: number;
+}
+
+export interface CategoriaCatalogo {
+  nombre: string;
+  paso: number;
+  /** Si se puede elegir el mismo ingrediente más de una vez (porciones de carne). */
+  permiteRepetir: boolean;
 }
 
 export interface IngredienteCatalogo {
   id: string;
+  slug: string;
   categoria: CategoriaSlug;
   nombre: string;
   precioExtra: number;
   activo: boolean;
+  sinTacc: boolean;
+  imagenUrl: string | null;
+  colorHex: string | null;
+  orden: number;
 }
 
 export interface ProductoCatalogo {
@@ -39,8 +55,7 @@ export interface ZonaEnvioCatalogo {
 
 export interface Catalogo {
   tamanos: TamanoCatalogo[];
-  /** Mínimo por categoría (de `categorias_ingrediente.min`). */
-  minimos: Record<CategoriaSlug, number>;
+  categorias: Record<CategoriaSlug, CategoriaCatalogo>;
   ingredientes: IngredienteCatalogo[];
   productos: ProductoCatalogo[];
   zonasEnvio: ZonaEnvioCatalogo[];

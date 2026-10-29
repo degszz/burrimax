@@ -1,5 +1,5 @@
 import { type Armado, type ErrorArmado, validarArmado } from './armador/schema';
-import type { Catalogo } from './catalogo';
+import type { Catalogo, TamanoCatalogo } from './catalogo';
 import { CATEGORIAS } from './constantes';
 import type { Entrega, ItemPedido } from './pedido/schema';
 
@@ -18,21 +18,42 @@ export class PedidoInvalidoError extends Error {
   }
 }
 
-/** Precio base del tamaño + `precio_extra` de cada ingrediente elegido. */
+/**
+ * Precio base del tamaño (papas incluidas) + `precio_extra` de cada ingrediente
+ * elegido. Cada porción de carne suma su extra.
+ */
 export function precioUnitarioArmado(armado: Armado, catalogo: Catalogo): number {
   const errores = validarArmado(armado, catalogo);
   if (errores.length > 0) throw new PedidoInvalidoError(errores);
   return sumarArmado(armado, catalogo);
 }
 
+/**
+ * Lo mismo pero sin validar, para mostrar mientras se arma: tamaño desconocido
+ * suma 0 e ingredientes desconocidos también.
+ */
+export function precioVistaPrevia(armado: Armado, catalogo: Catalogo): number {
+  return sumarArmado(armado, catalogo);
+}
+
 function sumarArmado(armado: Armado, catalogo: Catalogo): number {
-  const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId)!;
+  const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const precios = new Map(catalogo.ingredientes.map((i) => [i.id, i.precioExtra]));
-  let precio = tamano.precioBase;
+  let precio = tamano?.precioBase ?? 0;
   for (const categoria of CATEGORIAS) {
-    for (const id of armado.seleccion[categoria]) precio += precios.get(id)!;
+    for (const id of armado.seleccion[categoria]) precio += precios.get(id) ?? 0;
   }
   return precio;
+}
+
+/** Relleno = porciones de carne + vegetales (las salsas no cuentan). */
+export function contarRelleno(armado: Armado): number {
+  return armado.seleccion.carne.length + armado.seleccion.vegetal.length;
+}
+
+/** 6 en la simple, 10 en la doble (con los límites de la base). */
+export function maximoRelleno(tamano: TamanoCatalogo): number {
+  return tamano.maximos.carne + tamano.maximos.vegetal;
 }
 
 export interface ItemCalculado {

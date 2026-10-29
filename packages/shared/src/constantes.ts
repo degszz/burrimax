@@ -1,7 +1,8 @@
 // Valores fijos del dominio. Los que el dueño puede cambiar (precios, límites)
 // viven en la base, no acá.
 
-export const CATEGORIAS = ['tapa', 'proteina', 'relleno', 'salsa', 'agregado'] as const;
+/** En el orden de los pasos del armador. */
+export const CATEGORIAS = ['tortilla', 'salsa', 'carne', 'vegetal'] as const;
 export type CategoriaSlug = (typeof CATEGORIAS)[number];
 
 export const ESTADOS_PEDIDO = [

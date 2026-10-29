@@ -24,6 +24,7 @@ export type Database = {
           nombre: string
           obligatoria: boolean
           paso: number
+          permite_repetir: boolean
           slug: string
         }
         Insert: {
@@ -32,6 +33,7 @@ export type Database = {
           nombre: string
           obligatoria?: boolean
           paso: number
+          permite_repetir?: boolean
           slug: string
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           nombre?: string
           obligatoria?: boolean
           paso?: number
+          permite_repetir?: boolean
           slug?: string
         }
         Relationships: []
@@ -138,6 +141,7 @@ export type Database = {
           orden: number
           precio_extra: number
           sin_tacc: boolean
+          slug: string
           vegetariano: boolean
         }
         Insert: {
@@ -152,6 +156,7 @@ export type Database = {
           orden?: number
           precio_extra?: number
           sin_tacc?: boolean
+          slug: string
           vegetariano?: boolean
         }
         Update: {
@@ -166,6 +171,7 @@ export type Database = {
           orden?: number
           precio_extra?: number
           sin_tacc?: boolean
+          slug?: string
           vegetariano?: boolean
         }
         Relationships: [
@@ -444,14 +450,17 @@ export type Database = {
       producto_ingredientes: {
         Row: {
           ingrediente_id: string
+          porciones: number
           producto_id: string
         }
         Insert: {
           ingrediente_id: string
+          porciones?: number
           producto_id: string
         }
         Update: {
           ingrediente_id?: string
+          porciones?: number
           producto_id?: string
         }
         Relationships: [
@@ -533,10 +542,10 @@ export type Database = {
           activo: boolean
           cant_tapas: number
           id: string
-          max_agregados: number
-          max_proteinas: number
-          max_rellenos: number
+          max_carnes: number
           max_salsas: number
+          max_vegetales: number
+          min_carnes: number
           nombre: string
           orden: number
           precio_base: number
@@ -546,10 +555,10 @@ export type Database = {
           activo?: boolean
           cant_tapas: number
           id?: string
-          max_agregados: number
-          max_proteinas: number
-          max_rellenos: number
+          max_carnes: number
           max_salsas: number
+          max_vegetales: number
+          min_carnes: number
           nombre: string
           orden?: number
           precio_base: number
@@ -559,10 +568,10 @@ export type Database = {
           activo?: boolean
           cant_tapas?: number
           id?: string
-          max_agregados?: number
-          max_proteinas?: number
-          max_rellenos?: number
+          max_carnes?: number
           max_salsas?: number
+          max_vegetales?: number
+          min_carnes?: number
           nombre?: string
           orden?: number
           precio_base?: number

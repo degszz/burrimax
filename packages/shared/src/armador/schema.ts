@@ -2,17 +2,19 @@ import { z } from 'zod';
 import type { Catalogo } from '../catalogo';
 import { CANTIDAD_MAXIMA_POR_ITEM, CATEGORIAS, type CategoriaSlug } from '../constantes';
 
-const ids = z.array(z.uuid()).default([]);
+const ids = z.array(z.uuid()).max(20).default([]);
 
-/** Forma de un burrito armado. No conoce el catálogo: eso lo valida `validarArmado`. */
+/**
+ * Forma de un burrito armado. No conoce el catálogo: eso lo valida `validarArmado`.
+ * En `carne` cada id repetido es una porción más.
+ */
 export const armadoSchema = z.object({
   tamanoId: z.uuid(),
   seleccion: z.object({
-    tapa: ids,
-    proteina: ids,
-    relleno: ids,
+    tortilla: ids,
     salsa: ids,
-    agregado: ids,
+    carne: ids,
+    vegetal: ids,
   }),
   cantidad: z.number().int().min(1).max(CANTIDAD_MAXIMA_POR_ITEM),
   nombrePersonalizado: z.string().trim().max(40).optional(),
@@ -29,8 +31,8 @@ export type ErrorArmado =
 
 /**
  * Valida un armado contra el catálogo: tamaño activo, ingredientes activos y de
- * la categoría correcta, sin repetidos, y dentro de mínimos y máximos.
- * Devuelve la lista de errores (vacía si está todo bien).
+ * la categoría correcta, repetidos solo donde se permite, y dentro de mínimos y
+ * máximos del tamaño. Devuelve la lista de errores (vacía si está todo bien).
  */
 export function validarArmado(armado: Armado, catalogo: Catalogo): ErrorArmado[] {
   const errores: ErrorArmado[] = [];
@@ -48,17 +50,17 @@ export function validarArmado(armado: Armado, catalogo: Catalogo): ErrorArmado[]
       if (!ingrediente || !ingrediente.activo || ingrediente.categoria !== categoria) {
         errores.push({ tipo: 'ingrediente_invalido', categoria, ingredienteId });
       }
-      if (vistos.has(ingredienteId)) {
+      if (vistos.has(ingredienteId) && !catalogo.categorias[categoria].permiteRepetir) {
         errores.push({ tipo: 'ingrediente_repetido', categoria, ingredienteId });
       }
       vistos.add(ingredienteId);
     }
 
-    const minimo = catalogo.minimos[categoria];
-    if (elegidos.length < minimo) {
-      errores.push({ tipo: 'faltan', categoria, minimo, elegidos: elegidos.length });
+    if (!tamano) continue;
+    if (elegidos.length < tamano.minimos[categoria]) {
+      errores.push({ tipo: 'faltan', categoria, minimo: tamano.minimos[categoria], elegidos: elegidos.length });
     }
-    if (tamano && elegidos.length > tamano.maximos[categoria]) {
+    if (elegidos.length > tamano.maximos[categoria]) {
       errores.push({ tipo: 'excede', categoria, maximo: tamano.maximos[categoria], elegidos: elegidos.length });
     }
   }
