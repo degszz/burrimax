@@ -95,6 +95,13 @@ Por cada fase del [[08 Roadmap por fases]]:
 4. `/code-review` antes de cerrar la fase
 5. Si se decidió algo nuevo → [[09 Decisiones]]
 
+## Contenido visual con IA (Fase 8, secundaria)
+Plan completo en [[Planes/Fase 8 - Contenido visual con IA]]. Nada instalado todavía.
+- **Higgsfield CLI** (`@higgsfield/cli`) + `higgsfield-ai/skills`: imágenes y video. Login y créditos los pone Max.
+- **`landing-page-design`** (elayadesign): solo para `/como-lo-hacemos`, con nuestra paleta. ⚠️ Se basa en `taste-skill` (ver "No instalar" arriba).
+- **`scroll-world`** (oso95): referencia del motor de scrub; su pipeline por defecto es caro.
+- **`<model-viewer>`** (Google): realidad aumentada en el paso "¡Listo!".
+
 ## Opcional (comunidad, revisar antes de instalar)
 - Skills de React Three Fiber/Three.js de la comunidad (hay varias en marketplaces de skills). Leé el `SKILL.md` antes de instalar: son de terceros y la calidad varía. Nuestra `estilo-3d` ya cubre lo esencial.
 - Stripe: no instalar nada hasta decidir si se usa (ver [[06 Pagos]]).

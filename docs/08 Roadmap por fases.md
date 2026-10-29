@@ -51,3 +51,8 @@ tags: [burritos, roadmap]
 - [ ] Lighthouse mobile > 85
 - [ ] Textos legales (celíacos, términos)
 - [ ] Dominio, SEO básico, Open Graph con foto de burrito
+
+## Fase 8 — Contenido visual con IA (secundaria) → [[Planes/Fase 8 - Contenido visual con IA|plan]]
+- [ ] Paseo con scroll "Así hacemos tu burrito" en `/como-lo-hacemos` (fotos reales + clips de Higgsfield)
+- [ ] "Ver en mi mesa": burrito cerrado en plato con realidad aumentada
+- [ ] Renders faltantes con Higgsfield: cerdo, salsas, burrito enrollado

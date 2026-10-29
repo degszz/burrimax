@@ -24,6 +24,12 @@ tags: [burritos, pendientes]
 - [ ] ¿Stripe se va a usar realmente? ¿Hay o habrá empresa en el exterior?
 - [ ] ¿La transferencia es al alias de MP o a un banco?
 
+## Contenido con IA (Fase 8, secundaria) → [[Planes/Fase 8 - Contenido visual con IA]]
+- [ ] ¿Se crea la cuenta de Higgsfield? Presupuesto aprox. US$10–15
+- [ ] Las 7 fotos del proceso (plancha → tortilla → carne → vegetales → armado → enrollado → plato con papas)
+- [ ] Fotos del burrito cerrado en plato, simple y doble (para la realidad aumentada)
+- [ ] ¿El paseo va en página propia `/como-lo-hacemos` (recomendado) o como sección de la home?
+
 ## Imágenes
 - [x] Renders 3D en `.avif` (los hace Max)
 - [ ] Render del burrito enrollado simple y doble + papas (hoy es una ilustración provisoria)
