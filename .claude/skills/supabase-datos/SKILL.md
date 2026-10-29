@@ -7,10 +7,10 @@ description: Usar al crear o cambiar tablas, migraciones, políticas RLS, funcio
 Fuente de verdad del modelo: `docs/05 Modelo de datos.md`. Si cambiás el modelo, actualizá esa nota en el mismo cambio.
 
 ## Flujo de trabajo
-1. Desarrollo local con Supabase CLI (`supabase start`). Probar ahí antes de tocar remoto.
-2. Cada cambio = `supabase migration new <nombre_en_snake>` → SQL en `supabase/migrations/`.
-3. `supabase db reset` para validar que todas las migraciones + seed corren de cero.
-4. `pnpm db:types` → genera `packages/shared/src/db.types.ts`.
+1. Sin Docker por ahora: desarrollo contra el proyecto de la nube `burritos-dev` (ver `docs/09 Decisiones.md`).
+2. Cada cambio = archivo nuevo `supabase/migrations/AAAAMMDDHHMMSS_<nombre_en_snake>.sql`, aplicado con `apply_migration` del MCP usando el mismo nombre.
+3. Datos de ejemplo en `supabase/seed.sql` (se aplica con `execute_sql` solo en el proyecto de desarrollo).
+4. Tipos: `generate_typescript_types` del MCP → `packages/shared/src/db.types.ts` (o `pnpm db:types` si está instalado el CLI y el proyecto vinculado).
 5. Con el MCP de Supabase: revisar `get_advisors` (seguridad y rendimiento) después de cada migración.
 6. Aplicar a remoto solo cuando el usuario lo confirme.
 

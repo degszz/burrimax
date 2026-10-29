@@ -42,10 +42,13 @@ tags: [burritos, supabase, datos]
 `item_id` · `ingrediente_id` · `nombre` (snapshot) · `categoria` · `precio` (snapshot)
 
 **pagos_eventos** (log e idempotencia de webhooks)
-`id` · `proveedor` · `evento_id` UNIQUE · `tipo` · `payload` jsonb · `procesado` bool · `created_at`
+`id` · `proveedor` · `evento_id` · `tipo` · `payload` jsonb · `procesado` bool · `created_at` — UNIQUE (`proveedor`, `evento_id`)
 
 **pedido_historial**
-`pedido_id` · `estado_anterior` · `estado_nuevo` · `usuario_id` · `created_at`
+`id` · `pedido_id` · `estado_anterior` · `estado_nuevo` · `usuario_id` · `created_at`
+
+> [!note] Implementación
+> Migración: `supabase/migrations/20261028220000_modelo_inicial.sql`. `config_negocio` tiene `id boolean` fijo en `true` para asegurar una sola fila. `token_seguimiento` se genera solo (36 caracteres hex).
 
 ## Seguridad (RLS)
 | Tabla | anon (tienda) | admin |

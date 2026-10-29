@@ -22,3 +22,18 @@ El contacto real es por WhatsApp/teléfono.
 
 ### 2026-10-28 · Límites de ingredientes en la base
 Así el dueño los cambia desde el admin sin tocar código.
+
+### 2026-10-28 · Supabase de desarrollo en la nube, sin Docker
+La base local de Supabase necesita Docker, y en Windows eso pide WSL y reinicio. Usamos un proyecto gratis de desarrollo (`burritos-dev`, São Paulo) y aplicamos migraciones con el MCP de Supabase. Las migraciones igual viven en `supabase/migrations/`. Descartado por ahora: Docker + `supabase start`.
+
+### 2026-10-28 · shadcn con Base UI
+Es la opción recomendada actual del CLI de shadcn (preset `nova`). Descartado: Radix (el propio shadcn ofrece migrar de Radix a Base).
+
+### 2026-10-28 · TypeScript 6, no 7
+`@astrojs/check` todavía no soporta TypeScript 7. Volver a mirar cuando lo soporte.
+
+### 2026-10-28 · Validación del armado separada del precio
+`validarArmado` (en `shared/armador/schema.ts`) devuelve todos los errores juntos; `pricing.ts` la usa y tira `PedidoInvalidoError`. El pedido que manda el cliente no tiene campos de precio: Zod los descarta.
+
+### 2026-10-28 · El `precio_extra` de la tapa se cobra una vez, también en la doble
+Regla de ejemplo hasta que se confirme (ver [[10 Preguntas abiertas]]).

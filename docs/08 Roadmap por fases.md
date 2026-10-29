@@ -4,12 +4,13 @@ tags: [burritos, roadmap]
 # Roadmap por fases
 
 ## Fase 0 — Base (1–2 días)
-- [ ] Monorepo pnpm: `apps/web`, `apps/admin`, `packages/shared`
-- [ ] Astro + Tailwind + React + shadcn/ui en ambas apps
-- [ ] Proyecto Supabase, CLI local, primera migración con todo el [[05 Modelo de datos]]
-- [ ] RLS + seed con ingredientes de ejemplo
-- [ ] `packages/shared`: tipos generados, schemas Zod, `pricing.ts` con tests
-- [ ] Deploy de prueba en Vercel (las dos apps)
+- [x] Monorepo pnpm: `apps/web`, `apps/admin`, `packages/shared`
+- [x] Astro + Tailwind + React + shadcn/ui en ambas apps
+- [ ] Proyecto Supabase en la nube (sin Docker, ver [[09 Decisiones]]) — migración escrita en `supabase/migrations/`, **falta crear el proyecto y aplicarla**
+- [x] RLS + seed con ingredientes de ejemplo (escritos, sin aplicar)
+- [x] `packages/shared`: schemas Zod, `pricing.ts` con tests (20 pasan)
+- [ ] `packages/shared`: tipos generados de Supabase (cuando exista el proyecto)
+- [ ] Deploy de prueba en Vercel (las dos apps) — falta `vercel login`
 
 ## Fase 1 — Menú y armador 2D (3–4 días)
 - [ ] Home con menús, productos y combos desde Supabase

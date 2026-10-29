@@ -9,6 +9,7 @@ tags: [burritos, pendientes]
 - [ ] Precios: base simple, base doble, extras
 - [ ] Límites reales por tamaño (¿4 y 6 rellenos está bien?)
 - [ ] ¿La doble tapa puede mezclar dos tipos de masa?
+- [ ] Doble tapa con masa que tiene costo extra (ej. sin TACC): ¿el extra se cobra una vez o dos? (hoy: una vez)
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?
 - [ ] Zonas de envío y costos

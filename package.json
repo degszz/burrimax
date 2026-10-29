@@ -1,0 +1,17 @@
+{
+  "name": "burritos",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.25.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @burritos/web dev",
+    "dev:admin": "pnpm --filter @burritos/admin dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:types": "supabase gen types typescript --linked > packages/shared/src/db.types.ts"
+  }
+}

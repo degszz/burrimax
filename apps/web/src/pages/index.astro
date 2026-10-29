@@ -1,0 +1,20 @@
+---
+import { CATEGORIAS } from '@burritos/shared';
+import { Button } from '@/components/ui/button';
+import Base from '@/layouts/Base.astro';
+
+// Placeholder de Fase 0: confirma que Astro, React, Tailwind, shadcn y
+// `packages/shared` funcionan juntos. La home real llega en la Fase 1.
+const pasos = ['tamaño', ...CATEGORIAS];
+---
+
+<Base titulo="Burritos [A CONFIRMAR nombre]">
+  <main class="mx-auto flex max-w-md flex-col gap-6 px-4 py-10">
+    <h1 class="text-3xl font-bold">Armá tu burrito 🌯</h1>
+    <p class="text-lg">Muy pronto vas a poder armarlo paso a paso:</p>
+    <ol class="list-decimal space-y-1 pl-6 text-lg capitalize">
+      {pasos.map((paso) => <li>{paso}</li>)}
+    </ol>
+    <Button client:load size="lg" className="min-h-12 text-lg">Empezar</Button>
+  </main>
+</Base>
