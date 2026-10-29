@@ -12,6 +12,6 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "db:types": "supabase gen types typescript --linked > packages/shared/src/db.types.ts"
+    "db:types": "supabase gen types typescript --project-id qoxzylgpstmzjzgxnetw > packages/shared/src/db.types.ts"
   }
 }

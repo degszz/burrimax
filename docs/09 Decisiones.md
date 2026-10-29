@@ -35,5 +35,11 @@ Es la opción recomendada actual del CLI de shadcn (preset `nova`). Descartado: 
 ### 2026-10-28 · Validación del armado separada del precio
 `validarArmado` (en `shared/armador/schema.ts`) devuelve todos los errores juntos; `pricing.ts` la usa y tira `PedidoInvalidoError`. El pedido que manda el cliente no tiene campos de precio: Zod los descarta.
 
+### 2026-10-28 · `config_negocio` es de lectura pública y no guarda secretos
+El asesor de Supabase marcó la vista `config_publica` con permisos de su creador (security definer) como error. Todo lo que hay en `config_negocio` se le muestra al cliente (alias, CVU, WhatsApp), así que la tabla tiene una política de lectura pública y la vista corre con los permisos del que consulta (`security_invoker`). **Las claves y tokens van siempre en variables de entorno, nunca en esta tabla.**
+
+### 2026-10-28 · `ver_pedido` pública a propósito
+Es una función con permisos de su creador que el asesor marca como aviso. Es intencional: solo devuelve datos con el id y el token de 36 caracteres hex. Solo la puede llamar `anon` (la tienda).
+
 ### 2026-10-28 · El `precio_extra` de la tapa se cobra una vez, también en la doble
 Regla de ejemplo hasta que se confirme (ver [[10 Preguntas abiertas]]).

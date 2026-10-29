@@ -6,10 +6,10 @@ tags: [burritos, roadmap]
 ## Fase 0 — Base (1–2 días)
 - [x] Monorepo pnpm: `apps/web`, `apps/admin`, `packages/shared`
 - [x] Astro + Tailwind + React + shadcn/ui en ambas apps
-- [ ] Proyecto Supabase en la nube (sin Docker, ver [[09 Decisiones]]) — migración escrita en `supabase/migrations/`, **falta crear el proyecto y aplicarla**
-- [x] RLS + seed con ingredientes de ejemplo (escritos, sin aplicar)
+- [x] Proyecto Supabase `burritos-dev` en la nube (sin Docker, ver [[09 Decisiones]]) con las migraciones de `supabase/migrations/` aplicadas
+- [x] RLS + seed con ingredientes de ejemplo (aplicados y probados como anon y admin)
 - [x] `packages/shared`: schemas Zod, `pricing.ts` con tests (20 pasan)
-- [ ] `packages/shared`: tipos generados de Supabase (cuando exista el proyecto)
+- [x] `packages/shared`: tipos generados de Supabase (`db.types.ts`)
 - [ ] Deploy de prueba en Vercel (las dos apps) — falta `vercel login`
 
 ## Fase 1 — Menú y armador 2D (3–4 días)
