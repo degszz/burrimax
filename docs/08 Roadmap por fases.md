@@ -12,11 +12,14 @@ tags: [burritos, roadmap]
 - [x] `packages/shared`: tipos generados de Supabase (`db.types.ts`)
 - [ ] Deploy de prueba en Vercel (las dos apps) — falta `vercel login`
 
-## Fase 1 — Menú y armador 2D (3–4 días)
-- [ ] Home con menús, productos y combos desde Supabase
-- [ ] Store Zustand del armador (pasos, límites, precio en vivo)
-- [ ] Armador completo con la **vista 2D** (es el fallback y valida la lógica antes del 3D)
-- [ ] Carrito persistente
+## Fase 1 — Armador en el hero (ver [[superpowers/specs/2026-10-28-armador-hero-design|diseño]])
+- [x] Home = armador, con el catálogo desde Supabase
+- [x] Store Zustand del armador (pasos, límites, precio en vivo)
+- [x] Armador completo con los renders `.avif` de Max: grilla de opciones, escenario con caída, resumen flotante
+- [x] Diálogo doble → simple, resumen final con papas incluidas
+- [x] Carrito persistente y **Mis combos** guardados en el celular
+- [ ] Sección de prehechos y combos del menú (están en la base, falta mostrarlos)
+- [ ] Imágenes reales de cerdo y salsas (hoy SVG provisorios)
 
 ## Fase 2 — Checkout y pedidos (2–3 días)
 - [ ] Formulario de datos con validación
@@ -35,11 +38,10 @@ tags: [burritos, roadmap]
 - [ ] Webhook con firma e idempotencia
 - [ ] Pruebas con usuarios de prueba
 
-## Fase 5 — 3D (4–6 días, en paralelo con assets)
-- [ ] Canvas R3F con tapa + caída de ingredientes
-- [ ] Look toon + contornos
-- [ ] Doble tapa y enrollado final
-- [ ] Detección de rendimiento y cambio automático a 2D
+## Fase 5 — Pulido visual del armador
+> [!note] El 3D real (WebGL) quedó descartado por ahora: el "3D" lo dan los renders de Max. Ver [[09 Decisiones]].
+- [ ] Render del burrito enrollado (simple y doble) para el paso "¡Listo!"
+- [ ] Revisar animaciones con 5 personas reales
 
 ## Fase 6 — Stripe (1–2 días, solo si se decide)
 - [ ] Provider Stripe detrás del interruptor

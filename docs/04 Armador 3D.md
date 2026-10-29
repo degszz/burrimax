@@ -1,46 +1,32 @@
 ---
 tags: [burritos, 3d, diseño]
+actualizado: 2026-10-29
 ---
-# Armador 3D
+# Armador (hero de la home)
+
+> Diseño completo: [[superpowers/specs/2026-10-28-armador-hero-design|Diseño del armador en el hero]] · Decisiones: [[09 Decisiones]]
 
 ## Idea
-El burrito se arma frente al cliente: la tapa abierta en la mesa, y cada ingrediente **cae con un rebote** y se acomoda arriba. Al final, la tapa se enrolla. Estilo **caricatura**: colores saturados, bordes suaves, contornos, sombras simples.
+La home **es** el armador. El burrito se arma frente al cliente: la tortilla en un plato y cada ingrediente **cae con un rebote** en su lugar (salsas en chorrito, carnes al centro, vegetales alrededor). Estilo caricatura cálido. El "3D" lo dan los **renders `.avif` de Max**, no un motor 3D.
 
-## Tecnología
-- **React Three Fiber + drei** dentro de una isla React de Astro (`client:visible`).
-- Modelos **.glb low-poly** (uno por ingrediente), comprimidos con Draco/Meshopt, < 150 KB cada uno, en Supabase Storage.
-- Material **toon** (`MeshToonMaterial`) + contorno (`Outlines` de drei) para el look caricatura.
-- Animaciones con `@react-spring/three` (caída + rebote) o `framer-motion-3d`.
-- Precarga de modelos del paso siguiente mientras el cliente decide.
+## Pantalla (mobile, una columna)
+1. Encabezado: logo, "Abierto ahora", carrito con contador.
+2. Selector de tamaño: **Simple** (2 carnes · 4 verd.) | **Doble tapa** (4 carnes · 6 verd.).
+3. Escenario: plato con la tortilla, contador "Relleno X/N", sello "Papas fritas incluidas".
+4. Barra de pasos (1 Tortilla · 2 Salsas · 3 Carne · 4 Vegetales · 5 ¡Listo!).
+5. Título del paso + "Elegiste X de N" y **grilla de 2 columnas** con tarjetas grandes. Carne con `− n +` por porciones.
+6. Botón fijo abajo "Siguiente · $X" con el motivo si falta algo ("Te falta 1 porción de carne (1/2)").
+7. Al bajar, **resumen flotante** arriba: plato en miniatura, relleno, salsas y precio.
 
-## Cómo se representa cada cosa
-| Elemento | Representación |
-|---|---|
-| Tapa simple | Un disco de masa, color según tipo (beige, marrón integral, verde espinaca, amarillo sin TACC) |
-| Doble tapa | Dos discos superpuestos levemente corridos + burrito final más gordo y largo |
-| Proteína / rellenos | "Montoncitos" sobre la tapa, cada uno en su zona para que no se tapen |
-| Salsas | Chorrito animado encima |
-| Agregados | Ícono brillante ✨ + caída especial |
-| Final | Animación de enrollado + "¡Listo!" con confeti suave |
+## Imágenes
+- `apps/web/public/armador/<slug>.avif` (slug = `ingredientes.slug`). Fondo transparente.
+- Si falta el `.avif`, se usa `<slug>.svg` provisorio; si tampoco, un círculo de color.
+- Faltan: `cerdo`, las 5 salsas y el burrito enrollado.
 
-## Cámara e interacción
-- Cámara fija en ángulo 3/4, el usuario puede girar con el dedo (limitado, sin zoom loco).
-- Tocar un ingrediente en el 3D lo resalta y muestra "Quitar".
+## Accesibilidad
+- `prefers-reduced-motion`: nada cae ni rebota.
+- Botones ≥ 48px, textos ≥ 16px, todo con nombre accesible.
+- Nada se pierde: el armado en curso, el carrito y Mis combos quedan en el celular.
 
-## Fallback 2D (obligatorio)
-Se usa si: no hay WebGL, `prefers-reduced-motion`, equipo lento (FPS < 30 en los primeros 2 s) o el cliente toca "Modo simple".
-- Ilustraciones PNG/WebP por capas, apiladas con CSS y animación de caída suave.
-- Mismos datos y mismo store: solo cambia el componente que dibuja.
-
-## Rendimiento
-- El canvas no carga hasta que el usuario entra al armador.
-- `dpr` limitado a [1, 1.5] en mobile.
-- Objetivo: armador interactivo en < 3 s con 4G.
-
-## Assets a producir
-- [ ] Lista final de ingredientes (ver [[02 Reglas de negocio]])
-- [ ] Un .glb por ingrediente + tapa + burrito enrollado (simple y doble)
-- [ ] Un PNG por ingrediente para el fallback
-- [ ] Paleta de colores y tipografía (ver skill `estilo-3d`)
-
-Opciones para los modelos: Blender a mano, kits low-poly comprados, o generadores 3D por IA y retoque en Blender. → [[10 Preguntas abiertas]]
+## Código
+`apps/web/src/components/Tienda.tsx` (isla raíz) · `components/armador/*` · `lib/armador/reglas.ts` · `stores/{armador,carrito}.ts` · `lib/misCombos.ts`

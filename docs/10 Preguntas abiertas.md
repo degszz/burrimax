@@ -4,12 +4,15 @@ tags: [burritos, pendientes]
 # Preguntas abiertas
 
 ## Negocio
-- [ ] Nombre del emprendimiento, logo y colores
-- [ ] Lista final de tapas, proteínas, rellenos, salsas y agregados
-- [ ] Precios: base simple, base doble, extras
-- [ ] Límites reales por tamaño (¿4 y 6 rellenos está bien?)
-- [ ] ¿La doble tapa puede mezclar dos tipos de masa?
-- [ ] Doble tapa con masa que tiene costo extra (ej. sin TACC): ¿el extra se cobra una vez o dos? (hoy: una vez)
+- [ ] Nombre del emprendimiento, logo y colores (hoy dice `[NOMBRE]`)
+- [x] Ingredientes: tortilla maíz (sin TACC) o trigo · salsas · carne pollo/vaca/cerdo/pescado · vegetales (ver [[02 Reglas de negocio]])
+- [ ] Precios base con papas: simple (hoy $9.000) y doble (hoy $13.500)
+- [ ] ¿Pescado o maíz llevan costo extra? (hoy todos $0)
+- [x] Límites: simple 2 carnes + hasta 4 vegetales; doble 4 carnes + hasta 6 vegetales; hasta 2 salsas
+- [x] La doble tapa usa dos tortillas del mismo tipo
+- [ ] Doble tapa con tortilla que tenga costo extra: ¿se cobra una vez o dos? (hoy: una vez)
+- [ ] Salsas: ¿son estas 5? (guacamole, pico de gallo, crema ácida, picante suave, picante fuerte) — faltan sus imágenes
+- [ ] Imagen de cerdo (`apps/web/public/armador/cerdo.avif`)
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?
 - [ ] Zonas de envío y costos
@@ -21,9 +24,9 @@ tags: [burritos, pendientes]
 - [ ] ¿Stripe se va a usar realmente? ¿Hay o habrá empresa en el exterior?
 - [ ] ¿La transferencia es al alias de MP o a un banco?
 
-## 3D
-- [ ] ¿Quién hace los modelos? (Blender propio / kit comprado / IA + retoque)
-- [ ] Referencias visuales del estilo caricatura que te gustan
+## Imágenes
+- [x] Renders 3D en `.avif` (los hace Max)
+- [ ] Render del burrito enrollado simple y doble + papas (hoy es una ilustración provisoria)
 
 ## Técnico
 - [ ] Dominio

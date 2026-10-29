@@ -5,13 +5,13 @@ tags: [burritos, supabase, datos]
 
 ## Catálogo
 **tamanos**
-`id` · `slug` ('simple' | 'doble') · `nombre` · `cant_tapas` int · `precio_base` int · `max_proteinas` · `max_rellenos` · `max_salsas` · `max_agregados` · `activo` · `orden`
+`id` · `slug` ('simple' | 'doble') · `nombre` · `cant_tapas` int · `precio_base` int (incluye papas) · `min_carnes` · `max_carnes` · `max_salsas` · `max_vegetales` · `activo` · `orden`
 
 **categorias_ingrediente**
-`id` · `slug` ('tapa' | 'proteina' | 'relleno' | 'salsa' | 'agregado') · `nombre` · `paso` int · `obligatoria` bool · `min` int
+`id` · `slug` ('tortilla' | 'salsa' | 'carne' | 'vegetal') · `nombre` · `paso` int · `obligatoria` bool · `min` int · `permite_repetir` bool (solo carne)
 
 **ingredientes**
-`id` · `categoria_id` → categorias_ingrediente · `nombre` · `descripcion` · `precio_extra` int default 0 · `sin_tacc` bool · `vegetariano` bool · `activo` bool · `modelo_3d_url` · `imagen_url` · `color_hex` · `orden`
+`id` · `categoria_id` → categorias_ingrediente · `slug` UNIQUE (nombre de la imagen) · `nombre` · `descripcion` · `precio_extra` int default 0 · `sin_tacc` bool · `vegetariano` bool · `activo` bool · `modelo_3d_url` · `imagen_url` (`/armador/<slug>.avif`) · `color_hex` · `orden`
 
 **menus**
 `id` · `nombre` ('Burritos', 'Combos', 'Bebidas'…) · `orden` · `activo`
@@ -20,7 +20,7 @@ tags: [burritos, supabase, datos]
 `id` · `menu_id` → menus · `tipo` ('burrito' | 'combo' | 'bebida' | 'acompanamiento') · `nombre` · `descripcion` · `precio` int · `imagen_url` · `tamano_id` null · `activo` · `destacado` · `orden`
 
 **producto_ingredientes** — receta de un burrito prehecho (permite "editar en el armador")
-`producto_id` · `ingrediente_id`
+`producto_id` · `ingrediente_id` · `porciones` int default 1
 
 **combo_items**
 `combo_id` → productos · `producto_id` → productos · `cantidad`

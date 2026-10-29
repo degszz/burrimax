@@ -41,5 +41,17 @@ El asesor de Supabase marcó la vista `config_publica` con permisos de su creado
 ### 2026-10-28 · `ver_pedido` pública a propósito
 Es una función con permisos de su creador que el asesor marca como aviso. Es intencional: solo devuelve datos con el id y el token de 36 caracteres hex. Solo la puede llamar `anon` (la tienda).
 
+### 2026-10-29 · El "3D" son renders `.avif`, sin WebGL
+El armador apila los renders 3D de Max (íconos `.avif` livianos) sobre la tortilla. Carga rápido y anda en cualquier celular. Descartado: React Three Fiber (5–10× más pesado, va a saltos en celulares baratos) y modelos `.glb` (no existen). Ver [[superpowers/specs/2026-10-28-armador-hero-design|diseño]].
+
+### 2026-10-29 · Opciones en grilla, no en carrusel
+Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se desliza y cada tarjeta es un botón grande y quieto: mejor para gente mayor. Cuando el escenario sale de la pantalla, una franja arriba muestra el plato en miniatura, "Relleno X/N" y el precio, para que cada toque se vea. Descartado: carrusel con perspectiva (del diseño de Claude Design).
+
+### 2026-10-29 · Mis combos y carrito en el celular, sin cuenta
+`localStorage` con try/catch (máx. 10 combos). Al cargar, todo se valida contra el catálogo actual y se avisa qué ingrediente ya no está. Los precios se recalculan siempre; nunca se guardan.
+
+### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
+La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
+
 ### 2026-10-28 · El `precio_extra` de la tapa se cobra una vez, también en la doble
 Regla de ejemplo hasta que se confirme (ver [[10 Preguntas abiertas]]).

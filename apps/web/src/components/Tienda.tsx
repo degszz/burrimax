@@ -1,11 +1,11 @@
 import { contarRelleno, validarArmado, type Armado, type Catalogo, type TamanoCatalogo } from '@burritos/shared';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BarraPasos } from './armador/BarraPasos';
 import { BarraSiguiente } from './armador/BarraSiguiente';
-import { Carrusel } from './armador/Carrusel';
 import { DialogoCambioTamano } from './armador/DialogoCambioTamano';
 import { Escenario } from './armador/Escenario';
 import { PasoListo } from './armador/PasoListo';
+import { ResumenFlotante } from './armador/ResumenFlotante';
 import { SelectorTamano } from './armador/SelectorTamano';
 import { TarjetaIngrediente } from './armador/TarjetaIngrediente';
 import { Encabezado } from './tienda/Encabezado';
@@ -52,8 +52,21 @@ export default function Tienda({ catalogo, abierto }: Props) {
   const [destino, setDestino] = useState<TamanoCatalogo | null>(null);
   const [combos, setCombos] = useState<misCombos.ComboGuardado[]>([]);
   const [aviso, setAviso] = useState<Aviso | null>(null);
+  const escenario = useRef<HTMLDivElement>(null);
+  const [escenarioALaVista, setEscenarioALaVista] = useState(true);
 
   const primerTamano = catalogo.tamanos[0]!;
+
+  // Si el escenario sale de la pantalla mientras se elige, aparece el resumen flotante.
+  useEffect(() => {
+    const nodo = escenario.current;
+    if (!nodo) return;
+    const observador = new IntersectionObserver(([entrada]) => setEscenarioALaVista(entrada!.isIntersecting), {
+      rootMargin: '-40% 0px 0px 0px',
+    });
+    observador.observe(nodo);
+    return () => observador.disconnect();
+  }, [estado.paso === 5]);
 
   // Recupera lo guardado en el celular y lo pone al día con el menú actual.
   useEffect(() => {
@@ -208,7 +221,9 @@ export default function Tienda({ catalogo, abierto }: Props) {
 
         {paso < 5 ? (
           <>
-            <Escenario armado={armado} catalogo={catalogo} />
+            <div ref={escenario}>
+              <Escenario armado={armado} catalogo={catalogo} />
+            </div>
             <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
             <PasoActual
               paso={paso as PasoDeCategoria}
@@ -247,6 +262,10 @@ export default function Tienda({ catalogo, abierto }: Props) {
           onVolverArriba={subir}
         />
       </main>
+
+      {paso < 5 && (
+        <ResumenFlotante visible={listo && !escenarioALaVista} armado={armado} catalogo={catalogo} onVer={subir} />
+      )}
 
       {paso < 5 && (
         <BarraSiguiente
@@ -329,22 +348,21 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
   const lleno = categoria !== 'tortilla' && elegidos >= maximo;
   const porciones = catalogo.categorias[categoria].permiteRepetir;
 
+  // El subtítulo dice siempre cuánto llevás y cuánto entra.
   const subtitulo =
     paso === 1 ? (
       <>
-        Tocá una para elegirla · <b>elegí 1</b>
+        Tocá la que quieras · <b>elegí 1</b>
       </>
     ) : paso === 3 ? (
       <>
-        Van <b>{tamano.minimos.carne} porciones</b> · podés repetir la misma
+        Llevás <b>{elegidos} de {tamano.minimos.carne} porciones</b> · podés repetir la misma
       </>
     ) : (
       <>
-        Hasta <b>{maximo}</b> · son opcionales
+        Elegiste <b>{elegidos} de {maximo}</b> · son opcionales
       </>
     );
-
-  const pista = lleno ? (porciones ? 'Podés repetir la misma' : 'Sacá uno para cambiarlo') : 'Deslizá para ver más';
 
   return (
     <section aria-labelledby="titulo-paso" className="animate-aparecer" key={paso}>
@@ -354,34 +372,32 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
         </h1>
         {lleno ? (
           <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-verde-claro px-3 py-0.5 font-bold text-verde">
-            ✓ Llegaste al máximo ({elegidos}/{maximo})
+            ✓ Llegaste al máximo ({elegidos}/{maximo}){porciones ? '' : ' · tocá uno para cambiarlo'}
           </p>
         ) : (
           <p className="mt-1 text-lg text-tinta-suave">{subtitulo}</p>
         )}
       </div>
-      <Carrusel
-        items={ingredientes}
-        clave={(i) => i.id}
-        etiqueta={TITULOS[paso]}
-        pista={pista}
-        render={(ingrediente) => {
+      <ul aria-label={TITULOS[paso]} className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 px-4 sm:grid-cols-3">
+        {ingredientes.map((ingrediente) => {
           const cantidad = cuantas(armado, categoria, ingrediente.id);
           return (
-            <TarjetaIngrediente
-              ingrediente={ingrediente}
-              cantidad={cantidad}
-              apagada={lleno && cantidad === 0}
-              porciones={porciones}
-              puedeSumar={puedeAgregar(armado, categoria, catalogo)}
-              prioridad={paso === 1}
-              onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
-              onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
-              onRestar={() => restarPorcion(ingrediente.id)}
-            />
+            <li key={ingrediente.id}>
+              <TarjetaIngrediente
+                ingrediente={ingrediente}
+                cantidad={cantidad}
+                apagada={lleno && cantidad === 0}
+                porciones={porciones}
+                puedeSumar={puedeAgregar(armado, categoria, catalogo)}
+                prioridad={paso === 1}
+                onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
+                onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
+                onRestar={() => restarPorcion(ingrediente.id)}
+              />
+            </li>
           );
-        }}
-      />
+        })}
+      </ul>
     </section>
   );
 }

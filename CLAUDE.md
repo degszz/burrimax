@@ -7,7 +7,7 @@
 @docs/05 Modelo de datos.md
 
 ## Qué es
-Web de pedidos de burritos para un emprendimiento local en Argentina. El centro de la experiencia es el **armador de burritos 3D** (estilo caricatura): el cliente elige tamaño (tapa simple o doble), la tapa/masa, el relleno, salsas y agregados, y lo ve armarse en pantalla. También hay menús, burritos prehechos y combos.
+Web de pedidos de burritos para un emprendimiento local en Argentina. La home **es** el armador de burritos (estilo caricatura, con renders 3D en .avif): el cliente elige tamaño (simple o doble tapa), tortilla, salsas, carne por porciones y vegetales, y lo ve armarse en pantalla. Papas fritas incluidas. Puede guardar sus combos en el celular. También hay menús, burritos prehechos y combos.
 
 Público: cualquier persona desde el celular, incluidas personas mayores o poco técnicas. **Si algo no se entiende en 3 segundos, está mal diseñado.**
 
@@ -17,7 +17,7 @@ Público: cualquier persona desde el celular, incluidas personas mayores o poco 
   - `apps/admin` → panel de administración, app separada en subdominio `admin.`
   - `packages/shared` → tipos, schemas Zod, **lógica de precios** y constantes compartidas
 - **Astro** (SSR con adaptador de Vercel para endpoints y webhooks) + **Tailwind** + **shadcn/ui** (dentro de islas React)
-- **React Three Fiber + drei** para el armador 3D (isla `client:visible`, carga diferida)
+- Armador con **renders .avif** apilados (sin WebGL; ver docs/09 Decisiones) en la isla React `Tienda` (`client:load`)
 - **Zustand** para el estado del armador y del carrito (persistido en localStorage con try/catch)
 - **Supabase**: Postgres, Auth (solo admin), Storage (imágenes y modelos .glb), Realtime (pedidos nuevos en el admin)
 - **Pagos**: Mercado Pago (Checkout Pro) principal · Stripe detrás de feature flag · efectivo · transferencia
@@ -47,7 +47,7 @@ pnpm db:types       # regenera tipos de Supabase en packages/shared
 7. El admin es otra app, otro dominio, con login + MFA y rol `admin` en `app_metadata`. RLS en todas las tablas.
 8. Teléfono obligatorio, **email opcional**. Nunca pedir datos que no se usan.
 9. Mobile first. Botones grandes (mín. 48px), texto claro, un paso a la vez.
-10. Accesibilidad: respetar `prefers-reduced-motion` y tener **fallback 2D** si no hay WebGL o el equipo es lento.
+10. Accesibilidad: respetar `prefers-reduced-motion` (nada cae ni rebota) e imágenes con respaldo (.avif → .svg → círculo de color).
 
 ## Convenciones
 - Código y nombres de tablas/variables en **español** (`pedidos`, `ingredientes`, `tamano`), salvo términos técnicos estándar.
@@ -60,8 +60,8 @@ pnpm db:types       # regenera tipos de Supabase en packages/shared
 ## Skills del proyecto (`.claude/skills/`)
 | Skill | Cuándo usarla |
 |---|---|
-| `armador-burrito` | Todo lo del armador: pasos, límites, estado, 3D |
-| `estilo-3d` | Diseño visual, modelos, animaciones, fallback 2D |
+| `armador-burrito` | Todo lo del armador: pasos, límites, estado, grilla, Mis combos |
+| `estilo-3d` | Diseño visual, renders .avif, animaciones, botones de juguete |
 | `supabase-datos` | Tablas, migraciones, RLS, tipos |
 | `checkout-pedido` | Carrito, formulario de datos, creación del pedido |
 | `pagos-mercadopago` | Checkout Pro, webhook, transferencia |

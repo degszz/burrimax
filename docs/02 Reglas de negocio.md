@@ -5,39 +5,37 @@ tags: [burritos, negocio]
 
 > Todo lo marcado `[A CONFIRMAR]` es un valor de ejemplo. Se guarda en la base (tablas `tamanos`, `categorias_ingrediente`, `config_negocio`), así se cambia desde el admin sin tocar código.
 
-## Tamaños
-| Tamaño | Tapas | Para quién | Precio base | Proteínas | Rellenos | Salsas | Agregados |
-|---|---|---|---|---|---|---|---|
-| **Simple** | 1 | El normal | `[A CONFIRMAR]` | 1 | hasta 4 | hasta 2 | hasta 3 |
-| **Doble tapa** | 2 | Más grande, con más hambre | `[A CONFIRMAR]` | hasta 2 | hasta 6 | hasta 3 | hasta 5 |
+## Tamaños (decidido por Max, 2026-10-28)
+| Tamaño | Tapas | Precio base (con papas) | Carne | Vegetales | Relleno total | Salsas |
+|---|---|---|---|---|---|---|
+| **Simple** | 1 | `[A CONFIRMAR]` $9.000 | **exactamente 2** porciones | hasta 4 | 6 | hasta 2 |
+| **Doble tapa** | 2 | `[A CONFIRMAR]` $13.500 | **exactamente 4** porciones | hasta 6 | 10 | hasta 2 |
 
-- La doble tapa usa **dos tapas del mismo tipo** (no se mezclan). `[A CONFIRMAR]`
+- La doble tapa usa **dos tortillas del mismo tipo**.
+- **No hay opción sin carne.** Se puede repetir la misma carne (ej. pollo ×2).
+- **Papas fritas incluidas siempre**, no se eligen.
 
 ## Pasos del armador (en este orden)
-1. **Tamaño** — simple o doble tapa
-2. **Tapa (masa)** — obligatoria, elegís 1
-3. **Proteína** — obligatoria, mín. 1
-4. **Rellenos** — opcional, hasta el límite del tamaño
-5. **Salsas** — opcional, hasta el límite
-6. **Agregados** — opcional, con costo extra
-7. **Resumen** — nombre opcional del burrito ("El de Juan"), cantidad, agregar al carrito
+0. **Tamaño** — selector siempre visible arriba (simple / doble tapa)
+1. **Tortilla** — obligatoria, elegís 1
+2. **Salsas** — opcional, hasta 2
+3. **Carne** — por porciones, exacta según tamaño
+4. **Vegetales** — opcional, hasta el máximo del tamaño
+5. **¡Listo!** — resumen, nombre opcional ("El de Juan"), cantidad, agregar al pedido o guardar en el celular
 
-## Ingredientes de ejemplo `[A CONFIRMAR]`
-- **Tapas:** harina común · integral · espinaca · sin TACC (celíacos)
-- **Proteínas:** carne picada · pollo · cerdo desmechado · vegetariano (porotos)
-- **Rellenos:** arroz · porotos negros · lechuga · tomate · cebolla · morrón · choclo · queso
+## Ingredientes `[A CONFIRMAR nombres]`
+- **Tortillas:** maíz (sin TACC) · harina de trigo
+- **Carnes:** pollo · vaca · cerdo · pescado
 - **Salsas:** guacamole · pico de gallo · crema ácida · picante suave · picante fuerte
-- **Agregados (con costo):** extra queso · extra carne · panceta · jalapeños · nachos adentro
+- **Vegetales:** lechuga · tomate · cebolla · cebolla morada · cebolla de verdeo · choclo · morrones · repollo · zanahoria · huevo
 
 ## Precio
 ```
-precio_item = tamaño.precio_base
-            + Σ ingrediente.precio_extra   (proteínas premium, tapas especiales)
-            + Σ agregado.precio
+precio_item = tamaño.precio_base           (incluye papas)
+            + Σ precio_extra de cada porción/ingrediente
 total = Σ (precio_item × cantidad) + costo_envio
 ```
-- Rellenos y salsas dentro del límite **no suman** (están incluidos).
-- Algunas tapas/proteínas pueden tener `precio_extra` (ej. sin TACC +$X). `[A CONFIRMAR]`
+- Hoy todos los extras son $0. Si el pescado o el maíz tienen extra, se carga en `precio_extra` y cada porción lo suma. `[A CONFIRMAR]`
 - **Se calcula en el servidor.** El cliente solo muestra una vista previa con la misma función.
 
 ## Celíacos

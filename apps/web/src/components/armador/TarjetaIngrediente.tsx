@@ -27,21 +27,21 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
           <Check className="size-5" strokeWidth={3.5} aria-hidden />
         </span>
       )}
-      <ImagenIngrediente ingrediente={ingrediente} prioridad={prioridad} className="mx-auto w-[54%]" />
-      <span className="mt-1 block font-heading text-xl leading-tight font-extrabold">{ingrediente.nombre}</span>
+      <ImagenIngrediente ingrediente={ingrediente} prioridad={prioridad} className="mx-auto w-[64%]" />
+      <span className="mt-1 block font-heading text-lg leading-tight font-extrabold">{ingrediente.nombre}</span>
       {ingrediente.categoria === 'tortilla' && ingrediente.sinTacc && (
         <span className="mt-1 inline-flex items-center gap-1 rounded-full border-2 border-verde bg-verde-claro px-2 text-sm font-bold text-verde">
           <WheatOff className="size-4" aria-hidden /> Sin TACC
         </span>
       )}
       {!porciones && elegida && ingrediente.categoria !== 'tortilla' && (
-        <span className="mt-0.5 block text-base font-semibold text-verde">Tocá para sacar</span>
+        <span className="mt-0.5 block text-sm font-semibold text-verde">Tocá para sacar</span>
       )}
     </>
   );
 
   const clases = cn(
-    'juguete relative w-full rounded-3xl px-3 pt-4 pb-3 text-center',
+    'juguete relative flex h-full w-full flex-col items-center rounded-3xl px-2 pt-3 pb-3 text-center',
     elegida ? 'border-verde bg-verde-claro' : 'bg-white',
     apagada && 'opacity-45 grayscale',
   );
@@ -62,11 +62,11 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
         aria-disabled={apagada}
         aria-label={`Sumar una porción de ${ingrediente.nombre}`}
         onClick={() => !apagada && onSumar()}
-        className="block w-full"
+        className="block w-full flex-1"
       >
         {contenido}
       </button>
-      <div className="mt-2 flex items-center justify-center gap-3" role="group" aria-label={`Porciones de ${ingrediente.nombre}`}>
+      <div className="mt-2 flex items-center justify-center gap-2" role="group" aria-label={`Porciones de ${ingrediente.nombre}`}>
         <button
           type="button"
           onClick={onRestar}

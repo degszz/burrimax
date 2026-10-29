@@ -1,7 +1,7 @@
 ---
 tags: [burritos, diseño, armador]
-estado: borrador
-actualizado: 2026-10-28
+estado: aprobado
+actualizado: 2026-10-29
 ---
 # Diseño — Armador de burritos en el hero
 
@@ -110,6 +110,9 @@ precio = tamaño.precio_base            (incluye papas fritas)
   - ingredientes activos y de la categoría correcta (como hoy).
 - `pricing.ts` suma el extra por porción.
 - Tests nuevos: simple 2 porciones del mismo pollo, simple con 1 carne = error, doble con 3 carnes = error, doble con 5 = error, 5 vegetales en simple = error, salsa repetida = error.
+
+> [!note] 2026-10-29 · Cambio pedido por Max
+> Las opciones van en **grilla de 2 columnas** en vez de carrusel, y al bajar aparece un **resumen flotante** arriba (plato en miniatura, relleno, salsas y precio). Ver [[09 Decisiones]].
 
 ## Experiencia (pantalla)
 Mobile, una columna, todo en el hero:
