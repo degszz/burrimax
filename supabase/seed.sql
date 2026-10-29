@@ -97,9 +97,11 @@ insert into public.zonas_envio (nombre, costo) values
   ('Centro', 1500),
   ('Barrios cercanos', 2500);
 
-insert into public.config_negocio (abierto, horarios, whatsapp, aviso_celiacos) values (
+-- Mercado Pago prendido: igual solo aparece si el servidor tiene MP_ACCESS_TOKEN.
+insert into public.config_negocio (abierto, horarios, whatsapp, aviso_celiacos, pago_mp_activo) values (
   true,
   '{"lun-dom": "19:30-23:30"}'::jsonb,
   '[A CONFIRMAR]',
-  'Cocinamos en una cocina compartida: puede haber contaminación cruzada con TACC. [A CONFIRMAR texto legal]'
+  'Cocinamos en una cocina compartida: puede haber contaminación cruzada con TACC. [A CONFIRMAR texto legal]',
+  true
 );
