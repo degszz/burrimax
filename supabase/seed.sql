@@ -17,10 +17,19 @@ from (values
   ('tortilla', 'tortilla-maiz', 'Maíz', 0, true, true, '#F2C66B', 1),
   ('tortilla', 'tortilla-trigo', 'Harina de trigo', 0, false, true, '#F4D9A6', 2),
   ('salsa', 'guacamole', 'Guacamole', 0, true, true, '#7BB661', 1),
-  ('salsa', 'pico-de-gallo', 'Pico de gallo', 0, true, true, '#E4572E', 2),
-  ('salsa', 'crema-acida', 'Crema ácida', 0, true, true, '#F5F0E4', 3),
-  ('salsa', 'picante-suave', 'Picante suave', 0, true, true, '#F08A24', 4),
-  ('salsa', 'picante-fuerte', 'Picante fuerte', 0, true, true, '#B8261A', 5),
+  ('salsa', 'salsa-roja-casera', 'Salsa roja casera', 0, true, true, '#B5261E', 2),
+  ('salsa', 'picante-roja', 'Picante roja', 0, true, true, '#C1121F', 3),
+  ('salsa', 'cheddar', 'Queso cheddar', 0, true, true, '#F5A623', 4),
+  ('salsa', 'queso-crema', 'Queso crema', 0, true, true, '#FBF8F0', 5),
+  ('salsa', 'barbacoa', 'Barbacoa', 0, true, true, '#6B2A14', 6),
+  ('salsa', 'alioli', 'Alioli', 0, true, true, '#F3EBD3', 7),
+  ('salsa', 'ranch', 'Ranch', 0, true, true, '#EFEBDD', 8),
+  ('salsa', 'cesar', 'César', 0, true, true, '#EDE3C2', 9),
+  ('salsa', 'golf', 'Salsa golf', 0, true, true, '#F4A38C', 10),
+  ('salsa', 'mil-islas', 'Mil islas', 0, true, true, '#F2A07B', 11),
+  ('salsa', 'mayonesa', 'Mayonesa', 0, true, true, '#F6EFC9', 12),
+  ('salsa', 'ketchup', 'Ketchup', 0, true, true, '#C8102E', 13),
+  ('salsa', 'mostaza', 'Mostaza', 0, true, true, '#F2C200', 14),
   ('carne', 'pollo', 'Pollo', 0, true, false, '#F2B8A6', 1),
   ('carne', 'vaca', 'Vaca', 0, true, false, '#9B2F3A', 2),
   ('carne', 'cerdo', 'Cerdo', 0, true, false, '#D98B6A', 3),
@@ -46,9 +55,9 @@ insert into public.menus (nombre, orden) values
 insert into public.productos (menu_id, tipo, nombre, descripcion, precio, tamano_id, destacado, orden)
 select m.id, 'burrito', p.nombre, p.descripcion, p.precio, t.id, p.destacado, p.orden
 from (values
-  ('Clásico', 'Trigo, vaca ×2, pico de gallo, lechuga, tomate y cebolla', 9000, 'simple', true, 1),
+  ('Clásico', 'Trigo, vaca ×2, salsa roja casera, lechuga, tomate y cebolla', 9000, 'simple', true, 1),
   ('Pollo y choclo', 'Maíz sin TACC, pollo ×2, guacamole, choclo, lechuga y morrones', 9000, 'simple', false, 2),
-  ('El Doble', 'Doble tapa de trigo, vaca ×2, pollo ×2, picante fuerte y 6 vegetales', 13500, 'doble', true, 3)
+  ('El Doble', 'Doble tapa de trigo, vaca ×2, pollo ×2, picante roja y 6 vegetales', 13500, 'doble', true, 3)
 ) as p (nombre, descripcion, precio, tamano, destacado, orden)
 join public.menus m on m.nombre = 'Burritos'
 join public.tamanos t on t.slug = p.tamano;
@@ -65,12 +74,12 @@ from public.menus m where m.nombre = 'Combos';
 insert into public.producto_ingredientes (producto_id, ingrediente_id, porciones)
 select p.id, i.id, r.porciones
 from (values
-  ('Clásico', 'tortilla-trigo', 1), ('Clásico', 'vaca', 2), ('Clásico', 'pico-de-gallo', 1),
+  ('Clásico', 'tortilla-trigo', 1), ('Clásico', 'vaca', 2), ('Clásico', 'salsa-roja-casera', 1),
   ('Clásico', 'lechuga', 1), ('Clásico', 'tomate', 1), ('Clásico', 'cebolla', 1),
   ('Pollo y choclo', 'tortilla-maiz', 1), ('Pollo y choclo', 'pollo', 2), ('Pollo y choclo', 'guacamole', 1),
   ('Pollo y choclo', 'choclo', 1), ('Pollo y choclo', 'lechuga', 1), ('Pollo y choclo', 'morron', 1),
   ('El Doble', 'tortilla-trigo', 1), ('El Doble', 'vaca', 2), ('El Doble', 'pollo', 2),
-  ('El Doble', 'picante-fuerte', 1), ('El Doble', 'lechuga', 1), ('El Doble', 'tomate', 1),
+  ('El Doble', 'picante-roja', 1), ('El Doble', 'lechuga', 1), ('El Doble', 'tomate', 1),
   ('El Doble', 'cebolla-morada', 1), ('El Doble', 'choclo', 1), ('El Doble', 'zanahoria', 1),
   ('El Doble', 'repollo', 1)
 ) as r (producto, ingrediente, porciones)

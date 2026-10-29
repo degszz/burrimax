@@ -17,7 +17,7 @@ Referencia: video de midudev [Crea una Landing ESPECTACULAR con Claude Code](htt
 |---|---|---|---|---|
 | 1 | **Paseo con scroll** "Así hacemos tu burrito" | Página propia `/como-lo-hacemos` + link desde la home | Mostrar el proceso real y dar confianza; termina en "Armá el tuyo" | US$10–15 (clips + pruebas) |
 | 2 | **"Ver en mi mesa" (AR)** | Botón en el paso "¡Listo!" | Burrito cerrado en plato, sobre la mesa real, con la cámara | Gratis/bajo (modelo con IA de imagen a 3D) |
-| 3 | **Renders faltantes** | `apps/web/public/armador/` | Cerdo, 5 salsas, burrito enrollado simple y doble, con el mismo estilo | Créditos de Higgsfield |
+| 3 | **Renders faltantes** | `apps/web/public/armador/` | Cerdo y burrito enrollado simple y doble, con el mismo estilo | Créditos de Higgsfield |
 
 ## 1 · Paseo con scroll (método midudev)
 Cómo funciona: **7 fotos reales en orden → 6 clips** (la foto N es el primer cuadro y la N+1 el último) → el scroll adelanta o atrasa el video (no se reproduce solo).
@@ -51,7 +51,7 @@ Pasos:
 
 ## 3 · Renders faltantes con Higgsfield
 - [ ] Cerdo (`cerdo.avif`)
-- [ ] Salsas: `guacamole`, `pico-de-gallo`, `crema-acida`, `picante-suave`, `picante-fuerte`
+- [x] Salsas: las 14 ya las puso Max (2026-10-29). Opcional: versión 512×512
 - [ ] Burrito enrollado simple y doble + papas (reemplaza la ilustración de `BurritoEnrollado.tsx`)
 - Formato: `.avif`, fondo transparente, cuadrado (íconos 512×512), < 40 KB, estilo igual a los que ya hizo Max. Se copian con el nombre del `slug` y listo, sin tocar código.
 

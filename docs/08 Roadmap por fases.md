@@ -19,7 +19,8 @@ tags: [burritos, roadmap]
 - [x] Diálogo doble → simple, resumen final con papas incluidas
 - [x] Carrito persistente y **Mis combos** guardados en el celular
 - [ ] Sección de prehechos y combos del menú (están en la base, falta mostrarlos)
-- [ ] Imágenes reales de cerdo y salsas (hoy SVG provisorios)
+- [x] Imágenes de las 14 salsas
+- [ ] Imagen real de cerdo (hoy SVG provisorio)
 
 ## Fase 2 — Checkout y pedidos (2–3 días)
 - [ ] Formulario de datos con validación
@@ -55,4 +56,4 @@ tags: [burritos, roadmap]
 ## Fase 8 — Contenido visual con IA (secundaria) → [[Planes/Fase 8 - Contenido visual con IA|plan]]
 - [ ] Paseo con scroll "Así hacemos tu burrito" en `/como-lo-hacemos` (fotos reales + clips de Higgsfield)
 - [ ] "Ver en mi mesa": burrito cerrado en plato con realidad aumentada
-- [ ] Renders faltantes con Higgsfield: cerdo, salsas, burrito enrollado
+- [ ] Renders faltantes con Higgsfield: cerdo, burrito enrollado

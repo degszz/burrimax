@@ -11,7 +11,8 @@ tags: [burritos, pendientes]
 - [x] Límites: simple 2 carnes + hasta 4 vegetales; doble 4 carnes + hasta 6 vegetales; hasta 2 salsas
 - [x] La doble tapa usa dos tortillas del mismo tipo
 - [ ] Doble tapa con tortilla que tenga costo extra: ¿se cobra una vez o dos? (hoy: una vez)
-- [ ] Salsas: ¿son estas 5? (guacamole, pico de gallo, crema ácida, picante suave, picante fuerte) — faltan sus imágenes
+- [x] Salsas: las 14 de las imágenes de Max (2026-10-29)
+- [ ] Imágenes de salsas en más resolución: hoy son de ~146 px; para pantallas de alta densidad conviene 512×512
 - [ ] Imagen de cerdo (`apps/web/public/armador/cerdo.avif`)
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?

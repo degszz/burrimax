@@ -21,7 +21,7 @@ La home **es** el armador. El burrito se arma frente al cliente: la tortilla en 
 ## Imágenes
 - `apps/web/public/armador/<slug>.avif` (slug = `ingredientes.slug`). Fondo transparente.
 - Si falta el `.avif`, se usa `<slug>.svg` provisorio; si tampoco, un círculo de color.
-- Faltan: `cerdo`, las 5 salsas y el burrito enrollado.
+- Faltan: `cerdo` y el burrito enrollado. Salsas: las 14 en `.avif` (en baja resolución, ~146 px).
 
 ## Accesibilidad
 - `prefers-reduced-motion`: nada cae ni rebota.
