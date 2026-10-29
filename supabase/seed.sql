@@ -1,47 +1,41 @@
--- Datos de ejemplo de docs/02 Reglas de negocio.md.
--- TODOS los precios, nombres y zonas son [A CONFIRMAR].
+-- Catálogo de ejemplo del armador (tortilla → salsas → carne → vegetales).
+-- Precios y nombres [A CONFIRMAR]. Las imágenes viven en apps/web/public/armador/.
 
-insert into public.tamanos (slug, nombre, cant_tapas, precio_base, max_proteinas, max_rellenos, max_salsas, max_agregados, orden) values
-  ('simple', 'Simple', 1, 6000, 1, 4, 2, 3, 1),
-  ('doble', 'Doble tapa', 2, 9000, 2, 6, 3, 5, 2);
+insert into public.tamanos (slug, nombre, cant_tapas, precio_base, min_carnes, max_carnes, max_salsas, max_vegetales, orden) values
+  ('simple', 'Simple', 1, 9000, 2, 2, 2, 4, 1),
+  ('doble', 'Doble tapa', 2, 13500, 4, 4, 2, 6, 2);
 
-insert into public.categorias_ingrediente (slug, nombre, paso, obligatoria, min) values
-  ('tapa', 'Tapa', 2, true, 1),
-  ('proteina', 'Proteína', 3, true, 1),
-  ('relleno', 'Rellenos', 4, false, 0),
-  ('salsa', 'Salsas', 5, false, 0),
-  ('agregado', 'Agregados', 6, false, 0);
+insert into public.categorias_ingrediente (slug, nombre, paso, obligatoria, min, permite_repetir) values
+  ('tortilla', 'Tortilla', 1, true, 1, false),
+  ('salsa', 'Salsas', 2, false, 0, false),
+  ('carne', 'Carne', 3, true, 1, true),
+  ('vegetal', 'Vegetales', 4, false, 0, false);
 
-insert into public.ingredientes (categoria_id, nombre, precio_extra, sin_tacc, vegetariano, color_hex, orden)
-select c.id, i.nombre, i.precio_extra, i.sin_tacc, i.vegetariano, i.color_hex, i.orden
+insert into public.ingredientes (categoria_id, slug, nombre, precio_extra, sin_tacc, vegetariano, color_hex, imagen_url, orden)
+select c.id, i.slug, i.nombre, i.precio_extra, i.sin_tacc, i.vegetariano, i.color_hex, '/armador/' || i.slug || '.avif', i.orden
 from (values
-  ('tapa', 'Harina común', 0, false, true, '#F2D9A0', 1),
-  ('tapa', 'Integral', 0, false, true, '#C89B5E', 2),
-  ('tapa', 'Espinaca', 0, false, true, '#7FA650', 3),
-  ('tapa', 'Sin TACC', 800, true, true, '#EFE2B8', 4),
-  ('proteina', 'Carne picada', 0, true, false, '#8B4A2B', 1),
-  ('proteina', 'Pollo', 0, true, false, '#E0B070', 2),
-  ('proteina', 'Cerdo desmechado', 500, true, false, '#B5653A', 3),
-  ('proteina', 'Vegetariano (porotos)', 0, true, true, '#5A3A2E', 4),
-  ('relleno', 'Arroz', 0, true, true, '#F7F3E8', 1),
-  ('relleno', 'Porotos negros', 0, true, true, '#2E2420', 2),
-  ('relleno', 'Lechuga', 0, true, true, '#8CC152', 3),
-  ('relleno', 'Tomate', 0, true, true, '#E8463A', 4),
-  ('relleno', 'Cebolla', 0, true, true, '#E9D7E8', 5),
-  ('relleno', 'Morrón', 0, true, true, '#D93B30', 6),
-  ('relleno', 'Choclo', 0, true, true, '#F5C842', 7),
-  ('relleno', 'Queso', 0, true, true, '#F8D35E', 8),
-  ('salsa', 'Guacamole', 0, true, true, '#7BAF3E', 1),
-  ('salsa', 'Pico de gallo', 0, true, true, '#D9503E', 2),
-  ('salsa', 'Crema ácida', 0, true, true, '#F5F2EA', 3),
-  ('salsa', 'Picante suave', 0, true, true, '#E07B2A', 4),
-  ('salsa', 'Picante fuerte', 0, true, true, '#B8261A', 5),
-  ('agregado', 'Extra queso', 700, true, true, '#F8D35E', 1),
-  ('agregado', 'Extra carne', 1500, true, false, '#8B4A2B', 2),
-  ('agregado', 'Panceta', 1000, true, false, '#C9705A', 3),
-  ('agregado', 'Jalapeños', 500, true, true, '#4F8A2B', 4),
-  ('agregado', 'Nachos adentro', 600, false, true, '#E8B44A', 5)
-) as i (categoria, nombre, precio_extra, sin_tacc, vegetariano, color_hex, orden)
+  ('tortilla', 'tortilla-maiz', 'Maíz', 0, true, true, '#F2C66B', 1),
+  ('tortilla', 'tortilla-trigo', 'Harina de trigo', 0, false, true, '#F4D9A6', 2),
+  ('salsa', 'guacamole', 'Guacamole', 0, true, true, '#7BB661', 1),
+  ('salsa', 'pico-de-gallo', 'Pico de gallo', 0, true, true, '#E4572E', 2),
+  ('salsa', 'crema-acida', 'Crema ácida', 0, true, true, '#F5F0E4', 3),
+  ('salsa', 'picante-suave', 'Picante suave', 0, true, true, '#F08A24', 4),
+  ('salsa', 'picante-fuerte', 'Picante fuerte', 0, true, true, '#B8261A', 5),
+  ('carne', 'pollo', 'Pollo', 0, true, false, '#F2B8A6', 1),
+  ('carne', 'vaca', 'Vaca', 0, true, false, '#9B2F3A', 2),
+  ('carne', 'cerdo', 'Cerdo', 0, true, false, '#D98B6A', 3),
+  ('carne', 'pescado', 'Pescado', 0, true, false, '#F07B4A', 4),
+  ('vegetal', 'lechuga', 'Lechuga', 0, true, true, '#8CC152', 1),
+  ('vegetal', 'tomate', 'Tomate', 0, true, true, '#E8463A', 2),
+  ('vegetal', 'cebolla', 'Cebolla', 0, true, true, '#F2EDE4', 3),
+  ('vegetal', 'cebolla-morada', 'Cebolla morada', 0, true, true, '#8E3B78', 4),
+  ('vegetal', 'cebolla-verdeo', 'Cebolla de verdeo', 0, true, true, '#5FA83A', 5),
+  ('vegetal', 'choclo', 'Choclo', 0, true, true, '#F5C842', 6),
+  ('vegetal', 'morron', 'Morrones', 0, true, true, '#D93B30', 7),
+  ('vegetal', 'repollo', 'Repollo', 0, true, true, '#C7C9C0', 8),
+  ('vegetal', 'zanahoria', 'Zanahoria', 0, true, true, '#F28C28', 9),
+  ('vegetal', 'huevo', 'Huevo', 0, true, true, '#F6E7B0', 10)
+) as i (categoria, slug, nombre, precio_extra, sin_tacc, vegetariano, color_hex, orden)
 join public.categorias_ingrediente c on c.slug = i.categoria;
 
 insert into public.menus (nombre, orden) values
@@ -49,55 +43,43 @@ insert into public.menus (nombre, orden) values
   ('Combos', 2),
   ('Bebidas', 3);
 
--- Prehechos: el precio es el del armado equivalente.
 insert into public.productos (menu_id, tipo, nombre, descripcion, precio, tamano_id, destacado, orden)
 select m.id, 'burrito', p.nombre, p.descripcion, p.precio, t.id, p.destacado, p.orden
 from (values
-  ('Clásico', 'Harina, carne, arroz, porotos, queso y pico de gallo', 6000, 'simple', true, 1),
-  ('Pollo crocante', 'Harina, pollo, lechuga, tomate, choclo y crema ácida', 6000, 'simple', false, 2),
-  ('El Hambre', 'Doble tapa, carne y cerdo, arroz, porotos, queso, guacamole y panceta', 10500, 'doble', true, 3)
+  ('Clásico', 'Trigo, vaca ×2, pico de gallo, lechuga, tomate y cebolla', 9000, 'simple', true, 1),
+  ('Pollo y choclo', 'Maíz sin TACC, pollo ×2, guacamole, choclo, lechuga y morrones', 9000, 'simple', false, 2),
+  ('El Doble', 'Doble tapa de trigo, vaca ×2, pollo ×2, picante fuerte y 6 vegetales', 13500, 'doble', true, 3)
 ) as p (nombre, descripcion, precio, tamano, destacado, orden)
 join public.menus m on m.nombre = 'Burritos'
 join public.tamanos t on t.slug = p.tamano;
 
 insert into public.productos (menu_id, tipo, nombre, precio, orden)
-select m.id, p.tipo::public.tipo_producto, p.nombre, p.precio, p.orden
-from (values
-  ('Bebidas', 'bebida', 'Gaseosa 500 ml', 2000, 1),
-  ('Bebidas', 'bebida', 'Agua 500 ml', 1500, 2),
-  ('Combos', 'acompanamiento', 'Nachos con cheddar', 3500, 9)
-) as p (menu, tipo, nombre, precio, orden)
-join public.menus m on m.nombre = p.menu;
+select m.id, 'bebida', p.nombre, p.precio, p.orden
+from (values ('Gaseosa 500 ml', 2000, 1), ('Agua 500 ml', 1500, 2)) as p (nombre, precio, orden)
+join public.menus m on m.nombre = 'Bebidas';
 
 insert into public.productos (menu_id, tipo, nombre, descripcion, precio, destacado, orden)
-select m.id, 'combo', c.nombre, c.descripcion, c.precio, c.destacado, c.orden
-from (values
-  ('Combo Clásico', 'Burrito Clásico + gaseosa', 7500, true, 1),
-  ('Combo Hambre', 'El Hambre + nachos con cheddar + gaseosa', 14500, false, 2)
-) as c (nombre, descripcion, precio, destacado, orden)
-join public.menus m on m.nombre = 'Combos';
+select m.id, 'combo', 'Combo Clásico', 'Burrito Clásico (con papas) + gaseosa', 10500, true, 1
+from public.menus m where m.nombre = 'Combos';
 
--- Recetas de los prehechos.
-insert into public.producto_ingredientes (producto_id, ingrediente_id)
-select p.id, i.id
+insert into public.producto_ingredientes (producto_id, ingrediente_id, porciones)
+select p.id, i.id, r.porciones
 from (values
-  ('Clásico', 'Harina común'), ('Clásico', 'Carne picada'), ('Clásico', 'Arroz'),
-  ('Clásico', 'Porotos negros'), ('Clásico', 'Queso'), ('Clásico', 'Pico de gallo'),
-  ('Pollo crocante', 'Harina común'), ('Pollo crocante', 'Pollo'), ('Pollo crocante', 'Lechuga'),
-  ('Pollo crocante', 'Tomate'), ('Pollo crocante', 'Choclo'), ('Pollo crocante', 'Crema ácida'),
-  ('El Hambre', 'Harina común'), ('El Hambre', 'Carne picada'), ('El Hambre', 'Cerdo desmechado'),
-  ('El Hambre', 'Arroz'), ('El Hambre', 'Porotos negros'), ('El Hambre', 'Queso'),
-  ('El Hambre', 'Guacamole'), ('El Hambre', 'Panceta')
-) as r (producto, ingrediente)
+  ('Clásico', 'tortilla-trigo', 1), ('Clásico', 'vaca', 2), ('Clásico', 'pico-de-gallo', 1),
+  ('Clásico', 'lechuga', 1), ('Clásico', 'tomate', 1), ('Clásico', 'cebolla', 1),
+  ('Pollo y choclo', 'tortilla-maiz', 1), ('Pollo y choclo', 'pollo', 2), ('Pollo y choclo', 'guacamole', 1),
+  ('Pollo y choclo', 'choclo', 1), ('Pollo y choclo', 'lechuga', 1), ('Pollo y choclo', 'morron', 1),
+  ('El Doble', 'tortilla-trigo', 1), ('El Doble', 'vaca', 2), ('El Doble', 'pollo', 2),
+  ('El Doble', 'picante-fuerte', 1), ('El Doble', 'lechuga', 1), ('El Doble', 'tomate', 1),
+  ('El Doble', 'cebolla-morada', 1), ('El Doble', 'choclo', 1), ('El Doble', 'zanahoria', 1),
+  ('El Doble', 'repollo', 1)
+) as r (producto, ingrediente, porciones)
 join public.productos p on p.nombre = r.producto
-join public.ingredientes i on i.nombre = r.ingrediente;
+join public.ingredientes i on i.slug = r.ingrediente;
 
 insert into public.combo_items (combo_id, producto_id, cantidad)
-select c.id, p.id, r.cantidad
-from (values
-  ('Combo Clásico', 'Clásico', 1), ('Combo Clásico', 'Gaseosa 500 ml', 1),
-  ('Combo Hambre', 'El Hambre', 1), ('Combo Hambre', 'Nachos con cheddar', 1), ('Combo Hambre', 'Gaseosa 500 ml', 1)
-) as r (combo, producto, cantidad)
+select c.id, p.id, 1
+from (values ('Combo Clásico', 'Clásico'), ('Combo Clásico', 'Gaseosa 500 ml')) as r (combo, producto)
 join public.productos c on c.nombre = r.combo
 join public.productos p on p.nombre = r.producto;
 
