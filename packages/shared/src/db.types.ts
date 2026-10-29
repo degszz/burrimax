@@ -276,6 +276,7 @@ export type Database = {
           ingrediente_id: string
           item_id: string
           nombre: string
+          porciones: number
           precio: number
         }
         Insert: {
@@ -283,6 +284,7 @@ export type Database = {
           ingrediente_id: string
           item_id: string
           nombre: string
+          porciones?: number
           precio: number
         }
         Update: {
@@ -290,6 +292,7 @@ export type Database = {
           ingrediente_id?: string
           item_id?: string
           nombre?: string
+          porciones?: number
           precio?: number
         }
         Relationships: [
@@ -646,6 +649,7 @@ export type Database = {
       }
     }
     Functions: {
+      crear_pedido: { Args: { p: Json }; Returns: Json }
       es_admin: { Args: never; Returns: boolean }
       ver_pedido: { Args: { p_id: string; p_token: string }; Returns: Json }
     }

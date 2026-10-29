@@ -1,0 +1,209 @@
+---
+import { Check, CircleAlert, Copy, MessageCircle } from 'lucide-react';
+import Base from '@/layouts/Base.astro';
+import { cargarDatosTienda, cliente } from '@/lib/catalogo.server';
+import { formatoPesos } from '@/lib/formato';
+
+// Seguimiento privado: /pedido/<id>?t=<token>. Sin token válido no se ve nada.
+
+interface Seguimiento {
+  numero: number;
+  estado: string;
+  estado_pago: string;
+  metodo_pago: string;
+  tipo_entrega: 'delivery' | 'retiro';
+  subtotal: number;
+  costo_envio: number;
+  total: number;
+  paga_con: number | null;
+  items: { nombre: string; cantidad: number; precio_unitario: number }[];
+}
+
+const { id } = Astro.params;
+const token = Astro.url.searchParams.get('t') ?? '';
+const nuevo = Astro.url.searchParams.get('nuevo') === '1';
+
+let pedido: Seguimiento | null = null;
+const uuid = /^[0-9a-f-]{36}$/i;
+if (id && uuid.test(id) && token) {
+  const { data } = await cliente().rpc('ver_pedido', { p_id: id, p_token: token });
+  pedido = (data as Seguimiento | null) ?? null;
+}
+const config = pedido ? (await cargarDatosTienda().catch(() => null))?.config : null;
+if (!pedido) Astro.response.status = 404;
+
+const PASOS =
+  pedido?.tipo_entrega === 'retiro'
+    ? [
+        ['confirmado', 'Recibimos tu pedido'],
+        ['en_preparacion', 'Lo estamos preparando'],
+        ['listo', 'Listo para retirar'],
+        ['entregado', 'Entregado'],
+      ]
+    : [
+        ['confirmado', 'Recibimos tu pedido'],
+        ['en_preparacion', 'Lo estamos preparando'],
+        ['en_camino', 'En camino'],
+        ['entregado', 'Entregado'],
+      ];
+const ORDEN = ['pendiente_pago', 'confirmado', 'en_preparacion', 'listo', 'en_camino', 'entregado'];
+const actual = pedido ? ORDEN.indexOf(pedido.estado) : -1;
+const cancelado = pedido?.estado === 'cancelado';
+const esperandoPago = pedido?.estado === 'pendiente_pago';
+const terminado = cancelado || pedido?.estado === 'entregado';
+
+const transferencia = pedido?.metodo_pago === 'transferencia' && pedido.estado_pago === 'pendiente' ? config?.transferencia : null;
+const whatsapp = config?.whatsapp;
+const mensajeWhatsapp = pedido
+  ? encodeURIComponent(`¡Hola! Te paso el comprobante del pedido #${pedido.numero} por ${formatoPesos(pedido.total)}.`)
+  : '';
+---
+
+<Base titulo={pedido ? `Pedido #${pedido.numero}` : 'Pedido no encontrado'}>
+  <meta slot="head" name="robots" content="noindex" />
+  {
+    !pedido ? (
+      <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
+        <div>
+          <h1 class="text-3xl font-extrabold">No encontramos ese pedido</h1>
+          <p class="mt-2 text-lg text-tinta-suave">Revisá que el link esté completo.</p>
+          <a href="/" class="juguete mt-6 inline-flex min-h-14 items-center rounded-2xl bg-rojo px-6 font-heading text-xl font-extrabold text-white">
+            Ir al inicio
+          </a>
+        </div>
+      </main>
+    ) : (
+      <main class="mx-auto max-w-md px-4 pt-6 pb-10">
+        {nuevo && <p class="mb-2 font-heading text-2xl font-extrabold text-verde">¡Gracias! Recibimos tu pedido 🌯</p>}
+        <p class="text-lg text-tinta-suave">Tu pedido</p>
+        <h1 class="font-heading text-6xl font-extrabold">#{String(pedido.numero).padStart(4, '0')}</h1>
+
+        {cancelado && (
+          <p class="mt-4 flex items-center gap-2 rounded-2xl border-2 border-rojo bg-rojo/10 p-3 font-bold text-rojo">
+            <CircleAlert aria-hidden className="size-5" /> Este pedido fue cancelado.
+          </p>
+        )}
+
+        {esperandoPago && pedido.metodo_pago === 'mercadopago' && (
+          <p class="juguete mt-4 rounded-2xl bg-amarillo p-3 font-bold">
+            {pedido.estado_pago === 'rechazado'
+              ? 'Mercado Pago no aprobó el pago. Escribinos y lo resolvemos.'
+              : 'Estamos esperando la confirmación de Mercado Pago. Se actualiza solo.'}
+          </p>
+        )}
+
+        {transferencia && (
+          <section aria-labelledby="titulo-transferencia" class="juguete mt-4 rounded-3xl bg-white p-4">
+            <h2 id="titulo-transferencia" class="text-2xl font-extrabold">
+              Transferí {formatoPesos(pedido.total)}
+            </h2>
+            <dl class="mt-2 space-y-2">
+              {[
+                ['Alias', transferencia.alias],
+                ['CVU', transferencia.cvu],
+                ['Titular', transferencia.titular],
+              ]
+                .filter(([, valor]) => valor)
+                .map(([etiqueta, valor]) => (
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <dt class="text-sm text-tinta-suave">{etiqueta}</dt>
+                      <dd class="font-heading text-xl font-extrabold break-all">{valor}</dd>
+                    </div>
+                    {etiqueta !== 'Titular' && (
+                      <button type="button" data-copiar={valor} class="juguete flex min-h-12 shrink-0 items-center gap-1 rounded-xl bg-white px-3 font-bold">
+                        <Copy aria-hidden className="size-4" /> <span>Copiar</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+            </dl>
+            {!transferencia.alias && !transferencia.cvu && (
+              <p class="mt-2 text-tinta-suave">Te pasamos el alias por WhatsApp.</p>
+            )}
+            {whatsapp && (
+              <a
+                href={`https://wa.me/${whatsapp}?text=${mensajeWhatsapp}`}
+                class="juguete mt-4 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-verde font-heading text-lg font-extrabold text-white"
+              >
+                <MessageCircle aria-hidden className="size-5" /> Enviar comprobante por WhatsApp
+              </a>
+            )}
+          </section>
+        )}
+
+        {!cancelado && (
+          <ol class="mt-6 space-y-3" aria-label="Estado del pedido">
+            {PASOS.map(([estado, texto]) => {
+              const hecho = ORDEN.indexOf(estado) <= actual;
+              const esActual = estado === pedido!.estado;
+              return (
+                <li class:list={['flex items-center gap-3', !hecho && 'text-tinta-suave']} aria-current={esActual ? 'step' : undefined}>
+                  <span
+                    class:list={[
+                      'grid size-10 place-items-center rounded-full border-2',
+                      hecho ? 'border-verde bg-verde text-white' : 'border-tinta/30 bg-white',
+                    ]}
+                  >
+                    {hecho && <Check aria-hidden className="size-5" strokeWidth={3} />}
+                  </span>
+                  <span class:list={['text-lg', esActual ? 'font-heading text-xl font-extrabold' : 'font-semibold']}>{texto}</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+
+        <section aria-label="Detalle" class="juguete mt-6 rounded-3xl bg-white p-4">
+          <ul class="space-y-1">
+            {pedido.items.map((item) => (
+              <li class="flex justify-between gap-2">
+                <span>{item.cantidad} × {item.nombre}</span>
+                <span class="whitespace-nowrap">{formatoPesos(item.precio_unitario * item.cantidad)}</span>
+              </li>
+            ))}
+            {pedido.costo_envio > 0 && (
+              <li class="flex justify-between"><span>Envío</span><span>{formatoPesos(pedido.costo_envio)}</span></li>
+            )}
+          </ul>
+          <p class="mt-2 flex items-end justify-between border-t-2 border-dashed border-tinta/30 pt-2">
+            <span class="font-bold">Total</span>
+            <span class="font-heading text-3xl font-extrabold">{formatoPesos(pedido.total)}</span>
+          </p>
+          {pedido.metodo_pago === 'efectivo' && pedido.paga_con && (
+            <p class="text-tinta-suave">Pagás con {formatoPesos(pedido.paga_con)} · vuelto {formatoPesos(pedido.paga_con - pedido.total)}</p>
+          )}
+          <p class="mt-1 text-tinta-suave">🍟 Cada burrito viene con papas fritas</p>
+        </section>
+
+        {whatsapp && !transferencia && (
+          <a href={`https://wa.me/${whatsapp}`} class="juguete mt-4 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-white font-heading text-lg font-extrabold">
+            <MessageCircle aria-hidden className="size-5" /> Escribinos por WhatsApp
+          </a>
+        )}
+        <a href="/" class="mt-4 flex min-h-12 items-center justify-center font-bold text-tinta-suave underline underline-offset-4">Volver al inicio</a>
+        <p class="mt-2 text-center text-sm text-tinta-suave">Guardá este link para ver cómo va tu pedido.</p>
+      </main>
+    )
+  }
+
+  <script is:inline define:vars={{ nuevo, terminado: !!terminado || !pedido }}>
+    // Pedido recién hecho: vaciar el carrito de este celular.
+    if (nuevo) {
+      try {
+        localStorage.removeItem('burritos:carrito:v1');
+      } catch {}
+    }
+    // Copiar alias/CVU
+    document.querySelectorAll('[data-copiar]').forEach((boton) => {
+      boton.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(boton.getAttribute('data-copiar'));
+          boton.querySelector('span').textContent = '¡Copiado!';
+        } catch {}
+      });
+    });
+    // Se actualiza solo mientras el pedido está en curso.
+    if (!terminado) setTimeout(() => location.reload(), 20000);
+  </script>
+</Base>

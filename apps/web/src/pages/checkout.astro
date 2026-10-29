@@ -1,0 +1,33 @@
+---
+import Checkout from '@/components/Checkout';
+import Base from '@/layouts/Base.astro';
+import { cargarDatosTienda, type DatosTienda } from '@/lib/catalogo.server';
+import { mercadoPagoConfigurado } from '@/lib/pagos/mercadopago';
+
+let datos: DatosTienda | null = null;
+try {
+  datos = await cargarDatosTienda();
+} catch (error) {
+  console.error(error);
+  Astro.response.status = 503;
+}
+// Mercado Pago aparece solo si está prendido en el admin Y hay credenciales en el servidor.
+const pagos = datos ? { ...datos.config.pagos, mercadopago: datos.config.pagos.mercadopago && mercadoPagoConfigurado() } : null;
+---
+
+<Base titulo="Tu pedido · [NOMBRE A CONFIRMAR]">
+  {
+    datos && pagos ? (
+      <Checkout client:load catalogo={datos.catalogo} pagos={pagos} abierto={datos.abierto} />
+    ) : (
+      <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
+        <div>
+          <h1 class="text-3xl font-extrabold">No pudimos cargar el menú</h1>
+          <a href="/checkout" class="juguete mt-6 inline-flex min-h-14 items-center rounded-2xl bg-rojo px-6 font-heading text-xl font-extrabold text-white">
+            Probar de nuevo
+          </a>
+        </div>
+      </main>
+    )
+  }
+</Base>

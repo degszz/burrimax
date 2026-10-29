@@ -13,13 +13,25 @@ export interface ComboCasa {
   armado: Armado;
 }
 
+export interface ConfigTienda {
+  abierto: boolean;
+  /** Medios de pago prendidos desde el admin. */
+  pagos: { mercadopago: boolean; transferencia: boolean; efectivo: boolean };
+  transferencia: { alias: string | null; cvu: string | null; titular: string | null };
+  /** Solo dígitos, o null si todavía no está cargado. */
+  whatsapp: string | null;
+  avisoCeliacos: string | null;
+}
+
 export interface DatosTienda {
   catalogo: Catalogo;
   combosCasa: ComboCasa[];
   abierto: boolean;
+  config: ConfigTienda;
 }
 
-function cliente() {
+/** Cliente con la clave pública (respeta RLS). */
+export function cliente() {
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const clave = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !clave) throw new Error('Faltan PUBLIC_SUPABASE_URL o PUBLIC_SUPABASE_PUBLISHABLE_KEY');
@@ -40,7 +52,7 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       .order('orden'),
     db.from('productos').select('id, nombre, precio, activo').eq('activo', true),
     db.from('zonas_envio').select('id, nombre, costo, activo').eq('activo', true),
-    db.from('config_publica').select('abierto').maybeSingle(),
+    db.from('config_publica').select('*').maybeSingle(),
     db
       .from('productos')
       .select('id, nombre, descripcion, destacado, orden, tamano_id, producto_ingredientes(ingrediente_id, porciones)')
@@ -100,7 +112,24 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
     zonasEnvio: zonas.data!,
   };
 
-  return { catalogo, combosCasa: armarCombosCasa(burritos.data!, catalogo), abierto: config.data?.abierto ?? false };
+  const c = config.data;
+  const whatsapp = c?.whatsapp?.replace(/\D/g, '') ?? '';
+  return {
+    catalogo,
+    combosCasa: armarCombosCasa(burritos.data!, catalogo),
+    abierto: c?.abierto ?? false,
+    config: {
+      abierto: c?.abierto ?? false,
+      pagos: {
+        mercadopago: !!c?.pago_mp_activo,
+        transferencia: !!c?.pago_transferencia_activo,
+        efectivo: !!c?.pago_efectivo_activo,
+      },
+      transferencia: { alias: c?.alias_transferencia ?? null, cvu: c?.cvu ?? null, titular: c?.titular ?? null },
+      whatsapp: whatsapp.length >= 10 ? whatsapp : null,
+      avisoCeliacos: c?.aviso_celiacos ?? null,
+    },
+  };
 }
 
 type FilaBurrito = {

@@ -66,10 +66,12 @@ export function PanelCarrito({ abierto, catalogo, onCerrar, onEditar, onArmarOtr
             <Plus aria-hidden className="size-5" strokeWidth={3} /> Armar {items.length ? 'otro' : 'mi'} burrito
           </button>
           {items.length > 0 && (
-            // Fase 2: datos del cliente y pago.
-            <button type="button" disabled className="mt-3 min-h-14 w-full rounded-2xl border-2 border-dashed border-tinta/40 font-heading text-lg font-bold text-tinta-suave">
-              Confirmar pedido (muy pronto)
-            </button>
+            <a
+              href="/checkout"
+              className="juguete mt-3 flex min-h-16 w-full items-center justify-center rounded-2xl bg-rojo font-heading text-2xl font-extrabold text-white shadow-[0_4px_0_var(--rojo-oscuro)]"
+            >
+              Confirmar pedido · {formatoPesos(total(catalogo))}
+            </a>
           )}
         </div>
       </SheetContent>
