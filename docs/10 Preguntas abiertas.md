@@ -14,6 +14,10 @@ tags: [burritos, pendientes]
 - [x] Salsas: las 14 de las imágenes de Max (2026-10-29)
 - [ ] Imágenes de salsas en más resolución: hoy son de ~146 px; para pantallas de alta densidad conviene 512×512
 - [ ] Imagen de cerdo (`apps/web/public/armador/cerdo.avif`)
+- [ ] **¿Qué salsas son sin TACC?** Por precaución hoy están todas como NO confirmadas (`sin_tacc = false`)
+- [ ] Foto definitiva del burrito cerrado: la actual tiene **marca de agua de banco de fotos** (no se puede publicar). Idea: generarla en Firefly como las papas
+- [ ] Foto del burrito cerrado **doble tapa** (`burrito-cerrado-doble.avif`)
+- [ ] Foto del burrito cerrado con **tortilla de maíz** (`burrito-cerrado-maiz.avif`; hoy se simula con un tono más amarillo)
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?
 - [ ] Zonas de envío y costos

@@ -21,7 +21,10 @@ La home **es** el armador. El burrito se arma frente al cliente: la tortilla en 
 ## Imágenes
 - `apps/web/public/armador/<slug>.avif` (slug = `ingredientes.slug`). Fondo transparente.
 - Si falta el `.avif`, se usa `<slug>.svg` provisorio; si tampoco, un círculo de color.
-- Faltan: `cerdo` y el burrito enrollado. Salsas: las 14 en `.avif` (en baja resolución, ~146 px).
+- Faltan: `cerdo`; fotos del burrito cerrado doble y de maíz. Salsas: las 14 en `.avif` (en baja resolución, ~146 px).
+- Final: `burrito-cerrado.avif` + `papas.avif` (`BurritoConPapas.tsx`). Prueba en orden `burrito-cerrado-doble-maiz`, `-doble`, `-maiz` y la base.
+- Salsas en el escenario: manchas de color untadas, debajo de los ingredientes.
+- **Verlo en mi mesa** (`VerEnMiMesa.tsx`): cámara trasera + la foto del burrito encima; un dedo mueve, dos agrandan, "Sacar foto" comparte o descarga. Necesita https (Vercel) o localhost.
 
 ## Accesibilidad
 - `prefers-reduced-motion`: nada cae ni rebota.

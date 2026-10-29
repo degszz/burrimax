@@ -8,21 +8,34 @@ interface Props {
   catalogo: Catalogo;
 }
 
-// Posiciones (en % del plato) para que nada se tape: carnes al centro,
-// vegetales en ronda alrededor.
+// Posiciones (en % del plato): carnes juntas al centro y vegetales en una
+// ronda apretada alrededor, para que se vea como un relleno armado.
 const LUGARES_CARNE = [
-  [50, 46],
-  [40, 56],
-  [60, 56],
-  [50, 64],
+  [47, 47],
+  [56, 54],
+  [44, 57],
+  [55, 44],
 ] as const;
 const LUGARES_VEGETAL = [
-  [27, 38],
-  [73, 38],
-  [24, 62],
-  [76, 62],
-  [38, 78],
-  [62, 78],
+  [33, 41],
+  [67, 42],
+  [34, 63],
+  [66, 64],
+  [50, 33],
+  [50, 70],
+] as const;
+
+// Manchas de salsa (coordenadas del plato, 0–100): la primera cruza el centro
+// y la segunda se superpone en diagonal, para que se vean las dos.
+const MANCHAS_SALSA = [
+  {
+    forma: 'M20 47 C 24 36, 40 33, 52 37 C 63 40, 76 36, 82 43 C 87 50, 78 58, 66 57 C 54 56, 44 62, 32 60 C 22 58, 17 53, 20 47 Z',
+    brillo: 'M30 43 C 36 39, 46 39, 52 41 C 46 42, 38 43, 30 45 Z',
+  },
+  {
+    forma: 'M30 26 C 40 22, 52 28, 56 38 C 60 48, 70 56, 74 66 C 77 74, 68 79, 60 74 C 52 69, 48 58, 40 52 C 32 46, 22 34, 30 26 Z',
+    brillo: 'M36 30 C 42 28, 48 32, 50 37 C 46 35, 41 33, 36 32 Z',
+  },
 ] as const;
 
 export function Escenario({ armado, catalogo }: Props) {
@@ -82,17 +95,30 @@ export function Escenario({ armado, catalogo }: Props) {
           )}
 
           {/* Salsas: chorritos ondulados */}
+          {/* Salsas: manchas untadas sobre la tortilla, debajo de la carne y los vegetales */}
           <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 z-10" aria-hidden>
-            {salsas.map((salsa, i) => {
-              const y = 40 + i * 18;
-              const d = `M18 ${y} q8 -8 16 0 t16 0 t16 0 t16 0`;
-              return (
-                <g key={salsa.id} className="animate-aparecer">
-                  <path d={d} fill="none" stroke="#2B1B12" strokeWidth="6.5" strokeLinecap="round" />
-                  <path d={d} fill="none" stroke={salsa.colorHex ?? '#E4572E'} strokeWidth="4" strokeLinecap="round" />
-                </g>
-              );
-            })}
+            <defs>
+              <clipPath id="sobre-tortilla">
+                <circle cx="50" cy="50" r="40" />
+              </clipPath>
+              {/* Borde irregular, como salsa untada con cuchara */}
+              <filter id="salsa-untada" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="7" result="ruido" />
+                <feDisplacementMap in="SourceGraphic" in2="ruido" scale="4" xChannelSelector="R" yChannelSelector="G" />
+                <feDropShadow dx="0" dy="0.6" stdDeviation="0.7" floodColor="#2B1B12" floodOpacity="0.22" />
+              </filter>
+            </defs>
+            <g clipPath="url(#sobre-tortilla)">
+              {salsas.map((salsa, i) => {
+                const mancha = MANCHAS_SALSA[i % MANCHAS_SALSA.length]!;
+                return (
+                  <g key={salsa.id} className="animate-aparecer" filter="url(#salsa-untada)">
+                    <path d={mancha.forma} fill={salsa.colorHex ?? '#E4572E'} opacity="0.93" />
+                    <path d={mancha.brillo} fill="#FFFFFF" opacity="0.28" />
+                  </g>
+                );
+              })}
+            </g>
           </svg>
 
           {/* Carnes al centro, vegetales alrededor */}
@@ -102,7 +128,7 @@ export function Escenario({ armado, catalogo }: Props) {
             return carne ? (
               <span
                 key={`${id}-${i}`}
-                className="animate-caer absolute z-[11] w-[26%]"
+                className="animate-caer absolute z-[11] w-[32%]"
                 style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
               >
                 <ImagenIngrediente ingrediente={carne} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />
@@ -115,7 +141,7 @@ export function Escenario({ armado, catalogo }: Props) {
             return vegetal ? (
               <span
                 key={id}
-                className="animate-caer absolute z-[12] w-[22%]"
+                className="animate-caer absolute z-[12] w-[28%]"
                 style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
               >
                 <ImagenIngrediente ingrediente={vegetal} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />

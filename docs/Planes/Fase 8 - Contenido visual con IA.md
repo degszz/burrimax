@@ -42,6 +42,7 @@ Pasos:
 - [ ] Texto de cada parada en español rioplatense, sin inventar nada (lo no confirmado va como `[A CONFIRMAR]`)
 
 ## 2 · "Ver en mi mesa" (realidad aumentada)
+- [x] Paso intermedio hecho (2026-10-29): "Verlo en mi mesa" con la cámara y la foto del burrito + papas encima (`VerEnMiMesa.tsx`). Al tener el `.glb`, el mismo botón pasa a AR real
 - [ ] Max saca 2–3 fotos del burrito **cerrado en plato con papas** (simple y doble)
 - [ ] Generar el modelo `.glb` con una IA de imagen a 3D (Meshy, Tripo, Rodin o Luma) — **Higgsfield no hace 3D**, pero sus imágenes sirven de entrada
 - [ ] Retocar y comprimir a **2–3 MB**

@@ -53,5 +53,14 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-29 · Salsas sin TACC: todas "no confirmado" hasta que Max diga
+Por seguridad de celíacos, `sin_tacc = false` en las 14 salsas hasta tener la lista. Nunca marcar algo como sin TACC sin confirmación.
+
+### 2026-10-29 · Final con foto del burrito cerrado + papas, y "Verlo en mi mesa" con la cámara
+Cualquier combinación termina cerrada y con papas, así que el paso "¡Listo!" usa una foto fija (`burrito-cerrado*.avif` + `papas.avif`). Busca primero la versión de doble/maíz y si no existe usa la base. "Verlo en mi mesa" abre la cámara y pone esa foto encima (se mueve y se agranda, y saca foto para compartir). No queda anclado a la mesa: eso necesita el modelo 3D (ver [[Planes/Fase 8 - Contenido visual con IA]]).
+
+### 2026-10-29 · Salsas como manchas untadas
+En el escenario cada salsa es una mancha de su color, con borde irregular y brillo, debajo de carnes y vegetales (pedido de Max: más realista, sin borde negro).
+
 ### 2026-10-28 · El `precio_extra` de la tapa se cobra una vez, también en la doble
 Regla de ejemplo hasta que se confirme (ver [[10 Preguntas abiertas]]).

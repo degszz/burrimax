@@ -1,9 +1,11 @@
 import { precioVistaPrevia, type Armado, type Catalogo, type CategoriaSlug } from '@burritos/shared';
-import { Check, HeartPlus, Minus, Plus, ShoppingBag, WheatOff } from 'lucide-react';
+import { Camera, Check, HeartPlus, Minus, Plus, ShoppingBag, WheatOff } from 'lucide-react';
+import { useState } from 'react';
 import { CATEGORIA_DEL_PASO, describir, type PasoDeCategoria } from '@/lib/armador/reglas';
 import { formatoPesos } from '@/lib/formato';
-import { BurritoEnrollado } from './BurritoEnrollado';
+import { BurritoConPapas } from './BurritoConPapas';
 import { ImagenIngrediente } from './ImagenIngrediente';
+import { VerEnMiMesa } from './VerEnMiMesa';
 
 interface Props {
   armado: Armado;
@@ -25,9 +27,8 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
   const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
   const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
   const precio = precioVistaPrevia(armado, catalogo);
-  const colores = [...armado.seleccion.carne, ...armado.seleccion.vegetal, ...armado.seleccion.salsa]
-    .map((id) => buscar(id)?.colorHex)
-    .filter((c): c is string => !!c);
+  const doble = (tamano?.cantTapas ?? 1) > 1;
+  const [camara, setCamara] = useState(false);
 
   return (
     <section aria-labelledby="titulo-listo" className="animate-aparecer px-4 pb-8">
@@ -40,8 +41,16 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
         <span className="juguete absolute top-3 left-3 flex -rotate-3 items-center gap-1.5 rounded-xl bg-amarillo px-2.5 py-1 font-heading font-extrabold">
           <span aria-hidden>🍟</span> Papas fritas incluidas
         </span>
-        <BurritoEnrollado doble={(tamano?.cantTapas ?? 1) > 1} colores={colores} colorTortilla={tortilla?.colorHex ?? '#F4D9A6'} />
+        <BurritoConPapas doble={doble} tortilla={tortilla?.slug} className="pt-2 pb-4" />
+        <button
+          type="button"
+          onClick={() => setCamara(true)}
+          className="juguete mx-auto mb-2 flex min-h-12 items-center gap-2 rounded-2xl bg-white px-4 font-heading text-lg font-extrabold"
+        >
+          <Camera aria-hidden className="size-5" strokeWidth={2.5} /> Verlo en mi mesa
+        </button>
       </div>
+      {camara && <VerEnMiMesa doble={doble} tortilla={tortilla?.slug} onCerrar={() => setCamara(false)} />}
 
       <div className="juguete mt-5 overflow-hidden rounded-3xl bg-white">
         <div className="flex items-center justify-between px-4 py-3">
