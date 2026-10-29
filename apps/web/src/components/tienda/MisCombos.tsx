@@ -1,5 +1,5 @@
 import { precioVistaPrevia, type Armado, type Catalogo } from '@burritos/shared';
-import { ArrowUp, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { describir } from '@/lib/armador/reglas';
 import { formatoPesos } from '@/lib/formato';
 import type { ComboGuardado } from '@/lib/misCombos';
@@ -12,7 +12,6 @@ interface Props {
   onPedir: (combo: ComboGuardado) => void;
   onEditar: (combo: ComboGuardado) => void;
   onBorrar: (combo: ComboGuardado) => void;
-  onVolverArriba: () => void;
 }
 
 export function resumenCorto(armado: Armado, catalogo: Catalogo): string {
@@ -22,24 +21,17 @@ export function resumenCorto(armado: Armado, catalogo: Catalogo): string {
     .join(' · ');
 }
 
-export function MisCombos({ combos, catalogo, onPedir, onEditar, onBorrar, onVolverArriba }: Props) {
+export function MisCombos({ combos, catalogo, onPedir, onEditar, onBorrar }: Props) {
   if (combos.length === 0) return null;
 
   return (
-    <section id="mis-combos" aria-labelledby="titulo-mis-combos" className="px-4 pt-10 pb-6">
-      <button
-        type="button"
-        onClick={onVolverArriba}
-        className="mx-auto mb-6 flex min-h-12 items-center gap-2 rounded-full border-[2.5px] border-dashed border-tinta px-5 font-bold"
-      >
-        <ArrowUp aria-hidden className="size-5" /> Volver a armar mi burrito
-      </button>
+    <section id="mis-combos" aria-labelledby="titulo-mis-combos" className="px-4 pt-6">
       <div className="mb-4 flex items-end justify-between">
         <div>
           <h2 id="titulo-mis-combos" className="text-3xl font-extrabold">
-            Mis combos
+            Tus combos
           </h2>
-          <p className="text-tinta-suave">Guardados en este celular</p>
+          <p className="text-tinta-suave">Los que armaste y guardaste en este celular</p>
         </div>
         <span className="grid size-10 place-items-center rounded-full border-2 border-tinta bg-amarillo font-heading text-lg font-extrabold">
           {combos.length}

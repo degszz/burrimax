@@ -53,6 +53,9 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-29 · Home con el armador opcional y los combos de la casa abajo
+Pedido de Max: no obligar a armar. El hero invita ("Armar el mío") y el armador se abre en el mismo lugar; abajo van los combos propios guardados (fijados arriba) y los combos de la casa con papas, que se pueden agregar directo o abrir en el armador para cambiarles algo. Los combos de la casa se arman desde `productos` + `producto_ingredientes` y se ocultan si su receta deja de ser válida.
+
 ### 2026-10-29 · Salsas sin TACC: todas "no confirmado" hasta que Max diga
 Por seguridad de celíacos, `sin_tacc = false` en las 14 salsas hasta tener la lista. Nunca marcar algo como sin TACC sin confirmación.
 

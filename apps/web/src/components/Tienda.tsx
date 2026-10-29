@@ -8,7 +8,9 @@ import { PasoListo } from './armador/PasoListo';
 import { ResumenFlotante } from './armador/ResumenFlotante';
 import { SelectorTamano } from './armador/SelectorTamano';
 import { TarjetaIngrediente } from './armador/TarjetaIngrediente';
+import { CombosCasa } from './tienda/CombosCasa';
 import { Encabezado } from './tienda/Encabezado';
+import { HeroArmar } from './tienda/HeroArmar';
 import { MisCombos } from './tienda/MisCombos';
 import { PanelCarrito } from './tienda/PanelCarrito';
 import {
@@ -22,6 +24,7 @@ import {
   type Paso,
   type PasoDeCategoria,
 } from '@/lib/armador/reglas';
+import type { ComboCasa } from '@/lib/catalogo.server';
 import * as misCombos from '@/lib/misCombos';
 import { precioVistaPrevia } from '@burritos/shared';
 import { armadoActual, useArmador } from '@/stores/armador';
@@ -29,6 +32,7 @@ import { useCarrito } from '@/stores/carrito';
 
 interface Props {
   catalogo: Catalogo;
+  combosCasa: ComboCasa[];
   abierto: boolean;
 }
 
@@ -44,10 +48,12 @@ const TITULOS: Record<PasoDeCategoria, string> = {
   4: 'Elegí tus vegetales',
 };
 
-export default function Tienda({ catalogo, abierto }: Props) {
+export default function Tienda({ catalogo, combosCasa, abierto }: Props) {
   const estado = useArmador();
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
+  // El armador arranca cerrado: la portada invita, y abajo están los combos.
+  const [armadorAbierto, setArmadorAbierto] = useState(false);
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [destino, setDestino] = useState<TamanoCatalogo | null>(null);
   const [combos, setCombos] = useState<misCombos.ComboGuardado[]>([]);
@@ -66,7 +72,7 @@ export default function Tienda({ catalogo, abierto }: Props) {
     });
     observador.observe(nodo);
     return () => observador.disconnect();
-  }, [estado.paso === 5]);
+  }, [estado.paso === 5, armadorAbierto]);
 
   // Recupera lo guardado en el celular y lo pone al día con el menú actual.
   useEffect(() => {
@@ -123,6 +129,53 @@ export default function Tienda({ catalogo, abierto }: Props) {
     window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
+  function abrirArmador() {
+    setArmadorAbierto(true);
+    subir();
+  }
+
+  // Hay algo elegido (o se está editando): vale la pena ofrecer "Borrar".
+  const enCurso =
+    estado.seleccion.tortilla.length + estado.seleccion.salsa.length + estado.seleccion.carne.length + estado.seleccion.vegetal.length >
+      0 || !!estado.editandoItemId;
+
+  function borrarArmado() {
+    const previo = useArmador.getState();
+    const copia = {
+      paso: previo.paso,
+      tamanoId: previo.tamanoId,
+      seleccion: previo.seleccion,
+      cantidad: previo.cantidad,
+      nombre: previo.nombre,
+      editandoItemId: previo.editandoItemId,
+    };
+    estado.reset(armado.tamanoId);
+    subir();
+    avisar('Borramos tu burrito.', {
+      etiqueta: 'Deshacer',
+      hacer: () => {
+        useArmador.setState(copia);
+        setAviso(null);
+      },
+    });
+  }
+
+  function agregarComboCasa(combo: ComboCasa) {
+    carrito.agregar(combo.armado, nombresDe(combo.armado, catalogo));
+    avisar(`Sumamos "${combo.nombre}" a tu pedido.`, {
+      etiqueta: 'Ver pedido',
+      hacer: () => {
+        setCarritoAbierto(true);
+        setAviso(null);
+      },
+    });
+  }
+
+  function personalizarComboCasa(combo: ComboCasa) {
+    estado.cargar(combo.armado);
+    abrirArmador();
+  }
+
   function irAPaso(p: Paso) {
     estado.irAPaso(p);
     subir();
@@ -156,6 +209,7 @@ export default function Tienda({ catalogo, abierto }: Props) {
       avisar('¡Listo! Lo sumamos a tu pedido.');
     }
     estado.reset(armado.tamanoId);
+    setArmadorAbierto(false);
     setCarritoAbierto(true);
   }
 
@@ -183,7 +237,7 @@ export default function Tienda({ catalogo, abierto }: Props) {
       // Algo cambió en el menú: que lo revise en el armador antes de sumarlo.
       cargarCombo(combo);
       estado.irAPaso(alcanzableDe(conNombre));
-      subir();
+      abrirArmador();
       return;
     }
     carrito.agregar(conNombre, nombresDe(conNombre, catalogo));
@@ -212,12 +266,28 @@ export default function Tienda({ catalogo, abierto }: Props) {
   const motivo = paso < 5 ? motivoBloqueo(paso as PasoDeCategoria, armado, catalogo) : null;
   const mensajeOk = paso < 5 && !motivo ? mensajeDelPaso(paso as PasoDeCategoria, armado, tamano) : null;
 
+  const armando = armadorAbierto && paso < 5;
+
   return (
-    <div className={paso < 5 ? 'pb-40' : 'pb-6'}>
+    <div className={armando ? 'pb-48' : 'pb-10'}>
       <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
 
       <main className="mx-auto max-w-md space-y-4">
-        <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
+        {!armadorAbierto ? (
+          <HeroArmar precioDesde={primerTamano.precioBase} enCurso={listo && enCurso} onArmar={abrirArmador} />
+        ) : (
+          <section id="armador" aria-label="Armá tu burrito" className="space-y-4">
+            <div className="flex items-center justify-between px-4">
+              <p className="font-heading text-2xl font-extrabold">Armá tu burrito</p>
+              <button
+                type="button"
+                onClick={() => setArmadorAbierto(false)}
+                className="min-h-11 px-2 font-bold text-tinta-suave underline underline-offset-4"
+              >
+                Ver combos
+              </button>
+            </div>
+            <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
 
         {paso < 5 ? (
           <>
@@ -247,34 +317,47 @@ export default function Tienda({ catalogo, abierto }: Props) {
               onAgregar={agregarAlPedido}
               onGuardar={guardarEnCelular}
             />
+            <button
+              type="button"
+              onClick={borrarArmado}
+              className="mx-auto -mt-4 flex min-h-11 items-center px-3 text-base font-semibold text-tinta-suave underline underline-offset-4"
+            >
+              Borrar y empezar de nuevo
+            </button>
           </>
         )}
+          </section>
+        )}
 
+        {/* Lo propio, fijado arriba de los combos de la casa */}
         <MisCombos
           combos={combos}
           catalogo={catalogo}
           onPedir={pedirDeNuevo}
           onEditar={(combo) => {
             cargarCombo(combo);
-            subir();
+            abrirArmador();
           }}
           onBorrar={borrarCombo}
-          onVolverArriba={subir}
         />
+
+        <CombosCasa combos={combosCasa} catalogo={catalogo} onAgregar={agregarComboCasa} onPersonalizar={personalizarComboCasa} />
       </main>
 
-      {paso < 5 && (
+      {armando && (
         <ResumenFlotante visible={listo && !escenarioALaVista} armado={armado} catalogo={catalogo} onVer={subir} />
       )}
 
-      {paso < 5 && (
+      {armando && (
         <BarraSiguiente
           precio={precio}
           motivo={motivo}
           mensajeOk={mensajeOk}
           puedeVolver={paso > 1}
+          puedeBorrar={enCurso}
           onSiguiente={() => irAPaso((paso + 1) as Paso)}
           onAnterior={() => irAPaso((paso - 1) as Paso)}
+          onBorrar={borrarArmado}
         />
       )}
 
@@ -285,12 +368,12 @@ export default function Tienda({ catalogo, abierto }: Props) {
         onEditar={(item) => {
           estado.cargar(item.armado, item.id);
           setCarritoAbierto(false);
-          subir();
+          abrirArmador();
         }}
         onArmarOtro={() => {
           estado.reset(armado.tamanoId);
           setCarritoAbierto(false);
-          subir();
+          abrirArmador();
         }}
       />
 

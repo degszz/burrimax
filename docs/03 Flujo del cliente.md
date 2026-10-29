@@ -19,11 +19,12 @@ flowchart TD
 
 ## Pantallas
 
-### 1. Home
+### 1. Home (actualizado 2026-10-29)
 - Arriba: logo, estado "Abierto ahora / Cerrado", botón carrito.
-- Héroe con burrito 3D girando + botón gigante **"Armá tu burrito"**.
-- Tabs por menú: Burritos · Combos · Bebidas · Acompañamientos.
-- Tarjetas grandes con foto/render, nombre, precio, botón "Agregar".
+- **Hero:** foto del burrito con papas + botón gigante **"Armar el mío"** (o "Seguir armando el mío" si hay uno a medio armar). El armador es **opcional**: se abre ahí mismo al tocarlo y se cierra con "Ver combos".
+- **Tus combos:** los que el cliente armó y guardó, **fijados arriba** de los de la casa.
+- **Combos de la casa:** burritos prehechos con papas (salen de `productos` + su receta), con "Agregar" y "Cambiarle algo" (lo abre en el armador para modificarlo).
+- Debajo de "Siguiente" en el armador: "Borrar y empezar de nuevo" en gris, con "Deshacer".
 
 ### 2. Armador (ver [[04 Armador 3D]])
 - Un paso por pantalla, barra de progreso arriba ("Paso 3 de 7").

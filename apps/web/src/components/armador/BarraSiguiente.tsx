@@ -6,12 +6,15 @@ interface Props {
   motivo: string | null;
   mensajeOk: string | null;
   puedeVolver: boolean;
+  /** Hay algo elegido: se puede borrar todo y empezar de nuevo. */
+  puedeBorrar: boolean;
   onSiguiente: () => void;
   onAnterior: () => void;
+  onBorrar: () => void;
 }
 
 /** Barra fija abajo: qué falta (o qué viene) y el botón Siguiente con el precio. */
-export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, onSiguiente, onAnterior }: Props) {
+export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBorrar, onSiguiente, onAnterior, onBorrar }: Props) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <p aria-live="polite" className="mb-2 flex min-h-6 items-center justify-center gap-1.5 text-center text-base font-bold">
@@ -41,6 +44,15 @@ export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, onSigui
           {!motivo && <ArrowRight aria-hidden className="size-6" strokeWidth={2.5} />}
         </button>
       </div>
+      {puedeBorrar && (
+        <button
+          type="button"
+          onClick={onBorrar}
+          className="mx-auto mt-1 flex min-h-10 items-center px-3 text-base font-semibold text-tinta-suave underline underline-offset-4"
+        >
+          Borrar y empezar de nuevo
+        </button>
+      )}
     </div>
   );
 }

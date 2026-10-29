@@ -1,11 +1,21 @@
-import { CATEGORIAS, type Catalogo, type CategoriaSlug, type Database } from '@burritos/shared';
+import { CATEGORIAS, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database } from '@burritos/shared';
 import { createClient } from '@supabase/supabase-js';
 
 // Lee el catálogo activo de Supabase con la clave pública (RLS ya filtra lo
 // inactivo para anon) y lo pasa a la forma que usan shared y el armador.
 
+/** Burrito armado por la casa (`productos` tipo burrito con su receta). */
+export interface ComboCasa {
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  destacado: boolean;
+  armado: Armado;
+}
+
 export interface DatosTienda {
   catalogo: Catalogo;
+  combosCasa: ComboCasa[];
   abierto: boolean;
 }
 
@@ -20,7 +30,7 @@ const esCategoria = (slug: string): slug is CategoriaSlug => (CATEGORIAS as read
 
 export async function cargarDatosTienda(): Promise<DatosTienda> {
   const db = cliente();
-  const [tamanos, categorias, ingredientes, productos, zonas, config] = await Promise.all([
+  const [tamanos, categorias, ingredientes, productos, zonas, config, burritos] = await Promise.all([
     db.from('tamanos').select('*').eq('activo', true).order('orden'),
     db.from('categorias_ingrediente').select('*').order('paso'),
     db
@@ -31,9 +41,16 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
     db.from('productos').select('id, nombre, precio, activo').eq('activo', true),
     db.from('zonas_envio').select('id, nombre, costo, activo').eq('activo', true),
     db.from('config_publica').select('abierto').maybeSingle(),
+    db
+      .from('productos')
+      .select('id, nombre, descripcion, destacado, orden, tamano_id, producto_ingredientes(ingrediente_id, porciones)')
+      .eq('activo', true)
+      .eq('tipo', 'burrito')
+      .order('orden'),
   ]);
 
-  const error = tamanos.error ?? categorias.error ?? ingredientes.error ?? productos.error ?? zonas.error ?? config.error;
+  const error =
+    tamanos.error ?? categorias.error ?? ingredientes.error ?? productos.error ?? zonas.error ?? config.error ?? burritos.error;
   if (error) throw new Error(`No se pudo leer el catálogo: ${error.message}`);
 
   const porSlug = new Map(categorias.data!.map((c) => [c.slug, c]));
@@ -83,5 +100,31 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
     zonasEnvio: zonas.data!,
   };
 
-  return { catalogo, abierto: config.data?.abierto ?? false };
+  return { catalogo, combosCasa: armarCombosCasa(burritos.data!, catalogo), abierto: config.data?.abierto ?? false };
+}
+
+type FilaBurrito = {
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  destacado: boolean;
+  tamano_id: string | null;
+  producto_ingredientes: { ingrediente_id: string; porciones: number }[];
+};
+
+/** Pasa cada receta a un Armado; si ya no es válido con el menú actual, no se muestra. */
+function armarCombosCasa(filas: FilaBurrito[], catalogo: Catalogo): ComboCasa[] {
+  const ingredientes = new Map(catalogo.ingredientes.map((i) => [i.id, i]));
+  return filas.flatMap((fila) => {
+    if (!fila.tamano_id) return [];
+    const seleccion: Armado['seleccion'] = { tortilla: [], salsa: [], carne: [], vegetal: [] };
+    for (const { ingrediente_id, porciones } of fila.producto_ingredientes) {
+      const ingrediente = ingredientes.get(ingrediente_id);
+      if (!ingrediente) return []; // receta con algo que ya no está
+      for (let i = 0; i < porciones; i++) seleccion[ingrediente.categoria].push(ingrediente_id);
+    }
+    const armado: Armado = { tamanoId: fila.tamano_id, seleccion, cantidad: 1, nombrePersonalizado: fila.nombre };
+    if (validarArmado(armado, catalogo).length) return [];
+    return [{ id: fila.id, nombre: fila.nombre, descripcion: fila.descripcion, destacado: fila.destacado, armado }];
+  });
 }
