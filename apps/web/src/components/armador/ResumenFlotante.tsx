@@ -21,7 +21,8 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const buscar = (id?: string) => (id ? catalogo.ingredientes.find((i) => i.id === id) : undefined);
   const tortilla = buscar(armado.seleccion.tortilla[0]);
-  const encima = [...armado.seleccion.carne, ...armado.seleccion.vegetal]
+  // Sin tortilla no se muestra el relleno (queda guardado para cuando elija una).
+  const encima = (tortilla ? [...armado.seleccion.carne, ...armado.seleccion.vegetal] : [])
     .filter((id, i, todos) => todos.indexOf(id) === i)
     .slice(-4)
     .map(buscar)

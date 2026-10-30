@@ -391,6 +391,17 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
       </div>
 
       <main className="mx-auto max-w-md space-y-4 lg:max-w-6xl lg:px-2">
+        {/* Bajando: todas las opciones del paso en grilla (la pantalla de arriba no cambia) */}
+        {armando && (
+          <PasoActual
+            vista="grilla"
+            paso={paso as PasoDeCategoria}
+            armado={armado}
+            catalogo={catalogo}
+            tamano={tamano}
+            ingredientes={ingredientesPorPaso[paso as PasoDeCategoria]}
+          />
+        )}
         {armadorAbierto && paso === 5 && (
           <section id="armador" aria-label="Tu burrito está listo" className="space-y-2 pt-1 lg:mx-auto lg:max-w-xl">
             <BarraPasos actual={5} alcanzable={5} onIr={irAPaso} />
@@ -502,9 +513,11 @@ interface PasoActualProps {
   catalogo: Catalogo;
   tamano: TamanoCatalogo;
   ingredientes: Catalogo['ingredientes'];
+  /** carrusel: en la pantalla del armador · grilla: todas las opciones, al bajar. */
+  vista?: 'carrusel' | 'grilla';
 }
 
-function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActualProps) {
+function PasoActual({ paso, armado, catalogo, tamano, ingredientes, vista = 'carrusel' }: PasoActualProps) {
   const { alternar, sumarPorcion, restarPorcion } = useArmador();
   const categoria = CATEGORIA_DEL_PASO[paso];
   const elegidos = cuantas(armado, categoria);
@@ -535,6 +548,41 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
       </>
     );
 
+  // La misma tarjeta para el carrusel y para la grilla de abajo.
+  const tarjeta = (ingrediente: Catalogo['ingredientes'][number]) => {
+    const cantidad = cuantas(armado, categoria, ingrediente.id);
+    return (
+      <TarjetaIngrediente
+        ingrediente={ingrediente}
+        cantidad={cantidad}
+        apagada={lleno && cantidad === 0}
+        porciones={porciones}
+        puedeSumar={puedeAgregar(armado, categoria, catalogo)}
+        prioridad={paso === 1 && vista === 'carrusel'}
+        onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
+        onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
+        onRestar={() => restarPorcion(ingrediente.id)}
+      />
+    );
+  };
+
+  // Debajo de la pantalla: todas las opciones del paso a la vista, en grilla.
+  if (vista === 'grilla') {
+    return (
+      <section aria-label={`Todas las opciones: ${TITULOS[paso]}`} className="px-4 pt-6" key={paso}>
+        <h2 className="text-2xl font-extrabold">Todas las opciones</h2>
+        <p className="text-base text-tinta-suave">
+          {ingredientes.length} para elegir · {lleno ? `ya llegaste al máximo (${elegidos}/${maximo})` : 'tocá la que quieras'}
+        </p>
+        <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
+          {ingredientes.map((ingrediente) => (
+            <li key={ingrediente.id}>{tarjeta(ingrediente)}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+
   return (
     <section aria-labelledby="titulo-paso" className={haciaAtras ? 'animate-entrar-izq' : 'animate-entrar-der'} key={paso}>
       <div className="px-4">
@@ -554,22 +602,7 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
         clave={(i) => i.id}
         etiqueta={TITULOS[paso]}
         pista={lleno ? (porciones ? 'Podés repetir la misma' : 'Sacá uno para cambiarlo') : 'Deslizá para ver más'}
-        render={(ingrediente) => {
-          const cantidad = cuantas(armado, categoria, ingrediente.id);
-          return (
-            <TarjetaIngrediente
-              ingrediente={ingrediente}
-              cantidad={cantidad}
-              apagada={lleno && cantidad === 0}
-              porciones={porciones}
-              puedeSumar={puedeAgregar(armado, categoria, catalogo)}
-              prioridad={paso === 1}
-              onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
-              onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
-              onRestar={() => restarPorcion(ingrediente.id)}
-            />
-          );
-        }}
+        render={tarjeta}
       />
     </section>
   );

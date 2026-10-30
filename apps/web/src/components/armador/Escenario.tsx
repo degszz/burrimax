@@ -45,7 +45,7 @@ const SIMPLE: Geometria = {
   anchoCarne: 'w-[32%]',
   anchoVegetal: 'w-[28%]',
   ancho: 100,
-  tortillas: [[50, 50, 40]],
+  tortillas: [[50, 50, 35]],
   // La primera mancha cruza el centro y la segunda se superpone en diagonal.
   manchas: [
     {
@@ -81,18 +81,18 @@ const DOBLE: Geometria = {
   ancho: 170,
   // Centros de las dos tortillas (ver las clases de las imágenes más abajo).
   tortillas: [
-    [61, 50, 38],
-    [109, 50, 38],
+    [61, 50, 33],
+    [109, 50, 33],
   ],
   // Manchas largas que cruzan las dos tortillas.
   manchas: [
     {
-      forma: 'M24 48 C 32 36, 62 34, 86 38 C 110 42, 134 34, 148 42 C 157 50, 145 60, 124 58 C 100 56, 76 64, 50 61 C 31 59, 19 55, 24 48 Z',
-      brillo: 'M36 44 C 52 39, 72 39, 88 41 C 72 43, 54 44, 36 46 Z',
+      forma: 'M42.3 48.3 C 47.9 38.1, 68.9 36.4, 85.7 39.8 C 102.5 43.2, 119.3 36.4, 129.1 43.2 C 135.4 50, 127 58.5, 112.3 56.8 C 95.5 55.1, 78.7 61.9, 60.5 59.4 C 47.2 57.7, 38.8 54.3, 42.3 48.3 Z',
+      brillo: 'M50.7 44.9 C 61.9 40.7, 75.9 40.7, 87.1 42.4 C 75.9 44.1, 63.3 44.9, 50.7 46.6 Z',
     },
     {
-      forma: 'M30 31 C 50 22, 76 30, 92 42 C 106 53, 126 63, 144 64 C 156 65, 153 76, 138 76 C 114 76, 94 65, 79 55 C 62 44, 42 42, 31 38 C 25 36, 25 33, 30 31 Z',
-      brillo: 'M40 30 C 52 27, 64 30, 72 35 C 62 33, 52 32, 40 32 Z',
+      forma: 'M46.5 33.9 C 60.5 26.2, 78.7 33, 89.9 43.2 C 99.7 52.6, 113.7 61.1, 126.3 61.9 C 134.7 62.8, 132.6 72.1, 122.1 72.1 C 105.3 72.1, 91.3 62.8, 80.8 54.3 C 68.9 44.9, 54.9 43.2, 47.2 39.8 C 43 38.1, 43 35.6, 46.5 33.9 Z',
+      brillo: 'M53.5 33 C 61.9 30.5, 70.3 33, 75.9 37.3 C 68.9 35.6, 61.9 34.7, 53.5 34.7 Z',
     },
   ],
 };
@@ -172,6 +172,10 @@ export function Escenario({ armado, catalogo }: Props) {
             </div>
           )}
 
+          {/* Sin tortilla no hay dónde apoyar nada: el relleno elegido queda guardado
+              (no se borra) y vuelve a aparecer apenas se elige una tortilla. */}
+          {tortilla && (
+          <>
           {/* Salsas: manchas untadas sobre la tortilla, debajo de la carne y los vegetales */}
           <svg viewBox={`0 0 ${geo.ancho} 100`} className="pointer-events-none absolute inset-0 z-10 size-full" aria-hidden>
             <defs>
@@ -227,6 +231,8 @@ export function Escenario({ armado, catalogo }: Props) {
               </span>
             ) : null;
           })}
+          </>
+          )}
           </div>
         </div>
 
