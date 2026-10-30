@@ -43,7 +43,7 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
           : cn('fixed transition-transform duration-200 motion-reduce:transition-none', visible ? 'translate-y-0' : '-translate-y-full'),
       )}
     >
-      <span className="mx-auto flex max-w-md items-center gap-3 px-4 py-2">
+      <span className="mx-auto flex max-w-md items-center gap-3 px-4 py-2 lg:max-w-6xl lg:px-6">
         <span className="relative grid size-14 shrink-0 place-items-center rounded-full border-2 border-tinta bg-white">
           {tortilla ? (
             <ImagenIngrediente ingrediente={tortilla} className="w-12 rounded-full" />

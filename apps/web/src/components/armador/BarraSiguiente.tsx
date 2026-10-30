@@ -38,7 +38,10 @@ export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBo
   const saltito = useLatido<HTMLButtonElement>(!motivo, 'animate-listo', (habilitado) => habilitado === true);
 
   return (
-    <div ref={barra} className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+    <div
+      ref={barra}
+      className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))] lg:static lg:order-5 lg:mx-4 lg:rounded-3xl lg:border-[2.5px] lg:bg-white lg:pb-1 lg:shadow-[0_4px_0_var(--tinta)]"
+    >
       <p aria-live="polite" className="mb-1.5 flex min-h-6 items-center justify-center gap-1.5 text-center text-base font-bold">
         {motivo ? (
           <span className="flex items-center gap-1.5 text-rojo">

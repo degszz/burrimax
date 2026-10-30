@@ -304,13 +304,14 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
   const armando = armadorAbierto && paso < 5;
 
   return (
-    <div className={armando ? 'pb-48' : 'pb-10'}>
-      {/* Encabezado + portada = una pantalla justa */}
-      {/* Armando: encabezado + armador ocupan justo la pantalla menos la barra de abajo */}
+    <div className={armando ? 'pb-48 lg:pb-10' : 'pb-10'}>
+      {/* Encabezado + portada = una pantalla justa.
+          Armando: encabezado + armador ocupan la pantalla menos la barra de abajo
+          (en PC la barra va dentro de la columna derecha). */}
       <div
         className={cn(
-          'mx-auto flex max-w-md flex-col',
-          armando ? 'h-[calc(100dvh-var(--alto-barra,8.5rem))]' : !armadorAbierto && 'min-h-dvh',
+          'mx-auto flex max-w-md flex-col lg:max-w-6xl',
+          armando ? 'h-[calc(100dvh-var(--alto-barra,8.5rem))] lg:h-dvh' : !armadorAbierto && 'min-h-dvh',
         )}
       >
         {armadorAbierto ? (
@@ -331,36 +332,65 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
         )}
         {armando && (
           // El plato es lo único elástico: se achica para que el carrusel nunca pise la barra.
-          <section id="armador" aria-label="Armá tu burrito" className="flex min-h-0 flex-1 flex-col gap-2 pt-1 pb-1">
-            {/* Simple o doble: se elige una vez y desaparece; vuelve con "Atrás" desde el paso 1 */}
-            {!estado.tamanoConfirmado && (
-              <div className="shrink-0 space-y-1.5">
-                <p className="px-4 font-heading text-xl font-extrabold [@media(max-height:720px)]:sr-only">Armá tu burrito</p>
-                <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
-              </div>
-            )}
-            <div ref={escenario} className="flex min-h-0 flex-1 flex-col">
+          // Celular: una columna (tamaño, plato, pasos, carrusel) y la barra fija abajo.
+          // PC: el plato grande a la izquierda y todo lo demás a la derecha.
+          <section
+            id="armador"
+            aria-label="Armá tu burrito"
+            className="flex min-h-0 flex-1 flex-col gap-2 pt-1 pb-1 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-10 lg:px-6 lg:py-6"
+          >
+            <div ref={escenario} className="order-2 flex min-h-0 flex-1 flex-col lg:order-none lg:h-full">
               <Escenario armado={armado} catalogo={catalogo} />
             </div>
-            <div className="shrink-0">
-              <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
-            </div>
-            <div className="shrink-0">
-              <PasoActual
-                paso={paso as PasoDeCategoria}
-                armado={armado}
-                catalogo={catalogo}
-                tamano={tamano}
-                ingredientes={ingredientesPorPaso[paso as PasoDeCategoria]}
+            {/* En el celular "contents": los hijos se ordenan junto con el plato */}
+            <div className="contents lg:flex lg:min-h-0 lg:flex-col lg:justify-center lg:gap-3">
+              {/* Simple o doble: se elige una vez y desaparece; vuelve con "Atrás" desde el paso 1 */}
+              {!estado.tamanoConfirmado && (
+                <div className="order-1 shrink-0 space-y-1.5">
+                  <p className="px-4 font-heading text-xl font-extrabold lg:text-3xl [@media(max-height:720px)]:sr-only">Armá tu burrito</p>
+                  <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
+                </div>
+              )}
+              <div className="order-3 shrink-0">
+                <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
+              </div>
+              <div className="order-4 shrink-0">
+                <PasoActual
+                  paso={paso as PasoDeCategoria}
+                  armado={armado}
+                  catalogo={catalogo}
+                  tamano={tamano}
+                  ingredientes={ingredientesPorPaso[paso as PasoDeCategoria]}
+                />
+              </div>
+              <BarraSiguiente
+                precio={precio}
+                motivo={motivo}
+                mensajeOk={mensajeOk}
+                puedeVolver={paso > 1 || estado.tamanoConfirmado}
+                puedeBorrar={enCurso}
+                onSiguiente={() => {
+                  // Terminó de armarlo: pasa a ser "Tu burrito" en los combos.
+                  if (paso === 4) recordarTuyo(armado);
+                  // Avanzar sin tocar simple/doble cuenta como elegido.
+                  if (!estado.tamanoConfirmado) estado.setTamanoConfirmado(true);
+                  irAPaso((paso + 1) as Paso);
+                }}
+                onAnterior={() => {
+                  // Desde el primer paso, "Atrás" vuelve a mostrar simple o doble.
+                  if (paso === 1) estado.setTamanoConfirmado(false);
+                  else irAPaso((paso - 1) as Paso);
+                }}
+                onBorrar={borrarArmado}
               />
             </div>
           </section>
         )}
       </div>
 
-      <main className="mx-auto max-w-md space-y-4">
+      <main className="mx-auto max-w-md space-y-4 lg:max-w-6xl lg:px-2">
         {armadorAbierto && paso === 5 && (
-          <section id="armador" aria-label="Tu burrito está listo" className="space-y-2 pt-1">
+          <section id="armador" aria-label="Tu burrito está listo" className="space-y-2 pt-1 lg:mx-auto lg:max-w-xl">
             <BarraPasos actual={5} alcanzable={5} onIr={irAPaso} />
             <PasoListo
               armado={armado}
@@ -409,28 +439,6 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
         )}
       </main>
 
-      {armando && (
-        <BarraSiguiente
-          precio={precio}
-          motivo={motivo}
-          mensajeOk={mensajeOk}
-          puedeVolver={paso > 1 || estado.tamanoConfirmado}
-          puedeBorrar={enCurso}
-          onSiguiente={() => {
-            // Terminó de armarlo: pasa a ser "Tu burrito" en los combos.
-            if (paso === 4) recordarTuyo(armado);
-            // Avanzar sin tocar simple/doble cuenta como elegido.
-            if (!estado.tamanoConfirmado) estado.setTamanoConfirmado(true);
-            irAPaso((paso + 1) as Paso);
-          }}
-          onAnterior={() => {
-            // Desde el primer paso, "Atrás" vuelve a mostrar simple o doble.
-            if (paso === 1) estado.setTamanoConfirmado(false);
-            else irAPaso((paso - 1) as Paso);
-          }}
-          onBorrar={borrarArmado}
-        />
-      )}
 
       <PanelCarrito
         abierto={carritoAbierto}

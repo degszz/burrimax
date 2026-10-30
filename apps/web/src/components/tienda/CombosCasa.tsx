@@ -36,7 +36,7 @@ export function CombosCasa({ combos, catalogo, tuBurrito, guardados, guardadosAb
       </h2>
       <p className="text-tinta-suave">Listos para pedir, con papas fritas incluidas</p>
 
-      <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
+      <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-6">
         {tuBurrito && (
           <Tarjeta
             armado={tuBurrito}

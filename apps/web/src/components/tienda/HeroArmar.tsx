@@ -30,20 +30,21 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
   const instagram = urlInstagram();
 
   return (
-    <section aria-labelledby="titulo-hero" className={cn('flex flex-col', className)}>
-      <div className="px-4 pt-2 text-center">
-        <h1 id="titulo-hero" className="text-[2.3rem] leading-none font-extrabold">
+    // PC: título, foto y botones a la izquierda; el armador de muestra a la derecha.
+    <section aria-labelledby="titulo-hero" className={cn('flex flex-col lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-6', className)}>
+      <div className="px-4 pt-2 text-center lg:px-0 lg:text-left">
+        <h1 id="titulo-hero" className="text-[2.3rem] leading-none font-extrabold lg:text-7xl">
           {MARCA.frase}
         </h1>
 
-        <div className="relative mx-auto mt-2 w-[64%] max-w-[15rem]">
+        <div className="relative mx-auto mt-2 w-[64%] max-w-[15rem] lg:mx-0 lg:mt-6 lg:w-[78%] lg:max-w-[26rem]">
           <span className="juguete absolute -top-1 -left-4 z-30 -rotate-6 rounded-lg bg-amarillo px-1.5 font-heading text-xs font-extrabold">
             desde {formatoPesos(precioDesde)}
           </span>
           <BurritoConPapas doble={false} />
         </div>
 
-        <div className="mx-auto mt-2 flex max-w-xs flex-col gap-2">
+        <div className="mx-auto mt-2 flex max-w-xs flex-col gap-2 lg:mx-0 lg:mt-6">
           <button
             type="button"
             onClick={onArmar}
@@ -93,7 +94,7 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
   }, [visibles]);
 
   return (
-    <div className="relative mt-3 min-h-56 flex-1 overflow-hidden">
+    <div className="relative mt-3 min-h-56 flex-1 overflow-hidden lg:mt-0 lg:h-[min(36rem,78dvh)] lg:flex-none lg:rounded-3xl">
       {/* Fuera del flujo: la zona mide lo que queda de pantalla y la grilla se corta */}
       <ul aria-hidden className="absolute inset-x-0 top-0 grid grid-cols-3 gap-2.5 px-3 pt-1 select-none">
         {ingredientes.map((ingrediente, i) => (

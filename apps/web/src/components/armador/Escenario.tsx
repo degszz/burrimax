@@ -70,7 +70,7 @@ export function Escenario({ armado, catalogo }: Props) {
         </div>
 
         {/* Plato con la tortilla */}
-        <div className="absolute top-1/2 left-1/2 @container size-[min(100cqh,100cqw,18rem)] -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute top-1/2 left-1/2 @container size-[min(100cqh,100cqw,18rem)] lg:size-[min(100cqh,100cqw,34rem)] -translate-x-1/2 -translate-y-1/2">
           {/* Se hunde apenas cuando le cae algo encima */}
           <div ref={latidoPlato} className="absolute inset-0">
           <div className="absolute inset-0 rounded-full border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />

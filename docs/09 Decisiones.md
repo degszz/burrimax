@@ -53,6 +53,12 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Versión para computadora (desde 1024px)
+Mobile first, pero ahora en PC se aprovecha el ancho (`max-w-6xl`): hero en dos columnas (título/foto/botones | armador de muestra), combos en 3–4 columnas, y el armador con el **plato grande a la izquierda** y tamaño + pasos + carrusel + "Siguiente" a la derecha (la barra deja de ser fija y va dentro de la columna). En el celular el orden se mantiene con `display: contents` + `order`. El carrusel suma **flechas** cuando hay mouse (`pointer: fine`), porque no se puede deslizar con el dedo. Checkout y seguimiento siguen en una columna angosta (formularios).
+
+### 2026-10-30 · URL y clave publicable de Supabase con valor por defecto
+En Vercel la tienda mostraba "No pudimos cargar el menú": en Astro las `PUBLIC_*` se graban al compilar y no estaban cargadas. Como la URL y la clave **publicable** no son secretas, `lib/supabasePublico.ts` las tiene por defecto (las variables, si existen, mandan). La clave secreta sigue solo en variables del servidor.
+
 ### 2026-10-30 · Animaciones que responden a lo que tocás + armador que nunca se pisa
 - **Animaciones** (solo como respuesta a un toque, nunca solas): la tarjeta elegida se aplasta y vuelve, aparece el tilde verde, el plato se hunde apenas cuando le cae algo, laten el contador de relleno, el precio del encabezado y el paso actual, el paso nuevo entra desde el lado hacia donde vas y "Siguiente" da un saltito cuando se habilita. Hook `lib/useLatido.ts`; keyframes en `global.css`. Todas se apagan con `prefers-reduced-motion`.
 - **Nada pisa la barra de abajo**: la barra publica su alto real (`--alto-barra`) y el armador ocupa `100dvh - barra`. El plato es lo único elástico (cuadrado del lado más corto, con container queries); el carrusel se dimensiona también por alto (`22dvh`). En pantallas bajas (≤720px) se ocultan el subtítulo del paso y el rótulo "Armá tu burrito", y la foto de la tarjeta es más chica. Probado a 375×667 y 375×812.

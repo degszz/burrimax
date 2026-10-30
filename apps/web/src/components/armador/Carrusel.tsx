@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -65,6 +65,18 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
     };
   }, [items.length]);
 
+  // Centra la tarjeta de al lado (flechas en PC).
+  function mover(direccion: 1 | -1) {
+    const contenedor = pista_.current;
+    const destino = contenedor?.children[centro + direccion] as HTMLElement | undefined;
+    if (!contenedor || !destino) return;
+    const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    contenedor.scrollTo({
+      left: destino.offsetLeft - (contenedor.clientWidth - destino.offsetWidth) / 2,
+      behavior: suave ? 'smooth' : 'auto',
+    });
+  }
+
   return (
     <div>
       <div
@@ -80,6 +92,8 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
         ))}
       </div>
       <div className="flex items-center justify-center gap-3 px-4 text-tinta-suave">
+        {/* Con mouse no se puede deslizar con el dedo: flechas (solo en PC) */}
+        <Flecha lado="izq" onClick={() => mover(-1)} disabled={centro === 0} />
         <span aria-hidden className="flex gap-1.5">
           {items.map((item, i) => (
             <span key={clave(item)} className={cn('h-2 rounded-full transition-all', i === centro ? 'w-5 bg-tinta' : 'w-2 bg-tinta/25')} />
@@ -87,9 +101,25 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
         </span>
         <span className="flex items-center gap-1 text-base font-semibold">
           {pista}
-          {pista.startsWith('Deslizá') && <ArrowRight aria-hidden className="size-4" />}
+          {pista.startsWith('Deslizá') && <ArrowRight aria-hidden className="size-4 [@media(pointer:fine)]:hidden" />}
         </span>
+        <Flecha lado="der" onClick={() => mover(1)} disabled={centro === items.length - 1} />
       </div>
     </div>
+  );
+}
+
+function Flecha({ lado, onClick, disabled }: { lado: 'izq' | 'der'; onClick: () => void; disabled: boolean }) {
+  const Icono = lado === 'izq' ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={lado === 'izq' ? 'Ver el anterior' : 'Ver el siguiente'}
+      className="juguete hidden size-11 shrink-0 place-items-center rounded-full bg-white disabled:opacity-35 [@media(pointer:fine)]:grid"
+    >
+      <Icono aria-hidden className="size-6" strokeWidth={2.75} />
+    </button>
   );
 }
