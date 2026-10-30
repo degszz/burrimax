@@ -10,7 +10,7 @@ tags: [burritos, roadmap]
 - [x] RLS + seed con ingredientes de ejemplo (aplicados y probados como anon y admin)
 - [x] `packages/shared`: schemas Zod, `pricing.ts` con tests (20 pasan)
 - [x] `packages/shared`: tipos generados de Supabase (`db.types.ts`)
-- [ ] Deploy de prueba en Vercel (las dos apps) — falta `vercel login`
+- [ ] Deploy en Vercel: **tienda publicada** (burrimax.vercel.app); falta el proyecto del **admin** (Root Directory `apps/admin`)
 
 ## Fase 1 — Armador en el hero (ver [[superpowers/specs/2026-10-28-armador-hero-design|diseño]])
 - [x] Home = armador, con el catálogo desde Supabase
@@ -25,14 +25,14 @@ tags: [burritos, roadmap]
 ## Fase 2 — Checkout y pedidos
 - [x] Formulario de datos con validación (`/checkout`)
 - [x] `POST /api/pedidos` con recálculo en servidor (`crear_pedido` en la base)
-- [ ] Efectivo y transferencia funcionando de punta a punta — código listo; **falta `SUPABASE_SECRET_KEY`** para guardar pedidos
+- [x] Efectivo y transferencia funcionando: `SUPABASE_SECRET_KEY` cargada en Vercel (2026-10-30); el pedido sale por WhatsApp
 - [x] Página de seguimiento con token (`/pedido/[id]`), probada con un pedido de prueba
 
 ## Fase 3 — Admin (3 días)
 - [x] Login + MFA + rol (MFA exigido también en la base)
 - [x] Pedidos en vivo con sonido (consulta cada 8 s; sesión httpOnly)
 - [x] Catálogo: precios, sin stock, tamaños, combos y zonas de envío · horarios automáticos
-- [ ] Configuración: alias/CVU, medios de pago; alta de ingredientes y fotos; recetas de combos
+- [ ] Configuración: alias/CVU, medios de pago; fotos de ingredientes nuevos; recetas de combos (stock, precios y alta de ingredientes ya hechos)
 - [x] Impresión de comanda (80 mm)
 
 ## Fase 4 — Mercado Pago
@@ -52,7 +52,7 @@ tags: [burritos, roadmap]
 - [ ] Prueba con 5 personas reales (al menos una mayor de 60)
 - [ ] Lighthouse mobile > 85
 - [ ] Textos legales (celíacos, términos)
-- [ ] Dominio, SEO básico, Open Graph con foto de burrito
+- [ ] Dominio propio (SEO, Open Graph, íconos y ficha de Google ya hechos)
 
 ## Fase 8 — Contenido visual con IA (secundaria) → [[Planes/Fase 8 - Contenido visual con IA|plan]]
 - [ ] Paseo con scroll "Así hacemos tu burrito" en `/como-lo-hacemos` (fotos reales + clips de Higgsfield)

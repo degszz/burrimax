@@ -25,7 +25,7 @@ tags: [burritos, pendientes]
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?
 - [ ] Zonas de envío y costos
-- [ ] Horarios
+- [ ] Horarios reales: cargarlos en el admin → Horarios (hoy la tienda está "abierta a mano")
 - [ ] ¿Cuánto tiempo se espera una transferencia antes de cancelar?
 
 ## Pagos
@@ -33,7 +33,7 @@ tags: [burritos, pendientes]
 - [ ] ¿Stripe se va a usar realmente? ¿Hay o habrá empresa en el exterior?
 - [ ] ¿La transferencia es al alias de MP o a un banco? Cargar **alias, CVU y titular** en `config_negocio` (hoy vacíos: el seguimiento dice "te pasamos el alias por WhatsApp")
 - [x] **Número de WhatsApp** del local: +54 9 2271 468521 (`5492271468521` en `config_negocio.whatsapp`, 2026-10-30)
-- [ ] Claves del servidor: `SUPABASE_SECRET_KEY`, `MP_ACCESS_TOKEN` (prueba) y después `MP_WEBHOOK_SECRET` (ver `.env.example`)
+- [ ] Claves del servidor: ~~`SUPABASE_SECRET_KEY`~~ (cargada) · faltan `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`
 
 ## Contenido con IA (Fase 8, secundaria) → [[Planes/Fase 8 - Contenido visual con IA]]
 - [ ] ¿Se crea la cuenta de Higgsfield? Presupuesto aprox. US$10–15
