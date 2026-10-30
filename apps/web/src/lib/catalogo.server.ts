@@ -1,5 +1,6 @@
 import { CATEGORIAS, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database } from '@burritos/shared';
 import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_CLAVE_PUBLICA, SUPABASE_URL } from './supabasePublico';
 
 // Lee el catálogo activo de Supabase con la clave pública (RLS ya filtra lo
 // inactivo para anon) y lo pasa a la forma que usan shared y el armador.
@@ -32,10 +33,7 @@ export interface DatosTienda {
 
 /** Cliente con la clave pública (respeta RLS). */
 export function cliente() {
-  const url = import.meta.env.PUBLIC_SUPABASE_URL;
-  const clave = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !clave) throw new Error('Faltan PUBLIC_SUPABASE_URL o PUBLIC_SUPABASE_PUBLISHABLE_KEY');
-  return createClient<Database>(url, clave, { auth: { persistSession: false } });
+  return createClient<Database>(SUPABASE_URL, SUPABASE_CLAVE_PUBLICA, { auth: { persistSession: false } });
 }
 
 const esCategoria = (slug: string): slug is CategoriaSlug => (CATEGORIAS as readonly string[]).includes(slug);
