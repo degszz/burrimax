@@ -63,5 +63,6 @@ export function mensajePedido(datos: DatosMensaje, catalogo: Catalogo): string {
 
 /** Link que abre WhatsApp (la app en el celular) con el mensaje ya escrito. */
 export function linkWhatsapp(numero: string, mensaje: string): string {
-  return `https://wa.me/${numero.replace(/\D/g, '')}?text=${encodeURIComponent(mensaje)}`;
+  // Directo a api.whatsapp.com: el atajo wa.me rompe los emojis al redirigir (🌯 → �).
+  return `https://api.whatsapp.com/send?phone=${numero.replace(/\D/g, '')}&text=${encodeURIComponent(mensaje)}`;
 }

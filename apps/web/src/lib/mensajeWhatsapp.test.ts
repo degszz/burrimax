@@ -52,6 +52,6 @@ describe('mensaje de WhatsApp', () => {
   });
 
   it('el link usa solo dígitos y codifica el texto', () => {
-    expect(linkWhatsapp('+54 9 2271 468521', 'hola #1')).toBe('https://wa.me/5492271468521?text=hola%20%231');
+    expect(linkWhatsapp('+54 9 2271 468521', 'hola #1 🌯')).toBe('https://api.whatsapp.com/send?phone=5492271468521&text=hola%20%231%20%F0%9F%8C%AF');
   });
 });
