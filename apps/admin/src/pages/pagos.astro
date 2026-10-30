@@ -1,0 +1,20 @@
+---
+import EditorPagos from '@/components/EditorPagos';
+import Base from '@/layouts/Base.astro';
+
+const { data } = await Astro.locals.supabase
+  .from('config_negocio')
+  .select('pago_mp_activo, pago_transferencia_activo, pago_efectivo_activo, alias_transferencia, cvu, titular')
+  .maybeSingle();
+
+const pagos = {
+  mercadopago: !!data?.pago_mp_activo,
+  transferencia: data ? data.pago_transferencia_activo : true,
+  efectivo: data ? data.pago_efectivo_activo : true,
+};
+const transferencia = { alias: data?.alias_transferencia ?? '', cvu: data?.cvu ?? '', titular: data?.titular ?? '' };
+---
+
+<Base titulo="Pagos" conMenu activo="pagos">
+  <EditorPagos client:load pagosIniciales={pagos} transferenciaInicial={transferencia} />
+</Base>

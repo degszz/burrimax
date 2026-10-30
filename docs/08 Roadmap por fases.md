@@ -32,7 +32,9 @@ tags: [burritos, roadmap]
 - [x] Login + MFA + rol (MFA exigido también en la base)
 - [x] Pedidos en vivo con sonido (consulta cada 8 s; sesión httpOnly)
 - [x] Catálogo: precios, sin stock, tamaños, combos y zonas de envío · horarios automáticos
-- [ ] Configuración: alias/CVU, medios de pago; fotos de ingredientes nuevos; recetas de combos (stock, precios y alta de ingredientes ya hechos)
+- [x] Pagos (`/pagos`): medios de pago prendidos/apagados y alias, CVU y titular para transferir (la tienda ya los lee de la base)
+- [ ] Fotos de ingredientes nuevos (Storage) y recetas de combos (stock, precios y alta de ingredientes ya hechos)
+- [ ] Historial de pedidos con filtros
 - [x] Impresión de comanda (80 mm)
 
 ## Fase 4 — Mercado Pago

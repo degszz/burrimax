@@ -5,7 +5,7 @@ interface Props {
   titulo: string;
   /** Muestra la barra de arriba (Pedidos · Horarios · Salir). */
   conMenu?: boolean;
-  activo?: 'pedidos' | 'stock' | 'catalogo' | 'horarios';
+  activo?: 'pedidos' | 'stock' | 'catalogo' | 'horarios' | 'pagos';
 }
 
 const { titulo, conMenu = false, activo } = Astro.props;
@@ -15,6 +15,7 @@ const SECCIONES = [
   { id: 'stock', href: '/stock', texto: 'Stock' },
   { id: 'catalogo', href: '/catalogo', texto: 'Catálogo' },
   { id: 'horarios', href: '/horarios', texto: 'Horarios' },
+  { id: 'pagos', href: '/pagos', texto: 'Pagos' },
 ] as const;
 ---
 

@@ -34,8 +34,9 @@ Hecho en `apps/admin`:
 
 - **Stock** (`/stock`): lista por categoría con "Hay / No hay" de un toque, buscador, "Solo sin stock", resumen de lo que falta y "Poner todo disponible" (`/api/stock`).
 - **Catálogo** (`/catalogo`): precio extra **opcional** ("Sin cargo" si está vacío; en carne se suma por porción), **+ Agregar** en cada categoría (nombre, precio opcional, color mientras no haya foto, Sin TACC en tortillas; `/api/ingredientes`). ingredientes por categoría con foto (nombre, precio extra, Sin TACC en tortillas, **Disponible/Sin stock con un toque**, guarda al instante), tamaños (precio, carne mín./máx., vegetales y salsas máx., relleno total), combos de la casa (nombre, descripción, recomendado, disponible; el precio sale de la receta) y zonas de envío (nombre, costo, activa). Endpoint `/api/catalogo` con lista cerrada de columnas por tabla; la base valida el resto.
+- **Pagos** (`/pagos`): prende o apaga Mercado Pago, transferencia y efectivo, y carga **alias, CVU y titular** (`/api/config/pagos`). Un solo schema (`shared/configNegocio.ts`) valida la pantalla y el servidor: alias de 6 a 20 caracteres sin ñ ni tildes, CVU de 22 números (si los dígitos verificadores no cierran, solo avisa), tiene que quedar al menos un medio prendido. Muestra "Así lo ve el cliente". Mercado Pago aparece en la tienda solo si además están las claves en Vercel. No toca Stripe ni el WhatsApp. Nunca guarda claves: la tabla es de lectura pública.
 
-Falta: editar recetas de combos, subir fotos nuevas, resto de configuración (alias, medios de pago), historial con filtros, avisos por WhatsApp (ver [[Planes/WhatsApp automático]]).
+Falta: editar recetas de combos, subir fotos nuevas, historial con filtros, avisos por WhatsApp (ver [[Planes/WhatsApp automático]]).
 
 ## Cómo entrar por primera vez (lo hace Max)
 1. Supabase → **Authentication → Users → Add user → Create new user**: tu email y una contraseña larga, con "Auto Confirm User".

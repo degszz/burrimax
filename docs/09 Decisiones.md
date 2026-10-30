@@ -119,3 +119,11 @@ Web Push estándar (VAPID): el panel registra `sw.js` y guarda la suscripción e
 
 ### 2026-10-30 · Después de pedir: a WhatsApp solo y "Instalar la app"
 La pantalla de "¡Listo!" salta sola a WhatsApp con cuenta regresiva (3 s; 8 s con transferencia para copiar el alias, y copiar suma tiempo). Mientras, ofrece instalar la tienda: botón con el evento `beforeinstallprompt` (guardado en `Base.astro`), o instrucciones para iPhone (Compartir → Agregar a inicio) y Android (⋮ → Agregar a la pantalla principal). Si toca instalar, la cuenta se pausa.
+
+### 2026-10-30 · Pantalla de Pagos en el admin, con un solo schema para pantalla y servidor
+- Los medios de pago y los datos de transferencia se editan en `/pagos`, no en un "Configuración" genérico: Horarios ya es otra pantalla y cada una se entiende en 3 segundos.
+- `packages/shared/src/configNegocio.ts` valida el formulario y `POST /api/config/pagos`: alias de 6 a 20 caracteres (letras sin ñ ni tildes, números, `.` y `-`), CVU de 22 números, titular de 2 letras o más, vacío = no cargado, y al menos un medio de pago prendido.
+- Los **dígitos verificadores del CVU solo avisan, no rechazan**: no pudimos confirmar con el texto oficial del BCRA que todos los CVU de billeteras cierren con la cuenta del CBU, y bloquear una cuenta válida deja sin cobrar por transferencia.
+- Mercado Pago se puede prender, pero la tienda lo ofrece solo si además existe `MP_ACCESS_TOKEN` en el servidor (la pantalla lo avisa). Solo se guardan datos públicos: **nunca claves** (la tabla es de lectura pública).
+- Sin migración: las columnas ya existían y la tienda ya leía alias, CVU, titular y medios activos de `config_publica`.
+- Descartado: editar desde acá el WhatsApp (ya está confirmado y un error rompe el envío de pedidos) y `pago_stripe_activo` (sigue detrás de su propio interruptor).
