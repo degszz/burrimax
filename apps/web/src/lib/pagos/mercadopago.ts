@@ -1,4 +1,6 @@
-import MercadoPagoConfig, { InvalidWebhookSignatureError, Payment, Preference, WebhookSignatureValidator } from 'mercadopago';
+// Import con nombre, no por defecto: `mercadopago` es CommonJS y en Node (Vercel)
+// el import por defecto trae el módulo entero ("MercadoPagoConfig is not a constructor").
+import { InvalidWebhookSignatureError, MercadoPagoConfig, Payment, Preference, WebhookSignatureValidator } from 'mercadopago';
 import type { ItemSnapshot } from '../pedidos/armarPedido';
 import type { PagoInformado } from './estadoPago';
 
