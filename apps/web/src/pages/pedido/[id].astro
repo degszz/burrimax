@@ -17,6 +17,17 @@ interface Seguimiento {
   total: number;
   paga_con: number | null;
   items: { nombre: string; cantidad: number; precio_unitario: number }[];
+  /** Cada cambio de estado con su hora (lo carga el admin al avanzar el pedido). */
+  historial?: { estado: string; fecha: string }[];
+}
+
+/** "20:35" (hora de Argentina) del momento en que el pedido llegó a ese paso. */
+function horaDe(estado: string): string | null {
+  const paso = pedido?.historial?.find((h) => h.estado === estado);
+  if (!paso) return null;
+  return new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(
+    new Date(paso.fecha),
+  );
 }
 
 const { id } = Astro.params;
@@ -146,7 +157,10 @@ const mensajeWhatsapp = pedido
                   >
                     {hecho && <Check aria-hidden className="size-5" strokeWidth={3} />}
                   </span>
-                  <span class:list={['text-lg', esActual ? 'font-heading text-xl font-extrabold' : 'font-semibold']}>{texto}</span>
+                  <span class="flex min-w-0 flex-1 items-baseline justify-between gap-2">
+                    <span class:list={['text-lg', esActual ? 'font-heading text-xl font-extrabold' : 'font-semibold']}>{texto}</span>
+                    {horaDe(estado) && <span class="text-sm font-bold text-tinta-suave tabular-nums">{horaDe(estado)}</span>}
+                  </span>
                 </li>
               );
             })}

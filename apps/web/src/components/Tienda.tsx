@@ -37,6 +37,8 @@ interface Props {
   catalogo: Catalogo;
   combosCasa: ComboCasa[];
   abierto: boolean;
+  /** "Abierto · cierra 23:30", "Abrimos hoy a las 19:30"… */
+  textoApertura?: string;
   /** Solo dígitos, o null si todavía no está cargado. */
   whatsapp: string | null;
 }
@@ -63,7 +65,7 @@ const TITULOS: Record<PasoDeCategoria, string> = {
   4: 'Elegí tus vegetales',
 };
 
-export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Props) {
+export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, whatsapp }: Props) {
   const estado = useArmador();
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
@@ -318,7 +320,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
           // Armando: el encabezado es el pedido en curso; la flecha vuelve a los combos.
           <ResumenFlotante visible encabezado armado={armado} catalogo={catalogo} onVer={() => setArmadorAbierto(false)} />
         ) : (
-          <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
+          <Encabezado abierto={abierto} textoApertura={textoApertura} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
         )}
         {!armadorAbierto && (
           <HeroArmar

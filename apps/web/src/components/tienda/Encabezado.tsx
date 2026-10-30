@@ -3,11 +3,13 @@ import { MARCA } from '@/lib/marca';
 
 interface Props {
   abierto: boolean;
+  /** "Abierto · cierra 23:30", "Abrimos hoy a las 19:30"… */
+  textoApertura?: string;
   cantidadEnCarrito: number;
   onAbrirCarrito: () => void;
 }
 
-export function Encabezado({ abierto, cantidadEnCarrito, onAbrirCarrito }: Props) {
+export function Encabezado({ abierto, textoApertura, cantidadEnCarrito, onAbrirCarrito }: Props) {
   return (
     <header className="flex items-center gap-3 px-4 pt-4 pb-2">
       <span aria-hidden className="juguete grid size-11 shrink-0 -rotate-6 place-items-center rounded-xl bg-rojo">
@@ -22,7 +24,7 @@ export function Encabezado({ abierto, cantidadEnCarrito, onAbrirCarrito }: Props
         <p className="truncate font-heading text-xl font-extrabold leading-tight">{MARCA.nombre}</p>
         <p className={`flex items-center gap-1.5 text-sm font-bold ${abierto ? 'text-verde' : 'text-rojo'}`}>
           <span aria-hidden className={`size-2.5 rounded-full ${abierto ? 'bg-verde' : 'bg-rojo'}`} />
-          {abierto ? 'Abierto ahora' : 'Cerrado ahora'}
+          {textoApertura ?? (abierto ? 'Abierto ahora' : 'Cerrado ahora')}
         </p>
       </div>
       <button

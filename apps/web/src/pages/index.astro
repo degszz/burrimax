@@ -32,7 +32,7 @@ const ficha = datosRestaurante({
   </Fragment>
   {
     datos ? (
-      <Tienda client:load catalogo={datos.catalogo} combosCasa={datos.combosCasa} abierto={datos.abierto} whatsapp={datos.config.whatsapp} />
+      <Tienda client:load catalogo={datos.catalogo} combosCasa={datos.combosCasa} abierto={datos.abierto} textoApertura={datos.config.textoApertura} whatsapp={datos.config.whatsapp} />
     ) : (
       <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
         <div>

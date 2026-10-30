@@ -1,4 +1,4 @@
-import { CATEGORIAS, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database } from '@burritos/shared';
+import { CATEGORIAS, estadoApertura, normalizarHorarios, textoApertura, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database, type ModoApertura } from '@burritos/shared';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_CLAVE_PUBLICA, SUPABASE_URL } from './supabasePublico';
 
@@ -16,6 +16,8 @@ export interface ComboCasa {
 
 export interface ConfigTienda {
   abierto: boolean;
+  /** "Abierto · cierra 23:30", "Abrimos hoy a las 19:30"… (hora de Argentina). */
+  textoApertura: string;
   /** Medios de pago prendidos desde el admin. */
   pagos: { mercadopago: boolean; transferencia: boolean; efectivo: boolean };
   transferencia: { alias: string | null; cvu: string | null; titular: string | null };
@@ -112,12 +114,16 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
 
   const c = config.data;
   const whatsapp = c?.whatsapp?.replace(/\D/g, '') ?? '';
+  // Abierto o cerrado según los horarios de la semana (o el interruptor manual del admin).
+  const modo: ModoApertura = c?.modo_apertura === 'abierto' || c?.modo_apertura === 'cerrado' ? c.modo_apertura : 'automatico';
+  const apertura = estadoApertura(modo, normalizarHorarios(c?.horarios));
   return {
     catalogo,
     combosCasa: armarCombosCasa(burritos.data!, catalogo),
-    abierto: c?.abierto ?? false,
+    abierto: apertura.abierto,
     config: {
-      abierto: c?.abierto ?? false,
+      abierto: apertura.abierto,
+      textoApertura: textoApertura(apertura),
       pagos: {
         mercadopago: !!c?.pago_mp_activo,
         transferencia: !!c?.pago_transferencia_activo,

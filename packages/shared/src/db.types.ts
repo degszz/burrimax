@@ -87,6 +87,7 @@ export type Database = {
           aviso_celiacos: string | null
           cvu: string | null
           horarios: Json
+          modo_apertura: string
           id: boolean
           pago_efectivo_activo: boolean
           pago_mp_activo: boolean
@@ -102,6 +103,7 @@ export type Database = {
           aviso_celiacos?: string | null
           cvu?: string | null
           horarios?: Json
+          modo_apertura?: string
           id?: boolean
           pago_efectivo_activo?: boolean
           pago_mp_activo?: boolean
@@ -117,6 +119,7 @@ export type Database = {
           aviso_celiacos?: string | null
           cvu?: string | null
           horarios?: Json
+          modo_apertura?: string
           id?: boolean
           pago_efectivo_activo?: boolean
           pago_mp_activo?: boolean
@@ -242,6 +245,7 @@ export type Database = {
           estado_nuevo: Database["public"]["Enums"]["estado_pedido"]
           id: string
           pedido_id: string
+          motivo: string | null
           usuario_id: string | null
         }
         Insert: {
@@ -250,6 +254,7 @@ export type Database = {
           estado_nuevo: Database["public"]["Enums"]["estado_pedido"]
           id?: string
           pedido_id: string
+          motivo?: string | null
           usuario_id?: string | null
         }
         Update: {
@@ -258,6 +263,7 @@ export type Database = {
           estado_nuevo?: Database["public"]["Enums"]["estado_pedido"]
           id?: string
           pedido_id?: string
+          motivo?: string | null
           usuario_id?: string | null
         }
         Relationships: [
@@ -612,6 +618,7 @@ export type Database = {
           aviso_celiacos: string | null
           cvu: string | null
           horarios: Json | null
+          modo_apertura: string | null
           pago_efectivo_activo: boolean | null
           pago_mp_activo: boolean | null
           pago_stripe_activo: boolean | null
@@ -625,6 +632,7 @@ export type Database = {
           aviso_celiacos?: string | null
           cvu?: string | null
           horarios?: Json | null
+          modo_apertura?: string | null
           pago_efectivo_activo?: boolean | null
           pago_mp_activo?: boolean | null
           pago_stripe_activo?: boolean | null
@@ -638,6 +646,7 @@ export type Database = {
           aviso_celiacos?: string | null
           cvu?: string | null
           horarios?: Json | null
+          modo_apertura?: string | null
           pago_efectivo_activo?: boolean | null
           pago_mp_activo?: boolean | null
           pago_stripe_activo?: boolean | null
@@ -649,8 +658,20 @@ export type Database = {
       }
     }
     Functions: {
+      cambiar_estado_pedido: {
+        Args: {
+          p_estado: Database["public"]["Enums"]["estado_pedido"]
+          p_id: string
+          p_motivo?: string
+        }
+        Returns: Database["public"]["Tables"]["pedidos"]["Row"]
+      }
       crear_pedido: { Args: { p: Json }; Returns: Json }
       es_admin: { Args: never; Returns: boolean }
+      marcar_pagado: {
+        Args: { p_id: string }
+        Returns: Database["public"]["Tables"]["pedidos"]["Row"]
+      }
       ver_pedido: { Args: { p_id: string; p_token: string }; Returns: Json }
     }
     Enums: {
