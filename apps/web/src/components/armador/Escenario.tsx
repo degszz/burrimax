@@ -63,16 +63,16 @@ const SIMPLE: Geometria = {
 const DOBLE: Geometria = {
   // Una carne y un par de vegetales por tortilla, de punta a punta.
   carnes: [
-    [30, 50],
+    [36, 50],
     [42, 57],
     [58, 44],
-    [70, 51],
+    [64, 51],
   ],
   vegetales: [
-    [21, 47],
-    [79, 52],
-    [34, 34],
-    [66, 66],
+    [31, 45],
+    [69, 56],
+    [38, 36],
+    [62, 65],
     [49, 67],
     [53, 32],
   ],
