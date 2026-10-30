@@ -1,0 +1,69 @@
+---
+import Base from '@/layouts/Base.astro';
+
+// Segundo factor obligatorio (TOTP: Google Authenticator, Authy, 1Password…).
+// Primera vez: QR para registrar el celular. Después: solo el código.
+const supabase = Astro.locals.supabase;
+
+const { data: nivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+if (nivel?.currentLevel === 'aal2') return Astro.redirect('/');
+
+const { data: factores } = await supabase.auth.mfa.listFactors();
+const todos = factores?.all ?? [];
+let factorId: string | undefined = todos.find((f) => f.factor_type === 'totp' && f.status === 'verified')?.id;
+let qr: string | null = null;
+let secreto: string | null = null;
+
+if (!factorId) {
+  // Borra intentos de alta que quedaron a medias y empieza uno nuevo.
+  for (const f of todos.filter((f) => f.factor_type === 'totp' && f.status !== 'verified')) {
+    await supabase.auth.mfa.unenroll({ factorId: f.id });
+  }
+  const { data: alta } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: `Panel ${new Date().toISOString().slice(0, 10)}` });
+  if (alta) {
+    factorId = alta.id;
+    qr = alta.totp.qr_code;
+    secreto = alta.totp.secret;
+  }
+}
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<Base titulo="Código de seguridad">
+  <main class="grid min-h-dvh place-items-center px-4 py-8">
+    <form method="post" action="/api/auth/mfa" class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+      <h1 class="text-2xl font-bold">Código de seguridad</h1>
+      {
+        qr ? (
+          <div class="space-y-3">
+            <p>
+              <b>Primera vez:</b> abrí <b>Google Authenticator</b> (o Authy) en tu celular, tocá <b>+</b> y escaneá este código.
+            </p>
+            <img src={qr} alt="Código QR para la app de autenticación" class="mx-auto size-52 rounded-lg border bg-white p-2" />
+            <details class="text-sm text-zinc-600">
+              <summary class="cursor-pointer">¿No podés escanear? Copiá esta clave</summary>
+              <code class="mt-1 block break-all rounded bg-zinc-100 p-2">{secreto}</code>
+            </details>
+          </div>
+        ) : (
+          <p>Abrí tu app de autenticación y escribí el código de 6 números.</p>
+        )
+      }
+      {error && <p role="alert" class="rounded-lg bg-red-50 p-3 font-medium text-red-700">El código no es correcto o ya venció. Probá con el nuevo.</p>}
+      <input type="hidden" name="factorId" value={factorId} />
+      <input
+        name="codigo"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        pattern="[0-9]{6}"
+        maxlength="6"
+        required
+        autofocus
+        placeholder="123456"
+        class="h-14 w-full rounded-lg border px-3 text-center text-3xl tracking-[0.4em]"
+      />
+      <button class="h-12 w-full rounded-lg bg-zinc-900 text-lg font-bold text-white">Entrar</button>
+    </form>
+  </main>
+</Base>

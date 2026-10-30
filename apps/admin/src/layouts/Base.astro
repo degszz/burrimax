@@ -3,9 +3,13 @@ import '@/styles/global.css';
 
 interface Props {
   titulo: string;
+  /** Muestra la barra de arriba (Pedidos · Horarios · Salir). */
+  conMenu?: boolean;
+  activo?: 'pedidos' | 'horarios';
 }
 
-const { titulo } = Astro.props;
+const { titulo, conMenu = false, activo } = Astro.props;
+const usuario = Astro.locals.usuario;
 ---
 
 <!doctype html>
@@ -14,12 +18,36 @@ const { titulo } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#18181b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{titulo}</title>
+    <title>{titulo} · Admin</title>
   </head>
-  <body class="min-h-dvh bg-background text-foreground antialiased">
+  <body class="min-h-dvh bg-zinc-100 text-zinc-900 antialiased">
+    {
+      conMenu && (
+        <header class="sticky top-0 z-30 border-b bg-zinc-900 text-white print:hidden">
+          <nav class="mx-auto flex max-w-[1600px] items-center gap-2 px-4 py-2">
+            <span class="mr-2 text-lg font-bold">🌯 Admin</span>
+            <a
+              href="/"
+              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'pedidos' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
+            >
+              Pedidos
+            </a>
+            <a
+              href="/horarios"
+              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'horarios' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
+            >
+              Horarios
+            </a>
+            <span class="ml-auto hidden text-sm text-zinc-400 sm:inline">{usuario?.email}</span>
+            <form method="post" action="/api/auth/salir">
+              <button class="rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-zinc-800">Salir</button>
+            </form>
+          </nav>
+        </header>
+      )
+    }
     <slot />
   </body>
 </html>

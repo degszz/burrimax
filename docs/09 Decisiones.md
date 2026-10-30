@@ -53,6 +53,12 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Admin: sesión httpOnly, MFA también en la base, tablero por consulta
+- La sesión del admin vive en cookies **httpOnly** (`@supabase/ssr` 0.12.7 en el servidor): el JavaScript del navegador nunca ve el token. Por eso el tablero no usa Realtime en el navegador: **consulta cada 8 s** a su propio servidor (suficiente para una cocina, más simple y sin exponer el token). Si hace falta instantáneo, se suma Realtime desde el servidor.
+- `es_admin()` ahora exige rol admin **y** sesión con MFA (`aal2`). Una contraseña filtrada no alcanza ni llamando a la API directo.
+- Estados y pagos se cambian solo con `cambiar_estado_pedido` y `marcar_pagado` (validan transiciones, motivo al cancelar, "en camino" solo delivery, Mercado Pago solo por webhook) y registran historial con usuario.
+- Horarios: `config_negocio.modo_apertura` (automatico/abierto/cerrado) + `horarios` por día; la cuenta "¿abierto ahora?" está en `packages/shared/horarios.ts` con hora de Argentina y se usa en la tienda y en el endpoint de pedidos. El negocio quedó en "abierto" a mano hasta que se carguen los horarios reales.
+
 ### 2026-10-30 · Transferencia: alias y monto para copiar, y Mercado Pago como camino "automático"
 - Mercado Pago **no tiene un link oficial** para abrir "Transferir" con el alias puesto. Lo más parecido y mejor es el botón **Mercado Pago (Checkout Pro)**: abre la app con el monto y el destinatario cargados, se paga con saldo, tarjeta o cuotas, y el pedido pasa a "pagado" solo por webhook (sin comprobante). Ya está programado; se prende con `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET` en Vercel.
 - Transferencia común: la pantalla de "¡Listo!" ya no salta sola a WhatsApp; muestra **Monto / Alias / CVU con "Copiar"** y "Abrir Mercado Pago", y después "Mandar el pedido por WhatsApp". Se activa cuando se cargue el alias en `config_negocio`.

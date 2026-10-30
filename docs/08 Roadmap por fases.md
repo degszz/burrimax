@@ -29,10 +29,10 @@ tags: [burritos, roadmap]
 - [x] Página de seguimiento con token (`/pedido/[id]`), probada con un pedido de prueba
 
 ## Fase 3 — Admin (3 días)
-- [ ] Login + MFA + rol
-- [ ] Pedidos en vivo con Realtime y sonido
-- [ ] Catálogo y configuración
-- [ ] Impresión de comanda
+- [x] Login + MFA + rol (MFA exigido también en la base)
+- [x] Pedidos en vivo con sonido (consulta cada 8 s; sesión httpOnly)
+- [ ] Catálogo y configuración — **horarios hechos** (automático por día y hora)
+- [x] Impresión de comanda (80 mm)
 
 ## Fase 4 — Mercado Pago
 - [x] Checkout Pro (SDK `mercadopago` 3.6.1): preferencia con `external_reference` = pedido

@@ -1,0 +1,13 @@
+---
+import { normalizarHorarios, type ModoApertura } from '@burritos/shared';
+import EditorHorarios from '@/components/EditorHorarios';
+import Base from '@/layouts/Base.astro';
+
+const { data } = await Astro.locals.supabase.from('config_negocio').select('modo_apertura, horarios').maybeSingle();
+const modo: ModoApertura = data?.modo_apertura === 'abierto' || data?.modo_apertura === 'cerrado' ? data.modo_apertura : 'automatico';
+const horarios = normalizarHorarios(data?.horarios);
+---
+
+<Base titulo="Horarios" conMenu activo="horarios">
+  <EditorHorarios client:load modoInicial={modo} horariosIniciales={horarios} />
+</Base>

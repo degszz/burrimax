@@ -1,0 +1,28 @@
+---
+import Base from '@/layouts/Base.astro';
+
+const error = Astro.url.searchParams.get('error');
+const mensajes: Record<string, string> = {
+  datos: 'El email o la contraseña no son correctos.',
+  faltan: 'Completá el email y la contraseña.',
+};
+---
+
+<Base titulo="Ingresar">
+  <main class="grid min-h-dvh place-items-center px-4">
+    <form method="post" action="/api/auth/login" class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+      <h1 class="text-2xl font-bold">🌯 Panel del negocio</h1>
+      {error && <p role="alert" class="rounded-lg bg-red-50 p-3 font-medium text-red-700">{mensajes[error] ?? 'No se pudo ingresar.'}</p>}
+      <label class="block">
+        <span class="font-semibold">Email</span>
+        <input name="email" type="email" autocomplete="username" required class="mt-1 h-12 w-full rounded-lg border px-3 text-lg" />
+      </label>
+      <label class="block">
+        <span class="font-semibold">Contraseña</span>
+        <input name="password" type="password" autocomplete="current-password" required class="mt-1 h-12 w-full rounded-lg border px-3 text-lg" />
+      </label>
+      <button class="h-12 w-full rounded-lg bg-zinc-900 text-lg font-bold text-white">Ingresar</button>
+      <p class="text-sm text-zinc-500">Después te pedimos el código de 6 números de tu app de autenticación.</p>
+    </form>
+  </main>
+</Base>

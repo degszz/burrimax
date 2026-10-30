@@ -1,18 +1,20 @@
 ---
-import { ESTADOS_PEDIDO } from '@burritos/shared';
-import { Button } from '@/components/ui/button';
+import TableroPedidos from '@/components/TableroPedidos';
 import Base from '@/layouts/Base.astro';
 
-// Placeholder de Fase 0. Login con MFA y pedidos en vivo llegan en la Fase 3.
+// Pantalla principal (pensada para una tablet en la cocina).
+// El middleware ya verificó sesión + rol admin + código del celular.
 ---
 
-<Base titulo="Admin · Burritos">
-  <main class="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
-    <h1 class="text-2xl font-bold">Panel de pedidos</h1>
-    <p>Estados que va a manejar el panel:</p>
-    <ul class="flex flex-wrap gap-2">
-      {ESTADOS_PEDIDO.map((estado) => <li class="rounded-md border px-2 py-1 text-sm">{estado}</li>)}
-    </ul>
-    <Button client:load disabled>Ingresar (Fase 3)</Button>
-  </main>
+<Base titulo="Pedidos" conMenu activo="pedidos">
+  <TableroPedidos client:load />
 </Base>
+
+<style is:global>
+  @media print {
+    @page {
+      margin: 4mm;
+      size: 80mm auto;
+    }
+  }
+</style>
