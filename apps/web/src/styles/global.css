@@ -200,7 +200,30 @@
   animation: aparecer 260ms ease-out both;
 }
 
+/* Pedido enviado: el círculo verde aparece y el tilde se dibuja. */
+@keyframes sello {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes tilde {
+  from { stroke-dashoffset: 48; }
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-sello {
+  animation: sello 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.animate-tilde {
+  stroke-dasharray: 48;
+  animation: tilde 380ms 300ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .animate-sello,
+  .animate-tilde,
   .animate-caer,
   .animate-aparecer {
     animation: none;

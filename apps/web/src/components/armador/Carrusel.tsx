@@ -11,8 +11,9 @@ interface Props<T> {
 }
 
 /**
- * Carrusel que se desliza con el dedo. La tarjeta del centro se agranda y las
- * de los costados se inclinan en perspectiva (salvo con reduced-motion).
+ * Carrusel que se desliza con el dedo, estilo coverflow: la tarjeta del centro
+ * se agranda y las de los costados se achican y se desenfocan. Con
+ * reduced-motion se mantiene igual pero sin el giro en perspectiva.
  */
 export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>) {
   const pista_ = useRef<HTMLDivElement>(null);
@@ -36,9 +37,16 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
           menorDistancia = Math.abs(distancia);
           masCerca = i;
         }
-        if (sinMovimiento) return;
-        const d = Math.max(-1.6, Math.min(1.6, distancia));
-        tarjeta.style.transform = `perspective(900px) rotateY(${-d * 24}deg) scale(${1 - Math.abs(d) * 0.13})`;
+        // Coverflow: la del centro se agranda y queda nítida; las de los
+        // costados se achican, se meten un poco atrás y se desenfocan.
+        // El tamaño y el desenfoque siguen al dedo (no es animación), así que
+        // van siempre; con reduced-motion solo se saca el giro en perspectiva.
+        const d = Math.max(-2, Math.min(2, distancia));
+        const lejos = Math.min(1, Math.abs(d));
+        const giro = sinMovimiento ? '' : `perspective(900px) rotateY(${-d * 18}deg) `;
+        tarjeta.style.transform = `translateX(${-d * 14}%) ${giro}scale(${1.06 - lejos * 0.24})`;
+        tarjeta.style.filter = lejos > 0.05 ? `blur(${(lejos * 2.5).toFixed(2)}px)` : '';
+        tarjeta.style.opacity = String(1 - lejos * 0.35);
         tarjeta.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
       });
       setCentro(masCerca);
@@ -66,7 +74,7 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
         className="sin-scrollbar relative flex snap-x snap-mandatory gap-1 overflow-x-auto px-[calc(50%-min(22vw,5.75rem))] py-2.5"
       >
         {items.map((item, i) => (
-          <div key={clave(item)} role="listitem" className="w-[min(44vw,11.5rem)] shrink-0 snap-center will-change-transform">
+          <div key={clave(item)} role="listitem" className="w-[min(44vw,11.5rem)] shrink-0 snap-center will-change-[transform,filter]">
             {render(item, i === centro)}
           </div>
         ))}

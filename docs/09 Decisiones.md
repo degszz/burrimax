@@ -53,6 +53,12 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Pedido por WhatsApp con pantalla de "¡Listo!"
+Con efectivo o transferencia, el botón final es **"Enviar pedido por WhatsApp"** (verde). Primero el pedido se guarda igual por `POST /api/pedidos` (el precio lo sigue calculando el servidor); después aparece un tilde grande con el número de pedido y a los 1,8 s se abre WhatsApp (`wa.me`) con el mensaje ya escrito: detalle de cada burrito, entrega, pago, total y link de seguimiento. Si el salto no anda, hay botón "Abrir WhatsApp". Mercado Pago sigue yendo a pagar. Texto en `lib/mensajeWhatsapp.ts` (con test).
+
+### 2026-10-30 · Carrusel coverflow aunque el celular tenga "reducir movimiento"
+La tarjeta del centro se agranda y las de los costados se achican y se desenfocan. Tamaño y desenfoque siguen al dedo (no es una animación), así que se aplican siempre; con `prefers-reduced-motion` solo se saca el giro en perspectiva. Antes con esa opción no se veía nada del efecto (Windows con animaciones apagadas la activa).
+
 ### 2026-10-30 · Armador en una pantalla, con carrusel
 Pedido de Max (vuelve al carrusel de los bocetos; reemplaza la decisión de la grilla). Al entrar a armar, todo entra en 100dvh en el celular: encabezado con el pedido (plato en miniatura, relleno, salsas, precio; la flecha vuelve a los combos), "Armá tu burrito" + Simple/Doble **solo hasta que elegís** (vuelve con "Atrás" desde el paso 1), el plato sin tarjeta con los carteles de relleno y papas (más grande cuando ya elegiste el tamaño), la línea de pasos y el carrusel. La barra de abajo tiene alto fijo.
 

@@ -20,6 +20,8 @@ interface EstadoCarrito {
   reemplazar: (id: string, armado: Armado, nombres: Record<string, string>) => void;
   cambiarCantidad: (id: string, cantidad: number) => void;
   quitar: (id: string) => void;
+  /** Deja el carrito vacío (después de mandar el pedido). */
+  vaciar: () => void;
   cantidadBurritos: () => number;
   total: (catalogo: Catalogo) => number;
   /** Saca lo que ya no está en el menú. Devuelve los nombres quitados. */
@@ -50,6 +52,8 @@ export const useCarrito = create<EstadoCarrito>()(
       },
 
       quitar: (id) => set({ items: get().items.filter((item) => item.id !== id) }),
+
+      vaciar: () => set({ items: [] }),
 
       cantidadBurritos: () => get().items.reduce((suma, item) => suma + item.armado.cantidad, 0),
 

@@ -18,7 +18,7 @@ const pagos = datos ? { ...datos.config.pagos, mercadopago: datos.config.pagos.m
 <Base titulo="Tu pedido · [NOMBRE A CONFIRMAR]">
   {
     datos && pagos ? (
-      <Checkout client:load catalogo={datos.catalogo} pagos={pagos} abierto={datos.abierto} />
+      <Checkout client:load catalogo={datos.catalogo} pagos={pagos} abierto={datos.abierto} whatsapp={datos.config.whatsapp} />
     ) : (
       <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
         <div>

@@ -104,7 +104,8 @@ insert into public.zonas_envio (nombre, costo) values
 insert into public.config_negocio (abierto, horarios, whatsapp, aviso_celiacos, pago_mp_activo) values (
   true,
   '{"lun-dom": "19:30-23:30"}'::jsonb,
-  '[A CONFIRMAR]',
+  -- +54 9 2271 468521 (el 9 es para celulares en wa.me)
+  '5492271468521',
   'Cocinamos en una cocina compartida: puede haber contaminación cruzada con TACC. [A CONFIRMAR texto legal]',
   true
 );

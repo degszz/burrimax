@@ -4,13 +4,18 @@ import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
 import { describir } from '@/lib/armador/reglas';
 import { DATOS_VACIOS, guardarDatosCliente, leerDatosCliente, olvidarDatosCliente, type DatosCliente } from '@/lib/datosCliente';
 import { formatoPesos } from '@/lib/formato';
+import { linkWhatsapp, mensajePedido } from '@/lib/mensajeWhatsapp';
 import { cn } from '@/lib/utils';
 import { useCarrito } from '@/stores/carrito';
+import { PedidoEnviado } from './checkout/PedidoEnviado';
+import { IconoWhatsapp } from './tienda/IconosRedes';
 
 interface Props {
   catalogo: Catalogo;
   pagos: { mercadopago: boolean; transferencia: boolean; efectivo: boolean };
   abierto: boolean;
+  /** Número del local para mandar el pedido (solo dígitos). */
+  whatsapp: string | null;
 }
 
 type MetodoVisible = Exclude<MetodoPago, 'stripe'>;
@@ -32,7 +37,7 @@ const MENSAJES: Record<string, string> = {
   'pago.pagaCon': 'Revisá con cuánto pagás',
 };
 
-export default function Checkout({ catalogo, pagos, abierto }: Props) {
+export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) {
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
   const [datos, setDatos] = useState<DatosCliente>(DATOS_VACIOS);
@@ -43,6 +48,7 @@ export default function Checkout({ catalogo, pagos, abierto }: Props) {
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado] = useState<{ numero: number; link: string; url: string } | null>(null);
 
   const metodosActivos = METODOS.filter((m) => pagos[m.id]);
 
@@ -61,6 +67,8 @@ export default function Checkout({ catalogo, pagos, abierto }: Props) {
   const subtotal = carrito.items.reduce((s, i) => s + precioVistaPrevia(i.armado, catalogo) * i.armado.cantidad, 0);
   const envio = delivery ? (zona?.costo ?? 0) : 0;
   const total = subtotal + envio;
+  // Efectivo y transferencia se mandan por WhatsApp; Mercado Pago va a pagar.
+  const porWhatsapp = !!whatsapp && metodo !== 'mercadopago';
 
   function armarEntrada() {
     return {
@@ -115,9 +123,30 @@ export default function Checkout({ catalogo, pagos, abierto }: Props) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ ...entrada, web: formulario.get('web') }),
       });
-      const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string; url?: string; redirectUrl?: string };
+      const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string; numero?: number; url?: string; redirectUrl?: string };
       if (!respuesta.ok || !cuerpo.url) {
         setErrorGeneral(cuerpo.error ?? 'No pudimos mandar tu pedido. Probá de nuevo.');
+        return;
+      }
+      if (porWhatsapp && whatsapp && cuerpo.numero && !cuerpo.redirectUrl) {
+        const mensaje = mensajePedido(
+          {
+            numero: cuerpo.numero,
+            nombre: datos.nombre,
+            items: carrito.items.map((i) => ({ armado: i.armado, precio: precioVistaPrevia(i.armado, catalogo) })),
+            entrega: delivery
+              ? { tipo: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined, zona: zona?.nombre }
+              : { tipo: 'retiro' },
+            pago: { metodo: metodo ?? '', pagaCon: metodo === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined },
+            envio,
+            total,
+            notas: entrada.notas,
+            urlSeguimiento: cuerpo.url,
+          },
+          catalogo,
+        );
+        carrito.vaciar();
+        setEnviado({ numero: cuerpo.numero, link: linkWhatsapp(whatsapp, mensaje), url: `${cuerpo.url}&nuevo=1` });
         return;
       }
       window.location.href = cuerpo.redirectUrl ?? `${cuerpo.url}&nuevo=1`;
@@ -129,6 +158,8 @@ export default function Checkout({ catalogo, pagos, abierto }: Props) {
   }
 
   if (!listo) return null;
+
+  if (enviado) return <PedidoEnviado numero={enviado.numero} linkWhatsapp={enviado.link} urlSeguimiento={enviado.url} />;
 
   if (carrito.items.length === 0) {
     return (
@@ -273,9 +304,22 @@ export default function Checkout({ catalogo, pagos, abierto }: Props) {
         <button
           type="submit"
           disabled={enviando || !abierto}
-          className="juguete flex min-h-16 w-full items-center justify-center rounded-2xl bg-rojo font-heading text-2xl font-extrabold text-white shadow-[0_4px_0_var(--rojo-oscuro)] disabled:border-tinta/40 disabled:bg-beige disabled:text-tinta-suave disabled:shadow-none"
+          className={cn(
+            'juguete flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl px-3 font-heading font-extrabold text-white disabled:border-tinta/40 disabled:bg-beige disabled:text-tinta-suave disabled:shadow-none',
+            porWhatsapp ? 'bg-verde text-xl leading-tight shadow-[0_4px_0_var(--tinta)]' : 'bg-rojo text-2xl shadow-[0_4px_0_var(--rojo-oscuro)]',
+          )}
         >
-          {enviando ? 'Mandando…' : metodo === 'mercadopago' ? `Ir a pagar · ${formatoPesos(total)}` : `Confirmar pedido · ${formatoPesos(total)}`}
+          {enviando ? (
+            'Mandando…'
+          ) : metodo === 'mercadopago' ? (
+            `Ir a pagar · ${formatoPesos(total)}`
+          ) : porWhatsapp ? (
+            <>
+              <IconoWhatsapp className="size-7 shrink-0" /> Enviar pedido por WhatsApp · {formatoPesos(total)}
+            </>
+          ) : (
+            `Confirmar pedido · ${formatoPesos(total)}`
+          )}
         </button>
       </form>
     </main>
