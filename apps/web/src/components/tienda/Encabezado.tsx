@@ -12,13 +12,9 @@ interface Props {
 export function Encabezado({ abierto, textoApertura, cantidadEnCarrito, onAbrirCarrito }: Props) {
   return (
     <header className="flex items-center gap-3 px-4 pt-4 pb-2">
-      <span aria-hidden className="juguete grid size-11 shrink-0 -rotate-6 place-items-center rounded-xl bg-rojo">
-        <svg viewBox="0 0 32 32" className="size-7">
-          <rect x="4" y="9" width="24" height="14" rx="7" fill="#F4D9A6" stroke="#2B1B12" strokeWidth="2.5" />
-          <path d="M11 9v14M17 9v14" stroke="#7BB661" strokeWidth="3" />
-          <path d="M23 10.5a6.5 6.5 0 0 1 0 11" stroke="#E4572E" strokeWidth="3" fill="none" />
-        </svg>
-      </span>
+      {/* Logo de la marca (public/logo.webp, fondo transparente) */}
+      <img src="/logo.webp" alt="" width={1520} height={860} className="h-11 w-auto shrink-0" />
+
       <div className="min-w-0 flex-1">
         {/* [A CONFIRMAR] nombre del emprendimiento: se cambia en lib/marca.ts */}
         <p className="truncate font-heading text-xl font-extrabold leading-tight">{MARCA.nombre}</p>

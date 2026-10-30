@@ -14,7 +14,7 @@ interface Props {
   datosEstructurados?: Record<string, unknown>;
 }
 
-const { titulo, descripcion = MARCA.descripcion, indexar = true, imagen = '/og.png', datosEstructurados } = Astro.props;
+const { titulo, descripcion = MARCA.descripcion, indexar = true, imagen = '/og.png?v=2', datosEstructurados } = Astro.props;
 
 // La dirección pública manda (PUBLIC_SITE_URL o la de la marca), así los links
 // compartidos apuntan siempre al dominio bueno y no a una URL de prueba.
@@ -58,8 +58,9 @@ const tituloCompartir = titulo ? `${titulo} · ${MARCA.nombre}` : `${MARCA.nombr
     <meta name="application-name" content={MARCA.nombre} />
     <meta name="apple-mobile-web-app-title" content={MARCA.nombre} />
     <meta name="format-detection" content="telephone=no" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icono-192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 

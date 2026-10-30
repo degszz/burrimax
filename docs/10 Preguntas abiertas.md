@@ -4,7 +4,7 @@ tags: [burritos, pendientes]
 # Preguntas abiertas
 
 ## Negocio
-- [ ] Nombre del emprendimiento, logo y colores. **Provisorio: "Burrimax"** y el logo del burrito en cuadrado rojo. Todo se cambia en `apps/web/src/lib/marca.ts`; si cambia el logo, regenerar `public/og.png`, `favicon.svg`, `apple-touch-icon.png` e `icono-192/512.png`
+- [ ] Nombre del emprendimiento, logo y colores. **Provisorio: "Burrimax"**. Logo: el burrito cerrado que mandó Max (2026-10-30, `public/logo.webp`). Todo se cambia en `apps/web/src/lib/marca.ts`; si cambia el logo, regenerar `public/og.png`, `favicon.svg`, `apple-touch-icon.png` e `icono-192/512.png`
 - [ ] **Ciudad** del local (`MARCA.ciudad`): mejora mucho aparecer en Google cuando buscan "burritos en <ciudad>"
 - [ ] Dominio propio (ej. burrimax.com.ar): cambiar `MARCA.sitio` o `PUBLIC_SITE_URL` en Vercel, y dar de alta el sitio en Google Search Console
 - [x] Título del hero: "Burrito a tu Gusto" (2026-10-30)

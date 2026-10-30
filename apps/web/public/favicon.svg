@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Logo provisorio [A CONFIRMAR]: el mismo burrito del encabezado -->
-  <rect x="4" y="4" width="56" height="56" rx="16" fill="#C9431F" stroke="#2B1B12" stroke-width="4" />
-  <g transform="translate(6.4 6.4) scale(1.6)">
-    <rect x="4" y="9" width="24" height="14" rx="7" fill="#F4D9A6" stroke="#2B1B12" stroke-width="2.5" />
-    <path d="M11 9v14M17 9v14" stroke="#7BB661" stroke-width="3" />
-    <path d="M23 10.5a6.5 6.5 0 0 1 0 11" stroke="#FFB703" stroke-width="3" fill="none" />
-  </g>
-</svg>
