@@ -53,6 +53,9 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Si la web no puede guardar el pedido, igual sale por WhatsApp
+Mientras falte `SUPABASE_SECRET_KEY` en Vercel, `POST /api/pedidos` responde 503. Con efectivo o transferencia, el checkout manda igual el pedido por WhatsApp (sin número ni link de seguimiento), así se puede vender desde ya. Con la clave cargada vuelve el flujo completo (pedido guardado + número + seguimiento).
+
 ### 2026-10-30 · Versión para computadora (desde 1024px)
 Mobile first, pero ahora en PC se aprovecha el ancho (`max-w-6xl`): hero en dos columnas (título/foto/botones | armador de muestra), combos en 3–4 columnas, y el armador con el **plato grande a la izquierda** y tamaño + pasos + carrusel + "Siguiente" a la derecha (la barra deja de ser fija y va dentro de la columna). En el celular el orden se mantiene con `display: contents` + `order`. El carrusel suma **flechas** cuando hay mouse (`pointer: fine`), porque no se puede deslizar con el dedo. Checkout y seguimiento siguen en una columna angosta (formularios).
 

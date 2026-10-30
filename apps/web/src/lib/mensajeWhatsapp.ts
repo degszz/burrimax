@@ -3,7 +3,8 @@ import { describir } from './armador/reglas';
 import { formatoPesos } from './formato';
 
 export interface DatosMensaje {
-  numero: number;
+  /** null: el pedido no se pudo guardar en la web; va solo por WhatsApp. */
+  numero: number | null;
   nombre: string;
   items: { armado: Armado; precio: number }[];
   entrega: { tipo: 'delivery'; direccion: string; referencias?: string; zona?: string } | { tipo: 'retiro' };
@@ -11,7 +12,7 @@ export interface DatosMensaje {
   envio: number;
   total: number;
   notas?: string;
-  urlSeguimiento: string;
+  urlSeguimiento: string | null;
 }
 
 const NOMBRES_PAGO: Record<string, string> = {
@@ -22,7 +23,8 @@ const NOMBRES_PAGO: Record<string, string> = {
 
 /** Texto del pedido listo para mandar por WhatsApp al local. */
 export function mensajePedido(datos: DatosMensaje, catalogo: Catalogo): string {
-  const lineas: string[] = [`¡Hola! Soy ${datos.nombre.trim()} y te mando mi pedido #${String(datos.numero).padStart(4, '0')} 🌯`, ''];
+  const numero = datos.numero ? ` #${String(datos.numero).padStart(4, '0')}` : '';
+  const lineas: string[] = [`¡Hola! Soy ${datos.nombre.trim()} y te mando mi pedido${numero} 🌯`, ''];
 
   for (const { armado, precio } of datos.items) {
     const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
@@ -53,7 +55,8 @@ export function mensajePedido(datos: DatosMensaje, catalogo: Catalogo): string {
   const pagaCon = datos.pago.pagaCon ? ` (pago con ${formatoPesos(datos.pago.pagaCon)})` : '';
   lineas.push(`💵 Pago: ${NOMBRES_PAGO[datos.pago.metodo] ?? datos.pago.metodo}${pagaCon}`);
   if (datos.notas) lineas.push(`📝 ${datos.notas}`);
-  lineas.push(`*Total: ${formatoPesos(datos.total)}*`, '', `Seguimiento: ${datos.urlSeguimiento}`);
+  lineas.push(`*Total: ${formatoPesos(datos.total)}*`);
+  if (datos.urlSeguimiento) lineas.push('', `Seguimiento: ${datos.urlSeguimiento}`);
 
   return lineas.join('\n');
 }

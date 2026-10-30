@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 import { IconoWhatsapp } from '../tienda/IconosRedes';
 
 interface Props {
-  numero: number;
+  /** null: la web no pudo guardarlo; va solo por WhatsApp (sin seguimiento). */
+  numero: number | null;
   linkWhatsapp: string;
-  urlSeguimiento: string;
+  urlSeguimiento: string | null;
 }
 
 /** Cuánto se ve el tilde antes de saltar a WhatsApp. */
@@ -35,7 +36,13 @@ export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento }: Props) {
           ¡Listo!
         </h1>
         <p className="animate-aparecer mt-1 text-xl font-semibold">
-          Tu pedido <span className="font-heading font-extrabold">#{String(numero).padStart(4, '0')}</span> está armado
+          {numero ? (
+            <>
+              Tu pedido <span className="font-heading font-extrabold">#{String(numero).padStart(4, '0')}</span> está armado
+            </>
+          ) : (
+            'Tu pedido está armado'
+          )}
         </p>
         <p className="mt-4 text-lg text-tinta-suave" aria-live="polite">
           <IconoWhatsapp className="mr-1 inline size-5 align-[-4px] text-verde" />
@@ -48,9 +55,15 @@ export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento }: Props) {
         >
           <IconoWhatsapp className="size-6" /> Abrir WhatsApp
         </a>
-        <a href={urlSeguimiento} className="mt-3 inline-flex min-h-12 items-center font-bold text-tinta-suave underline underline-offset-4">
-          Ver mi pedido
-        </a>
+        {urlSeguimiento ? (
+          <a href={urlSeguimiento} className="mt-3 inline-flex min-h-12 items-center font-bold text-tinta-suave underline underline-offset-4">
+            Ver mi pedido
+          </a>
+        ) : (
+          <a href="/" className="mt-3 inline-flex min-h-12 items-center font-bold text-tinta-suave underline underline-offset-4">
+            Volver al inicio
+          </a>
+        )}
       </div>
     </div>
   );

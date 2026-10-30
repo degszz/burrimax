@@ -48,7 +48,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
-  const [enviado, setEnviado] = useState<{ numero: number; link: string; url: string } | null>(null);
+  const [enviado, setEnviado] = useState<{ numero: number | null; link: string; url: string | null } | null>(null);
 
   const metodosActivos = METODOS.filter((m) => pagos[m.id]);
 
@@ -124,14 +124,19 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
         body: JSON.stringify({ ...entrada, web: formulario.get('web') }),
       });
       const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string; numero?: number; url?: string; redirectUrl?: string };
-      if (!respuesta.ok || !cuerpo.url) {
+      const guardado = respuesta.ok && !!cuerpo.url;
+      // 503 = la web todavía no puede guardar pedidos: igual se mandan por WhatsApp.
+      const soloWhatsapp = respuesta.status === 503;
+      if (!guardado && !(porWhatsapp && soloWhatsapp)) {
         setErrorGeneral(cuerpo.error ?? 'No pudimos mandar tu pedido. Probá de nuevo.');
         return;
       }
-      if (porWhatsapp && whatsapp && cuerpo.numero && !cuerpo.redirectUrl) {
+      if (porWhatsapp && whatsapp && !cuerpo.redirectUrl) {
+        const numero = guardado ? (cuerpo.numero ?? null) : null;
+        const url = guardado ? (cuerpo.url ?? null) : null;
         const mensaje = mensajePedido(
           {
-            numero: cuerpo.numero,
+            numero,
             nombre: datos.nombre,
             items: carrito.items.map((i) => ({ armado: i.armado, precio: precioVistaPrevia(i.armado, catalogo) })),
             entrega: delivery
@@ -141,12 +146,12 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
             envio,
             total,
             notas: entrada.notas,
-            urlSeguimiento: cuerpo.url,
+            urlSeguimiento: url,
           },
           catalogo,
         );
         carrito.vaciar();
-        setEnviado({ numero: cuerpo.numero, link: linkWhatsapp(whatsapp, mensaje), url: `${cuerpo.url}&nuevo=1` });
+        setEnviado({ numero, link: linkWhatsapp(whatsapp, mensaje), url: url ? `${url}&nuevo=1` : null });
         return;
       }
       window.location.href = cuerpo.redirectUrl ?? `${cuerpo.url}&nuevo=1`;

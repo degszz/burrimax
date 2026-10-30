@@ -41,6 +41,16 @@ describe('mensaje de WhatsApp', () => {
     expect(texto).not.toContain('Envío a');
   });
 
+  it('sin número ni seguimiento (la web no pudo guardarlo) igual arma el mensaje', () => {
+    const texto = mensajePedido(
+      { numero: null, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'efectivo' }, envio: 0, total: 18000, urlSeguimiento: null },
+      catalogoEjemplo,
+    );
+    expect(texto).toContain('te mando mi pedido 🌯');
+    expect(texto).not.toContain('#');
+    expect(texto).not.toContain('Seguimiento');
+  });
+
   it('el link usa solo dígitos y codifica el texto', () => {
     expect(linkWhatsapp('+54 9 2271 468521', 'hola #1')).toBe('https://wa.me/5492271468521?text=hola%20%231');
   });
