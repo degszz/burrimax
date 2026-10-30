@@ -214,14 +214,18 @@ export function PlatoArmado({ armado, catalogo, mini = false }: PlatoProps) {
         <div className="absolute inset-[12%] rounded-[50%] border-2 border-dashed border-tinta/40" />
       ) : (
         <div className="absolute inset-[9%] grid place-items-center rounded-[50%] border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
-          <div>
-            <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
-            <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
-              Acá se arma
-              <br />
-              tu burrito
-            </p>
-          </div>
+          {/* En la doble tapa el plato va sin texto: entre los carteles de relleno
+              y papas se confundía (pedido de Max). */}
+          {!doble && (
+            <div>
+              <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
+              <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
+                Acá se arma
+                <br />
+                tu burrito
+              </p>
+            </div>
+          )}
         </div>
       )}
 
