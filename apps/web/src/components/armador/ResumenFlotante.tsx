@@ -9,13 +9,15 @@ interface Props {
   armado: Armado;
   catalogo: Catalogo;
   onVer: () => void;
+  /** Como encabezado del armador: siempre a la vista, arriba de todo. */
+  encabezado?: boolean;
 }
 
 /**
- * Franja fija arriba mientras se elige en la grilla y el escenario quedó fuera
- * de vista: cada toque sigue teniendo respuesta visible.
+ * Franja con el pedido en curso: el plato en miniatura, el relleno, las salsas
+ * y el precio. En el armador es el encabezado (la flecha vuelve a los combos).
  */
-export function ResumenFlotante({ visible, armado, catalogo, onVer }: Props) {
+export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado = false }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const buscar = (id?: string) => (id ? catalogo.ingredientes.find((i) => i.id === id) : undefined);
   const tortilla = buscar(armado.seleccion.tortilla[0]);
@@ -32,10 +34,12 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer }: Props) {
       onClick={onVer}
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
-      aria-label="Ver tu burrito"
+      aria-label={encabezado ? 'Volver a los combos' : 'Ver tu burrito'}
       className={cn(
-        'fixed inset-x-0 top-0 z-30 border-b-[2.5px] border-tinta bg-crema/95 backdrop-blur transition-transform duration-200 motion-reduce:transition-none',
-        visible ? 'translate-y-0' : '-translate-y-full',
+        'inset-x-0 top-0 z-30 border-b-[2.5px] border-tinta bg-crema/95 backdrop-blur',
+        encabezado
+          ? 'sticky w-full'
+          : cn('fixed transition-transform duration-200 motion-reduce:transition-none', visible ? 'translate-y-0' : '-translate-y-full'),
       )}
     >
       <span className="mx-auto flex max-w-md items-center gap-3 px-4 py-2">

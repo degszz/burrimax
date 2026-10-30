@@ -2,6 +2,7 @@ import { contarRelleno, validarArmado, type Armado, type Catalogo, type TamanoCa
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BarraPasos } from './armador/BarraPasos';
 import { BarraSiguiente } from './armador/BarraSiguiente';
+import { Carrusel } from './armador/Carrusel';
 import { DialogoCambioTamano } from './armador/DialogoCambioTamano';
 import { Escenario } from './armador/Escenario';
 import { PasoListo } from './armador/PasoListo';
@@ -210,7 +211,10 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
   }
 
   function elegirTamano(t: TamanoCatalogo) {
-    if (t.id === armado.tamanoId) return;
+    if (t.id === armado.tamanoId) {
+      estado.setTamanoConfirmado(true);
+      return;
+    }
     if (excesoAlCambiar(armado, t).length) {
       setDestino(t);
       return;
@@ -302,7 +306,12 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
     <div className={armando ? 'pb-48' : 'pb-10'}>
       {/* Encabezado + portada = una pantalla justa */}
       <div className={`mx-auto flex max-w-md flex-col ${armadorAbierto ? '' : 'min-h-dvh'}`}>
-        <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
+        {armadorAbierto ? (
+          // Armando: el encabezado es el pedido en curso; la flecha vuelve a los combos.
+          <ResumenFlotante visible encabezado armado={armado} catalogo={catalogo} onVer={() => setArmadorAbierto(false)} />
+        ) : (
+          <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
+        )}
         {!armadorAbierto && (
           <HeroArmar
             className="flex-1"
@@ -317,23 +326,19 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
 
       <main className="mx-auto max-w-md space-y-4">
         {armadorAbierto && (
-          <section id="armador" aria-label="Armá tu burrito" className="space-y-4">
-            <div className="flex items-center justify-between px-4">
-              <p className="font-heading text-2xl font-extrabold">Armá tu burrito</p>
-              <button
-                type="button"
-                onClick={() => setArmadorAbierto(false)}
-                className="min-h-11 px-2 font-bold text-tinta-suave underline underline-offset-4"
-              >
-                Ver combos
-              </button>
-            </div>
-            <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
+          <section id="armador" aria-label="Armá tu burrito" className="space-y-2 pt-1">
+            {/* Simple o doble: se elige una vez y desaparece; vuelve con "Atrás" desde el paso 1 */}
+            {paso < 5 && !estado.tamanoConfirmado && (
+              <div className="space-y-1.5">
+                <p className="px-4 font-heading text-xl font-extrabold">Armá tu burrito</p>
+                <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
+              </div>
+            )}
 
         {paso < 5 ? (
           <>
             <div ref={escenario}>
-              <Escenario armado={armado} catalogo={catalogo} />
+              <Escenario armado={armado} catalogo={catalogo} grande={estado.tamanoConfirmado} />
             </div>
             <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
             <PasoActual
@@ -397,22 +402,24 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
       </main>
 
       {armando && (
-        <ResumenFlotante visible={listo && !escenarioALaVista} armado={armado} catalogo={catalogo} onVer={subir} />
-      )}
-
-      {armando && (
         <BarraSiguiente
           precio={precio}
           motivo={motivo}
           mensajeOk={mensajeOk}
-          puedeVolver={paso > 1}
+          puedeVolver={paso > 1 || estado.tamanoConfirmado}
           puedeBorrar={enCurso}
           onSiguiente={() => {
             // Terminó de armarlo: pasa a ser "Tu burrito" en los combos.
             if (paso === 4) recordarTuyo(armado);
+            // Avanzar sin tocar simple/doble cuenta como elegido.
+            if (!estado.tamanoConfirmado) estado.setTamanoConfirmado(true);
             irAPaso((paso + 1) as Paso);
           }}
-          onAnterior={() => irAPaso((paso - 1) as Paso)}
+          onAnterior={() => {
+            // Desde el primer paso, "Atrás" vuelve a mostrar simple o doble.
+            if (paso === 1) estado.setTamanoConfirmado(false);
+            else irAPaso((paso - 1) as Paso);
+          }}
           onBorrar={borrarArmado}
         />
       )}
@@ -506,37 +513,39 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
   return (
     <section aria-labelledby="titulo-paso" className="animate-aparecer" key={paso}>
       <div className="px-4">
-        <h1 id="titulo-paso" className="text-4xl font-extrabold">
+        <h1 id="titulo-paso" className="text-2xl font-extrabold">
           {TITULOS[paso]}
         </h1>
         {lleno ? (
-          <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-verde-claro px-3 py-0.5 font-bold text-verde">
+          <p className="mt-0.5 inline-flex items-center gap-1.5 rounded-full bg-verde-claro px-3 py-0.5 text-sm font-bold text-verde">
             ✓ Llegaste al máximo ({elegidos}/{maximo}){porciones ? '' : ' · tocá uno para cambiarlo'}
           </p>
         ) : (
-          <p className="mt-1 text-lg text-tinta-suave">{subtitulo}</p>
+          <p className="text-base text-tinta-suave">{subtitulo}</p>
         )}
       </div>
-      <ul aria-label={TITULOS[paso]} className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 px-4 sm:grid-cols-3">
-        {ingredientes.map((ingrediente) => {
+      <Carrusel
+        items={ingredientes}
+        clave={(i) => i.id}
+        etiqueta={TITULOS[paso]}
+        pista={lleno ? (porciones ? 'Podés repetir la misma' : 'Sacá uno para cambiarlo') : 'Deslizá para ver más'}
+        render={(ingrediente) => {
           const cantidad = cuantas(armado, categoria, ingrediente.id);
           return (
-            <li key={ingrediente.id}>
-              <TarjetaIngrediente
-                ingrediente={ingrediente}
-                cantidad={cantidad}
-                apagada={lleno && cantidad === 0}
-                porciones={porciones}
-                puedeSumar={puedeAgregar(armado, categoria, catalogo)}
-                prioridad={paso === 1}
-                onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
-                onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
-                onRestar={() => restarPorcion(ingrediente.id)}
-              />
-            </li>
+            <TarjetaIngrediente
+              ingrediente={ingrediente}
+              cantidad={cantidad}
+              apagada={lleno && cantidad === 0}
+              porciones={porciones}
+              puedeSumar={puedeAgregar(armado, categoria, catalogo)}
+              prioridad={paso === 1}
+              onTocar={() => alternar(categoria, ingrediente.id, catalogo)}
+              onSumar={() => sumarPorcion(ingrediente.id, catalogo)}
+              onRestar={() => restarPorcion(ingrediente.id)}
+            />
           );
-        })}
-      </ul>
+        }}
+      />
     </section>
   );
 }

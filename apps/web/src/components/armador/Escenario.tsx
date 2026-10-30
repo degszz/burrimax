@@ -6,6 +6,8 @@ import { ImagenIngrediente } from './ImagenIngrediente';
 interface Props {
   armado: Armado;
   catalogo: Catalogo;
+  /** Más grande cuando ya no están los botones de tamaño y sobra lugar. */
+  grande?: boolean;
 }
 
 // Posiciones (en % del plato): carnes juntas al centro y vegetales en una
@@ -38,7 +40,7 @@ const MANCHAS_SALSA = [
   },
 ] as const;
 
-export function Escenario({ armado, catalogo }: Props) {
+export function Escenario({ armado, catalogo, grande = false }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
   const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
@@ -49,9 +51,10 @@ export function Escenario({ armado, catalogo }: Props) {
 
   return (
     <section aria-label="Tu burrito" className="px-4">
-      <div className="juguete fondo-puntos relative overflow-hidden rounded-3xl" style={{ aspectRatio: '16 / 10.5' }}>
+      {/* Sin tarjeta: el plato apoyado sobre el fondo, con los dos carteles */}
+      <div className={cn("relative transition-[height] duration-300", grande ? "h-[min(29dvh,15rem)]" : "h-[min(19dvh,10rem)]")}>
         {/* Contador de relleno */}
-        <div className="absolute top-3 left-3 z-20 rounded-2xl border-2 border-tinta bg-white px-3 py-1.5">
+        <div className="absolute top-1 left-0 z-20 rounded-2xl border-2 border-tinta bg-white px-3 py-1.5">
           <p className="font-heading text-lg leading-none font-extrabold">
             Relleno {relleno}/{maximo}
           </p>
@@ -63,7 +66,7 @@ export function Escenario({ armado, catalogo }: Props) {
         </div>
 
         {/* Plato con la tortilla */}
-        <div className="absolute top-1/2 left-1/2 aspect-square h-[92%] -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2">
           <div className="absolute inset-0 rounded-full border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />
 
           {tortilla ? (
@@ -151,7 +154,7 @@ export function Escenario({ armado, catalogo }: Props) {
         </div>
 
         {/* Papas incluidas */}
-        <div className="juguete absolute right-2.5 bottom-3 z-20 flex rotate-[-6deg] items-center gap-1.5 rounded-xl bg-amarillo px-2.5 py-1.5">
+        <div className="juguete absolute right-0 bottom-1 z-20 flex rotate-[-6deg] items-center gap-1.5 rounded-xl bg-amarillo px-2.5 py-1.5">
           <span aria-hidden className="text-xl">🍟</span>
           <span className="font-heading text-base leading-[1.05] font-extrabold">
             Papas fritas

@@ -16,8 +16,8 @@ interface Props {
 /** Barra fija abajo: qué falta (o qué viene) y el botón Siguiente con el precio. */
 export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBorrar, onSiguiente, onAnterior, onBorrar }: Props) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <p aria-live="polite" className="mb-2 flex min-h-6 items-center justify-center gap-1.5 text-center text-base font-bold">
+    <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+      <p aria-live="polite" className="mb-1.5 flex min-h-6 items-center justify-center gap-1.5 text-center text-base font-bold">
         {motivo ? (
           <span className="flex items-center gap-1.5 text-rojo">
             <CircleAlert aria-hidden className="size-5" /> {motivo}
@@ -44,15 +44,14 @@ export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBo
           {!motivo && <ArrowRight aria-hidden className="size-6" strokeWidth={2.5} />}
         </button>
       </div>
-      {puedeBorrar && (
-        <button
-          type="button"
-          onClick={onBorrar}
-          className="mx-auto mt-1 flex min-h-10 items-center px-3 text-base font-semibold text-tinta-suave underline underline-offset-4"
-        >
-          Borrar y empezar de nuevo
-        </button>
-      )}
+      {/* Siempre ocupa su lugar, así la barra no cambia de alto al elegir algo */}
+      <div className="flex h-9 items-center justify-center">
+        {puedeBorrar && (
+          <button type="button" onClick={onBorrar} className="flex min-h-9 items-center px-3 text-sm font-semibold text-tinta-suave underline underline-offset-4">
+            Borrar y empezar de nuevo
+          </button>
+        )}
+      </div>
     </div>
   );
 }

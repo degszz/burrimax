@@ -20,7 +20,10 @@ interface EstadoArmador {
   nombre: string;
   /** Si se está editando un ítem del carrito, su id. */
   editandoItemId: string | null;
+  /** Ya eligió simple o doble: los botones de tamaño se ocultan hasta volver atrás. */
+  tamanoConfirmado: boolean;
 
+  setTamanoConfirmado: (confirmado: boolean) => void;
   elegirTamano: (tamanoId: string) => void;
   setSeleccion: (seleccion: Seleccion) => void;
   alternar: (categoria: CategoriaSlug, ingredienteId: string, catalogo: Catalogo) => void;
@@ -47,8 +50,10 @@ export const useArmador = create<EstadoArmador>()(
         cantidad: 1,
         nombre: '',
         editandoItemId: null,
+        tamanoConfirmado: false,
 
-        elegirTamano: (tamanoId) => set({ tamanoId }),
+        setTamanoConfirmado: (tamanoConfirmado) => set({ tamanoConfirmado }),
+        elegirTamano: (tamanoId) => set({ tamanoId, tamanoConfirmado: true }),
         setSeleccion: (seleccion) => set({ seleccion }),
 
         alternar: (categoria, ingredienteId, catalogo) => {
@@ -95,11 +100,12 @@ export const useArmador = create<EstadoArmador>()(
             cantidad: armado.cantidad,
             nombre: armado.nombrePersonalizado ?? '',
             editandoItemId,
+            tamanoConfirmado: true,
             paso: 5,
           }),
 
         reset: (tamanoId) =>
-          set({ paso: 1, tamanoId, seleccion: SELECCION_VACIA, cantidad: 1, nombre: '', editandoItemId: null }),
+          set({ paso: 1, tamanoId, seleccion: SELECCION_VACIA, cantidad: 1, nombre: '', editandoItemId: null, tamanoConfirmado: false }),
       };
     },
     {
@@ -107,7 +113,8 @@ export const useArmador = create<EstadoArmador>()(
       // Se rehidrata al montar la isla, para que el HTML del servidor coincida.
       skipHydration: true,
       storage: createJSONStorage(() => almacenSeguro),
-      partialize: ({ paso, tamanoId, seleccion, cantidad, nombre, editandoItemId }) => ({
+      partialize: ({ paso, tamanoId, seleccion, cantidad, nombre, editandoItemId, tamanoConfirmado }) => ({
+        tamanoConfirmado,
         paso,
         tamanoId,
         seleccion,
