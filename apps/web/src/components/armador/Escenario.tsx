@@ -9,35 +9,93 @@ interface Props {
   catalogo: Catalogo;
 }
 
-// Posiciones (en % del plato): carnes juntas al centro y vegetales en una
-// ronda apretada alrededor, para que se vea como un relleno armado.
-const LUGARES_CARNE = [
-  [47, 47],
-  [56, 54],
-  [44, 57],
-  [55, 44],
-] as const;
-const LUGARES_VEGETAL = [
-  [33, 41],
-  [67, 42],
-  [34, 63],
-  [66, 64],
-  [50, 33],
-  [50, 70],
-] as const;
+// Dos escenarios: simple (plato redondo, una tortilla) y doble tapa (plato
+// ovalado, dos tortillas una al lado de la otra). Posiciones en % del plato;
+// los ingredientes de la doble se reparten a lo largo de las dos tortillas.
+type Lugar = readonly [number, number];
+interface Geometria {
+  carnes: readonly Lugar[];
+  vegetales: readonly Lugar[];
+  /** Ancho de cada ingrediente, en % del ancho del plato. */
+  anchoCarne: string;
+  anchoVegetal: string;
+  /** Coordenadas del SVG de salsas (alto siempre 100). */
+  ancho: number;
+  /** Zonas sobre la tortilla donde se ve la salsa (círculos cx, cy, r). */
+  tortillas: readonly (readonly [number, number, number])[];
+  manchas: readonly { forma: string; brillo: string }[];
+}
 
-// Manchas de salsa (coordenadas del plato, 0–100): la primera cruza el centro
-// y la segunda se superpone en diagonal, para que se vean las dos.
-const MANCHAS_SALSA = [
-  {
-    forma: 'M20 47 C 24 36, 40 33, 52 37 C 63 40, 76 36, 82 43 C 87 50, 78 58, 66 57 C 54 56, 44 62, 32 60 C 22 58, 17 53, 20 47 Z',
-    brillo: 'M30 43 C 36 39, 46 39, 52 41 C 46 42, 38 43, 30 45 Z',
-  },
-  {
-    forma: 'M30 26 C 40 22, 52 28, 56 38 C 60 48, 70 56, 74 66 C 77 74, 68 79, 60 74 C 52 69, 48 58, 40 52 C 32 46, 22 34, 30 26 Z',
-    brillo: 'M36 30 C 42 28, 48 32, 50 37 C 46 35, 41 33, 36 32 Z',
-  },
-] as const;
+const SIMPLE: Geometria = {
+  // Carnes juntas al centro y vegetales en una ronda apretada alrededor.
+  carnes: [
+    [47, 47],
+    [56, 54],
+    [44, 57],
+    [55, 44],
+  ],
+  vegetales: [
+    [33, 41],
+    [67, 42],
+    [34, 63],
+    [66, 64],
+    [50, 33],
+    [50, 70],
+  ],
+  anchoCarne: 'w-[32%]',
+  anchoVegetal: 'w-[28%]',
+  ancho: 100,
+  tortillas: [[50, 50, 40]],
+  // La primera mancha cruza el centro y la segunda se superpone en diagonal.
+  manchas: [
+    {
+      forma: 'M20 47 C 24 36, 40 33, 52 37 C 63 40, 76 36, 82 43 C 87 50, 78 58, 66 57 C 54 56, 44 62, 32 60 C 22 58, 17 53, 20 47 Z',
+      brillo: 'M30 43 C 36 39, 46 39, 52 41 C 46 42, 38 43, 30 45 Z',
+    },
+    {
+      forma: 'M30 26 C 40 22, 52 28, 56 38 C 60 48, 70 56, 74 66 C 77 74, 68 79, 60 74 C 52 69, 48 58, 40 52 C 32 46, 22 34, 30 26 Z',
+      brillo: 'M36 30 C 42 28, 48 32, 50 37 C 46 35, 41 33, 36 32 Z',
+    },
+  ],
+};
+
+
+const DOBLE: Geometria = {
+  // Una carne y un par de vegetales por tortilla, de punta a punta.
+  carnes: [
+    [30, 50],
+    [42, 57],
+    [58, 44],
+    [70, 51],
+  ],
+  vegetales: [
+    [21, 47],
+    [79, 52],
+    [34, 34],
+    [66, 66],
+    [49, 67],
+    [53, 32],
+  ],
+  anchoCarne: 'w-[19%]',
+  anchoVegetal: 'w-[16.5%]',
+  ancho: 170,
+  // Centros de las dos tortillas (ver las clases de las imágenes más abajo).
+  tortillas: [
+    [61, 50, 38],
+    [109, 50, 38],
+  ],
+  // Manchas largas que cruzan las dos tortillas.
+  manchas: [
+    {
+      forma: 'M24 48 C 32 36, 62 34, 86 38 C 110 42, 134 34, 148 42 C 157 50, 145 60, 124 58 C 100 56, 76 64, 50 61 C 31 59, 19 55, 24 48 Z',
+      brillo: 'M36 44 C 52 39, 72 39, 88 41 C 72 43, 54 44, 36 46 Z',
+    },
+    {
+      forma: 'M30 31 C 50 22, 76 30, 92 42 C 106 53, 126 63, 144 64 C 156 65, 153 76, 138 76 C 114 76, 94 65, 79 55 C 62 44, 42 42, 31 38 C 25 36, 25 33, 30 31 Z',
+      brillo: 'M40 30 C 52 27, 64 30, 72 35 C 62 33, 52 32, 40 32 Z',
+    },
+  ],
+};
 
 export function Escenario({ armado, catalogo }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
@@ -47,6 +105,7 @@ export function Escenario({ armado, catalogo }: Props) {
   const relleno = contarRelleno(armado);
   const maximo = tamano ? maximoRelleno(tamano) : 0;
   const doble = (tamano?.cantTapas ?? 1) > 1;
+  const geo = doble ? DOBLE : SIMPLE;
   // Animaciones que responden a lo que se elige.
   const cambio = `${armado.seleccion.tortilla.join()}|${armado.seleccion.salsa.join()}|${relleno}`;
   const latidoPlato = useLatido<HTMLDivElement>(cambio, 'animate-plato');
@@ -69,29 +128,39 @@ export function Escenario({ armado, catalogo }: Props) {
           </div>
         </div>
 
-        {/* Plato con la tortilla */}
-        <div className="absolute top-1/2 left-1/2 @container size-[min(100cqh,100cqw,18rem)] lg:size-[min(100cqh,100cqw,34rem)] -translate-x-1/2 -translate-y-1/2">
+        {/* Plato: redondo (simple) u ovalado y más largo (doble tapa), del tamaño que entre */}
+        <div
+          className={cn(
+            'absolute top-1/2 left-1/2 @container -translate-x-1/2 -translate-y-1/2 transition-[width,height] duration-300',
+            doble
+              ? 'aspect-[17/10] w-[min(100cqw,170cqh,30rem)] lg:w-[min(100cqw,170cqh,52rem)]'
+              : 'size-[min(100cqh,100cqw,18rem)] lg:size-[min(100cqh,100cqw,34rem)]',
+          )}
+        >
           {/* Se hunde apenas cuando le cae algo encima */}
           <div ref={latidoPlato} className="absolute inset-0">
-          <div className="absolute inset-0 rounded-full border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />
+          <div className="absolute inset-0 rounded-[50%] border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />
 
           {tortilla ? (
-            <>
-              {doble && (
+            doble ? (
+              // Dos tortillas una al lado de la otra, apenas encimadas: se arma a lo largo.
+              <>
                 <ImagenIngrediente
                   ingrediente={tortilla}
                   prioridad
-                  className="absolute top-[8%] left-[14%] w-[80%] rounded-full opacity-90"
+                  className="absolute top-[8%] left-[11%] w-[49.4%] -rotate-6 rounded-full"
                 />
-              )}
-              <ImagenIngrediente
-                ingrediente={tortilla}
-                prioridad
-                className={cn('absolute w-[84%] rounded-full', doble ? 'top-[6%] left-[4%]' : 'top-[8%] left-[8%]')}
-              />
-            </>
+                <ImagenIngrediente
+                  ingrediente={tortilla}
+                  prioridad
+                  className="absolute top-[8%] left-[39.6%] w-[49.4%] rotate-[7deg] rounded-full drop-shadow-[-3px_0_2px_rgba(43,27,18,.18)]"
+                />
+              </>
+            ) : (
+              <ImagenIngrediente ingrediente={tortilla} prioridad className="absolute top-[8%] left-[8%] w-[84%] rounded-full" />
+            )
           ) : (
-            <div className="absolute inset-[9%] grid place-items-center rounded-full border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
+            <div className="absolute inset-[9%] grid place-items-center rounded-[50%] border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
               <div>
                 <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
                 <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
@@ -103,12 +172,13 @@ export function Escenario({ armado, catalogo }: Props) {
             </div>
           )}
 
-          {/* Salsas: chorritos ondulados */}
           {/* Salsas: manchas untadas sobre la tortilla, debajo de la carne y los vegetales */}
-          <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 z-10" aria-hidden>
+          <svg viewBox={`0 0 ${geo.ancho} 100`} className="pointer-events-none absolute inset-0 z-10 size-full" aria-hidden>
             <defs>
               <clipPath id="sobre-tortilla">
-                <circle cx="50" cy="50" r="40" />
+                {geo.tortillas.map(([cx, cy, r]) => (
+                  <circle key={cx} cx={cx} cy={cy} r={r} />
+                ))}
               </clipPath>
               {/* Borde irregular, como salsa untada con cuchara */}
               <filter id="salsa-untada" x="-10%" y="-10%" width="120%" height="120%">
@@ -119,7 +189,7 @@ export function Escenario({ armado, catalogo }: Props) {
             </defs>
             <g clipPath="url(#sobre-tortilla)">
               {salsas.map((salsa, i) => {
-                const mancha = MANCHAS_SALSA[i % MANCHAS_SALSA.length]!;
+                const mancha = geo.manchas[i % geo.manchas.length]!;
                 return (
                   <g key={salsa.id} className="animate-aparecer" filter="url(#salsa-untada)">
                     <path d={mancha.forma} fill={salsa.colorHex ?? '#E4572E'} opacity="0.93" />
@@ -133,11 +203,11 @@ export function Escenario({ armado, catalogo }: Props) {
           {/* Carnes al centro, vegetales alrededor */}
           {armado.seleccion.carne.map((id, i) => {
             const carne = buscar(id);
-            const lugar = LUGARES_CARNE[i % LUGARES_CARNE.length]!;
+            const lugar = geo.carnes[i % geo.carnes.length]!;
             return carne ? (
               <span
                 key={`${id}-${i}`}
-                className="animate-caer absolute z-[11] w-[32%]"
+                className={cn('animate-caer absolute z-[11]', geo.anchoCarne)}
                 style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
               >
                 <ImagenIngrediente ingrediente={carne} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />
@@ -146,11 +216,11 @@ export function Escenario({ armado, catalogo }: Props) {
           })}
           {armado.seleccion.vegetal.map((id, i) => {
             const vegetal = buscar(id);
-            const lugar = LUGARES_VEGETAL[i % LUGARES_VEGETAL.length]!;
+            const lugar = geo.vegetales[i % geo.vegetales.length]!;
             return vegetal ? (
               <span
                 key={id}
-                className="animate-caer absolute z-[12] w-[28%]"
+                className={cn('animate-caer absolute z-[12]', geo.anchoVegetal)}
                 style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
               >
                 <ImagenIngrediente ingrediente={vegetal} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />
