@@ -9,14 +9,13 @@ actualizado: 2026-10-29
 ## Idea
 La home **es** el armador. El burrito se arma frente al cliente: la tortilla en un plato y cada ingrediente **cae con un rebote** en su lugar (salsas en chorrito, carnes al centro, vegetales alrededor). Estilo caricatura cálido. El "3D" lo dan los **renders `.avif` de Max**, no un motor 3D.
 
-## Pantalla (mobile, una columna)
-1. Encabezado: logo, "Abierto ahora", carrito con contador.
-2. Selector de tamaño: **Simple** (2 carnes · 4 verd.) | **Doble tapa** (4 carnes · 6 verd.).
-3. Escenario: plato con la tortilla, contador "Relleno X/N", sello "Papas fritas incluidas".
-4. Barra de pasos (1 Tortilla · 2 Salsas · 3 Carne · 4 Vegetales · 5 ¡Listo!).
-5. Título del paso + "Elegiste X de N" y **grilla de 2 columnas** con tarjetas grandes. Carne con `− n +` por porciones.
-6. Botón fijo abajo "Siguiente · $X" con el motivo si falta algo ("Te falta 1 porción de carne (1/2)").
-7. Al bajar, **resumen flotante** arriba: plato en miniatura, relleno, salsas y precio.
+## Pantalla (mobile, todo en 100dvh)
+1. Encabezado = el pedido en curso: plato en miniatura, "Relleno X/N", salsas, tamaño y precio. La flecha vuelve a los combos.
+2. "Armá tu burrito" + **Simple** | **Doble tapa** — solo hasta que elegís (o tocás Siguiente). Vuelve con "Atrás" desde el paso 1.
+3. Plato **sin tarjeta** sobre el fondo con los carteles "Relleno X/N" y "Papas fritas incluidas". Se agranda cuando ya no están los botones de tamaño.
+4. Línea de pasos (1 Tortilla · 2 Salsas · 3 Carne · 4 Vegetales · 5 ¡Listo!).
+5. Título del paso y **carrusel** con perspectiva (como en los bocetos). Carne con `− n +` por porciones.
+6. Barra fija abajo: motivo o mensaje, "Siguiente · $X" y "Borrar y empezar de nuevo" (alto fijo).
 
 ## Imágenes
 - `apps/web/public/armador/<slug>.avif` (slug = `ingredientes.slug`). Fondo transparente.

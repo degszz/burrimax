@@ -53,6 +53,9 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Armador en una pantalla, con carrusel
+Pedido de Max (vuelve al carrusel de los bocetos; reemplaza la decisión de la grilla). Al entrar a armar, todo entra en 100dvh en el celular: encabezado con el pedido (plato en miniatura, relleno, salsas, precio; la flecha vuelve a los combos), "Armá tu burrito" + Simple/Doble **solo hasta que elegís** (vuelve con "Atrás" desde el paso 1), el plato sin tarjeta con los carteles de relleno y papas (más grande cuando ya elegiste el tamaño), la línea de pasos y el carrusel. La barra de abajo tiene alto fijo.
+
 ### 2026-10-30 · "Tu burrito" primero en los combos de la casa
 Pedido de Max: el último burrito que la persona terminó de armar (al llegar a "¡Listo!", al agregarlo o al guardarlo) se guarda en el celular (`lib/ultimoBurrito.ts`) y va primero en la grilla, marcado en verde; después los recomendados. Reemplaza la sección fija "Tus combos", que ahora se abre con un botón. Abrir un combo de la casa con "Cambiarle algo" no lo convierte en "tuyo" hasta que lo agregues o lo guardes.
 
