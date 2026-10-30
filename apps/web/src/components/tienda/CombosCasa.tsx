@@ -24,51 +24,49 @@ export function CombosCasa({ combos, catalogo, onAgregar, onPersonalizar }: Prop
       </h2>
       <p className="text-tinta-suave">Listos para pedir, con papas fritas incluidas</p>
 
-      <ul className="mt-4 space-y-4">
+      <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
         {combos.map((combo) => {
           const tamano = catalogo.tamanos.find((t) => t.id === combo.armado.tamanoId);
           const doble = (tamano?.cantTapas ?? 1) > 1;
-          const tortilla = catalogo.ingredientes.find((i) => i.id === combo.armado.seleccion.tortilla[0]);
           return (
-            <li key={combo.id} className="juguete overflow-hidden rounded-3xl bg-white">
-              <div className="fondo-puntos relative px-4 pt-3 pb-1">
+            <li key={combo.id} className="juguete flex flex-col overflow-hidden rounded-3xl bg-white">
+              <div className="fondo-puntos relative px-2 pt-6 pb-1">
                 {combo.destacado && (
-                  <span className="absolute top-3 left-3 z-30 rounded-full border-2 border-tinta bg-amarillo px-2.5 font-heading font-extrabold">
+                  <span className="absolute top-1.5 left-1.5 z-30 rounded-full border-2 border-tinta bg-amarillo px-2 font-heading text-xs font-extrabold">
                     Recomendado
                   </span>
                 )}
-                <BurritoConPapas doble={doble} tortilla={tortilla?.slug} className="max-w-[16rem]" />
+                {/* La misma foto para todos (también la doble) hasta tener las específicas */}
+                <BurritoConPapas doble={false} />
               </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-2xl font-extrabold">{combo.nombre}</h3>
-                  <span className="font-heading text-2xl font-extrabold">{formatoPesos(precioVistaPrevia(combo.armado, catalogo))}</span>
+              <div className="flex flex-1 flex-col p-3">
+                <h3 className="text-xl leading-tight font-extrabold">{combo.nombre}</h3>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span
+                    className={cn(
+                      'rounded-full border-2 border-tinta px-2 font-heading text-xs font-extrabold whitespace-nowrap',
+                      doble ? 'bg-rojo text-white' : 'bg-amarillo',
+                    )}
+                  >
+                    {tamano?.nombre}
+                  </span>
+                  <span className="font-heading text-lg font-extrabold">{formatoPesos(precioVistaPrevia(combo.armado, catalogo))}</span>
                 </div>
-                <span
-                  className={cn(
-                    'mt-1 inline-block rounded-full border-2 border-tinta px-2.5 font-heading font-extrabold',
-                    doble ? 'bg-rojo text-white' : 'bg-amarillo',
-                  )}
+                <p className="mt-1.5 line-clamp-3 flex-1 text-sm text-tinta-suave">{resumenCorto(combo.armado, catalogo)}</p>
+                <button
+                  type="button"
+                  onClick={() => onAgregar(combo)}
+                  className="juguete mt-3 flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-rojo font-heading text-lg font-extrabold text-white shadow-[0_4px_0_var(--rojo-oscuro)]"
                 >
-                  {tamano?.nombre}
-                </span>
-                <p className="mt-2 text-tinta-suave">{resumenCorto(combo.armado, catalogo)}</p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onAgregar(combo)}
-                    className="juguete flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-rojo px-2 font-heading text-lg font-extrabold whitespace-nowrap text-white shadow-[0_4px_0_var(--rojo-oscuro)]"
-                  >
-                    <ShoppingBag aria-hidden className="size-5" /> Agregar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onPersonalizar(combo)}
-                    className="juguete flex min-h-12 items-center gap-1.5 rounded-2xl bg-white px-3 font-heading text-base font-extrabold"
-                  >
-                    <Pencil aria-hidden className="size-4" /> Cambiarle algo
-                  </button>
-                </div>
+                  <ShoppingBag aria-hidden className="size-5" /> Agregar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onPersonalizar(combo)}
+                  className="mt-1 flex min-h-11 items-center justify-center gap-1 text-sm font-bold text-tinta-suave underline underline-offset-4"
+                >
+                  <Pencil aria-hidden className="size-3.5" /> Cambiarle algo
+                </button>
               </div>
             </li>
           );

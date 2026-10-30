@@ -58,7 +58,8 @@ select m.id, 'burrito', p.nombre, p.descripcion, p.precio, t.id, p.destacado, p.
 from (values
   ('Clásico', 'Trigo, vaca ×2, salsa roja casera, lechuga, tomate y cebolla', 9000, 'simple', true, 1),
   ('Pollo y choclo', 'Maíz sin TACC, pollo ×2, guacamole, choclo, lechuga y morrones', 9000, 'simple', false, 2),
-  ('El Doble', 'Doble tapa de trigo, vaca ×2, pollo ×2, picante roja y 6 vegetales', 13500, 'doble', true, 3)
+  ('El Doble', 'Doble tapa de trigo, vaca ×2, pollo ×2, picante roja y 6 vegetales', 13500, 'doble', true, 3),
+  ('Del Mar', 'Maíz sin TACC, pescado ×2, salsa golf, lechuga, repollo y zanahoria', 9000, 'simple', false, 4)
 ) as p (nombre, descripcion, precio, tamano, destacado, orden)
 join public.menus m on m.nombre = 'Burritos'
 join public.tamanos t on t.slug = p.tamano;
@@ -82,7 +83,9 @@ from (values
   ('El Doble', 'tortilla-trigo', 1), ('El Doble', 'vaca', 2), ('El Doble', 'pollo', 2),
   ('El Doble', 'picante-roja', 1), ('El Doble', 'lechuga', 1), ('El Doble', 'tomate', 1),
   ('El Doble', 'cebolla-morada', 1), ('El Doble', 'choclo', 1), ('El Doble', 'zanahoria', 1),
-  ('El Doble', 'repollo', 1)
+  ('El Doble', 'repollo', 1),
+  ('Del Mar', 'tortilla-maiz', 1), ('Del Mar', 'pescado', 2), ('Del Mar', 'golf', 1),
+  ('Del Mar', 'lechuga', 1), ('Del Mar', 'repollo', 1), ('Del Mar', 'zanahoria', 1)
 ) as r (producto, ingrediente, porciones)
 join public.productos p on p.nombre = r.producto
 join public.ingredientes i on i.slug = r.ingrediente;
