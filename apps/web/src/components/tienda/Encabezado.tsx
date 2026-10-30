@@ -1,4 +1,5 @@
 import { ShoppingBag } from 'lucide-react';
+import { MARCA } from '@/lib/marca';
 
 interface Props {
   abierto: boolean;
@@ -17,8 +18,8 @@ export function Encabezado({ abierto, cantidadEnCarrito, onAbrirCarrito }: Props
         </svg>
       </span>
       <div className="min-w-0 flex-1">
-        {/* [A CONFIRMAR] nombre del emprendimiento */}
-        <p className="truncate font-heading text-xl font-extrabold leading-tight">[NOMBRE]</p>
+        {/* [A CONFIRMAR] nombre del emprendimiento: se cambia en lib/marca.ts */}
+        <p className="truncate font-heading text-xl font-extrabold leading-tight">{MARCA.nombre}</p>
         <p className={`flex items-center gap-1.5 text-sm font-bold ${abierto ? 'text-verde' : 'text-rojo'}`}>
           <span aria-hidden className={`size-2.5 rounded-full ${abierto ? 'bg-verde' : 'bg-rojo'}`} />
           {abierto ? 'Abierto ahora' : 'Cerrado ahora'}

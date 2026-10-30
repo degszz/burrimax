@@ -59,8 +59,7 @@ const mensajeWhatsapp = pedido
   : '';
 ---
 
-<Base titulo={pedido ? `Pedido #${pedido.numero}` : 'Pedido no encontrado'}>
-  <meta slot="head" name="robots" content="noindex" />
+<Base titulo={pedido ? `Pedido #${pedido.numero}` : 'Pedido no encontrado'} indexar={false}>
   {
     !pedido ? (
       <main class="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">

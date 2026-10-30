@@ -53,6 +53,11 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Metadatos, vista previa al compartir y Google
+- Marca en un solo lugar (`lib/marca.ts`): nombre provisorio **Burrimax**, frase, descripción, ciudad, redes, dominio. `Base.astro` arma título, descripción, canónica, Open Graph + Twitter (lo que muestra WhatsApp al compartir el link), íconos y manifest.
+- `public/og.png` 1200×630 (~260 KB, por debajo del límite de 300 KB que se recomienda para WhatsApp): el plato armado con los ingredientes reales de la tienda, nombre, "Armá tu burrito a tu gusto" y papas. Se generó con Edge en modo sin ventana desde un HTML (no hay librería de imágenes en el repo).
+- Google: ficha `Restaurant` (schema.org) en la portada, `robots.txt` y `sitemap.xml` generados desde la marca; checkout y seguimiento con `noindex`.
+
 ### 2026-10-30 · Si la web no puede guardar el pedido, igual sale por WhatsApp
 Mientras falte `SUPABASE_SECRET_KEY` en Vercel, `POST /api/pedidos` responde 503. Con efectivo o transferencia, el checkout manda igual el pedido por WhatsApp (sin número ni link de seguimiento), así se puede vender desde ya. Con la clave cargada vuelve el flujo completo (pedido guardado + número + seguimiento).
 

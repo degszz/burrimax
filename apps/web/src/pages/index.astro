@@ -2,6 +2,8 @@
 import Tienda from '@/components/Tienda';
 import Base from '@/layouts/Base.astro';
 import { cargarDatosTienda, type DatosTienda } from '@/lib/catalogo.server';
+import { datosRestaurante } from '@/lib/datosGoogle';
+import { MARCA } from '@/lib/marca';
 
 // La home es el armador. El catálogo se lee en cada visita (cambia desde el admin).
 let datos: DatosTienda | null = null;
@@ -14,9 +16,17 @@ try {
 
 // Precarga las tortillas: son lo primero que se ve.
 const tortillas = datos?.catalogo.ingredientes.filter((i) => i.categoria === 'tortilla' && i.imagenUrl) ?? [];
+
+// Ficha del negocio para Google.
+const sitio = (import.meta.env.PUBLIC_SITE_URL || MARCA.sitio).replace(/\/$/, '');
+const ficha = datosRestaurante({
+  sitio,
+  whatsapp: datos?.config.whatsapp ?? null,
+  precioDesde: datos?.catalogo.tamanos[0]?.precioBase ?? null,
+});
 ---
 
-<Base titulo="Armá tu burrito · [NOMBRE A CONFIRMAR]">
+<Base datosEstructurados={ficha}>
   <Fragment slot="head">
     {tortillas.map((t) => <link rel="preload" as="image" type="image/avif" href={t.imagenUrl} />)}
   </Fragment>

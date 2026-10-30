@@ -15,7 +15,7 @@ try {
 const pagos = datos ? { ...datos.config.pagos, mercadopago: datos.config.pagos.mercadopago && mercadoPagoConfigurado() } : null;
 ---
 
-<Base titulo="Tu pedido · [NOMBRE A CONFIRMAR]">
+<Base titulo="Tu pedido" indexar={false}>
   {
     datos && pagos ? (
       <Checkout client:load catalogo={datos.catalogo} pagos={pagos} abierto={datos.abierto} whatsapp={datos.config.whatsapp} />
