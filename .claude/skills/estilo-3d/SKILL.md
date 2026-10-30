@@ -20,7 +20,8 @@ description: Usar para todo lo visual — estilo caricatura con renders 3D en .a
 - Opciones en **carrusel coverflow** (`Carrusel.tsx`: el del centro grande y nítido, los costados chicos y desenfocados). `ResumenFlotante` es el encabezado del armador.
 - El armador entra en `100dvh - var(--alto-barra)`; el plato es lo elástico. Nada puede quedar debajo de `BarraSiguiente` (probar a 375×667 y 375×812).
 - Animaciones de respuesta con `useLatido(valor, 'animate-…')`: `animate-pop`, `animate-latido`, `animate-plato`, `animate-listo`, `animate-entrar-der/izq`, `animate-sello`. Solo responden a un toque; todas apagadas con reduced-motion.
-- Utilidades CSS: `juguete` (borde tinta + sombra dura que se hunde), `fondo-puntos`.
+- Utilidades CSS: `juguete` (borde tinta + sombra dura que se hunde), `fondo-puntos`, `sin-scrollbar`.
+- Barra de scroll global (PC) "de juguete": riel crema con borde tinta, pastilla roja con contorno (`global.css`). Firefox solo toma colores.
 
 ## Checklist antes de terminar una tarea visual
 - [ ] Probado a 375px y 768px
