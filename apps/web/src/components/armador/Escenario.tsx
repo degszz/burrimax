@@ -1,4 +1,5 @@
 import { contarRelleno, maximoRelleno, type Armado, type Catalogo, type IngredienteCatalogo } from '@burritos/shared';
+import { useId } from 'react';
 import { Smile } from 'lucide-react';
 import { useLatido } from '@/lib/useLatido';
 import { cn } from '@/lib/utils';
@@ -99,13 +100,9 @@ const DOBLE: Geometria = {
 
 export function Escenario({ armado, catalogo }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
-  const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
-  const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
-  const salsas = armado.seleccion.salsa.map(buscar).filter((i): i is IngredienteCatalogo => !!i);
   const relleno = contarRelleno(armado);
   const maximo = tamano ? maximoRelleno(tamano) : 0;
   const doble = (tamano?.cantTapas ?? 1) > 1;
-  const geo = doble ? DOBLE : SIMPLE;
   // Animaciones que responden a lo que se elige.
   const cambio = `${armado.seleccion.tortilla.join()}|${armado.seleccion.salsa.join()}|${relleno}`;
   const latidoPlato = useLatido<HTMLDivElement>(cambio, 'animate-plato');
@@ -139,100 +136,7 @@ export function Escenario({ armado, catalogo }: Props) {
         >
           {/* Se hunde apenas cuando le cae algo encima */}
           <div ref={latidoPlato} className="absolute inset-0">
-          <div className="absolute inset-0 rounded-[50%] border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />
-
-          {tortilla ? (
-            doble ? (
-              // Dos tortillas una al lado de la otra, apenas encimadas: se arma a lo largo.
-              <>
-                <ImagenIngrediente
-                  ingrediente={tortilla}
-                  prioridad
-                  className="absolute top-[8%] left-[11%] w-[49.4%] -rotate-6 rounded-full"
-                />
-                <ImagenIngrediente
-                  ingrediente={tortilla}
-                  prioridad
-                  className="absolute top-[8%] left-[39.6%] w-[49.4%] rotate-[7deg] rounded-full drop-shadow-[-3px_0_2px_rgba(43,27,18,.18)]"
-                />
-              </>
-            ) : (
-              <ImagenIngrediente ingrediente={tortilla} prioridad className="absolute top-[8%] left-[8%] w-[84%] rounded-full" />
-            )
-          ) : (
-            <div className="absolute inset-[9%] grid place-items-center rounded-[50%] border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
-              <div>
-                <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
-                <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
-                  Acá se arma
-                  <br />
-                  tu burrito
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Sin tortilla no hay dónde apoyar nada: el relleno elegido queda guardado
-              (no se borra) y vuelve a aparecer apenas se elige una tortilla. */}
-          {tortilla && (
-          <>
-          {/* Salsas: manchas untadas sobre la tortilla, debajo de la carne y los vegetales */}
-          <svg viewBox={`0 0 ${geo.ancho} 100`} className="pointer-events-none absolute inset-0 z-10 size-full" aria-hidden>
-            <defs>
-              <clipPath id="sobre-tortilla">
-                {geo.tortillas.map(([cx, cy, r]) => (
-                  <circle key={cx} cx={cx} cy={cy} r={r} />
-                ))}
-              </clipPath>
-              {/* Borde irregular, como salsa untada con cuchara */}
-              <filter id="salsa-untada" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="7" result="ruido" />
-                <feDisplacementMap in="SourceGraphic" in2="ruido" scale="4" xChannelSelector="R" yChannelSelector="G" />
-                <feDropShadow dx="0" dy="0.6" stdDeviation="0.7" floodColor="#2B1B12" floodOpacity="0.22" />
-              </filter>
-            </defs>
-            <g clipPath="url(#sobre-tortilla)">
-              {salsas.map((salsa, i) => {
-                const mancha = geo.manchas[i % geo.manchas.length]!;
-                return (
-                  <g key={salsa.id} className="animate-aparecer" filter="url(#salsa-untada)">
-                    <path d={mancha.forma} fill={salsa.colorHex ?? '#E4572E'} opacity="0.93" />
-                    <path d={mancha.brillo} fill="#FFFFFF" opacity="0.28" />
-                  </g>
-                );
-              })}
-            </g>
-          </svg>
-
-          {/* Carnes al centro, vegetales alrededor */}
-          {armado.seleccion.carne.map((id, i) => {
-            const carne = buscar(id);
-            const lugar = geo.carnes[i % geo.carnes.length]!;
-            return carne ? (
-              <span
-                key={`${id}-${i}`}
-                className={cn('animate-caer absolute z-[11]', geo.anchoCarne)}
-                style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
-              >
-                <ImagenIngrediente ingrediente={carne} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />
-              </span>
-            ) : null;
-          })}
-          {armado.seleccion.vegetal.map((id, i) => {
-            const vegetal = buscar(id);
-            const lugar = geo.vegetales[i % geo.vegetales.length]!;
-            return vegetal ? (
-              <span
-                key={id}
-                className={cn('animate-caer absolute z-[12]', geo.anchoVegetal)}
-                style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
-              >
-                <ImagenIngrediente ingrediente={vegetal} className="w-full drop-shadow-[0_2px_0_rgba(43,27,18,.35)]" />
-              </span>
-            ) : null;
-          })}
-          </>
-          )}
+            <PlatoArmado armado={armado} catalogo={catalogo} />
           </div>
         </div>
 
@@ -247,5 +151,141 @@ export function Escenario({ armado, catalogo }: Props) {
         </div>
       </div>
     </section>
+  );
+}
+
+/** ¿El armado es doble tapa? (para que la miniatura use el plato ovalado). */
+export function esDobleTapa(armado: Armado, catalogo: Catalogo): boolean {
+  return (catalogo.tamanos.find((t) => t.id === armado.tamanoId)?.cantTapas ?? 1) > 1;
+}
+
+interface PlatoProps {
+  armado: Armado;
+  catalogo: Catalogo;
+  /** Miniatura (encabezado): sin animaciones ni textos, bordes más finos. */
+  mini?: boolean;
+}
+
+/**
+ * El plato armado (tortillas, salsas, carnes y vegetales). Ocupa todo su
+ * contenedor, que tiene que estar posicionado: redondo para la simple y
+ * ovalado (17:10) para la doble. El mismo dibujo se usa en grande en el
+ * armador y en miniatura en el encabezado, así siempre coinciden.
+ */
+export function PlatoArmado({ armado, catalogo, mini = false }: PlatoProps) {
+  const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
+  const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
+  const salsas = armado.seleccion.salsa.map(buscar).filter((i): i is IngredienteCatalogo => !!i);
+  const doble = esDobleTapa(armado, catalogo);
+  const geo = doble ? DOBLE : SIMPLE;
+  // Ids únicos: hay dos platos en la página (el grande y la miniatura).
+  const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const cae = mini ? '' : 'animate-caer';
+  const sombra = mini ? '' : 'drop-shadow-[0_2px_0_rgba(43,27,18,.35)]';
+
+  return (
+    <>
+      <div
+        className={cn(
+          'absolute inset-0 rounded-[50%] border-tinta bg-white',
+          mini ? 'border-2' : 'border-[3px] shadow-[0_5px_0_var(--tinta)]',
+        )}
+      />
+
+      {tortilla ? (
+        doble ? (
+          // Dos tortillas una al lado de la otra, apenas encimadas: se arma a lo largo.
+          <>
+            <ImagenIngrediente
+              ingrediente={tortilla}
+              prioridad={!mini}
+              className="absolute top-[8%] left-[11%] w-[49.4%] -rotate-6 rounded-full"
+            />
+            <ImagenIngrediente
+              ingrediente={tortilla}
+              prioridad={!mini}
+              className={cn('absolute top-[8%] left-[39.6%] w-[49.4%] rotate-[7deg] rounded-full', !mini && 'drop-shadow-[-3px_0_2px_rgba(43,27,18,.18)]')}
+            />
+          </>
+        ) : (
+          <ImagenIngrediente ingrediente={tortilla} prioridad={!mini} className="absolute top-[8%] left-[8%] w-[84%] rounded-full" />
+        )
+      ) : mini ? (
+        <div className="absolute inset-[12%] rounded-[50%] border-2 border-dashed border-tinta/40" />
+      ) : (
+        <div className="absolute inset-[9%] grid place-items-center rounded-[50%] border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
+          <div>
+            <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
+            <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
+              Acá se arma
+              <br />
+              tu burrito
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Sin tortilla no hay dónde apoyar nada: el relleno elegido queda guardado
+          (no se borra) y vuelve a aparecer apenas se elige una tortilla. */}
+      {tortilla && (
+        <>
+          {/* Salsas: manchas untadas sobre la tortilla, debajo de la carne y los vegetales */}
+          <svg viewBox={`0 0 ${geo.ancho} 100`} className="pointer-events-none absolute inset-0 z-10 size-full" aria-hidden>
+            <defs>
+              <clipPath id={`${id}-tortilla`}>
+                {geo.tortillas.map(([cx, cy, r]) => (
+                  <circle key={cx} cx={cx} cy={cy} r={r} />
+                ))}
+              </clipPath>
+              {/* Borde irregular, como salsa untada con cuchara */}
+              <filter id={`${id}-salsa`} x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="7" result="ruido" />
+                <feDisplacementMap in="SourceGraphic" in2="ruido" scale="4" xChannelSelector="R" yChannelSelector="G" />
+                <feDropShadow dx="0" dy="0.6" stdDeviation="0.7" floodColor="#2B1B12" floodOpacity="0.22" />
+              </filter>
+            </defs>
+            <g clipPath={`url(#${id}-tortilla)`}>
+              {salsas.map((salsa, i) => {
+                const mancha = geo.manchas[i % geo.manchas.length]!;
+                return (
+                  <g key={salsa.id} className={mini ? undefined : 'animate-aparecer'} filter={`url(#${id}-salsa)`}>
+                    <path d={mancha.forma} fill={salsa.colorHex ?? '#E4572E'} opacity="0.93" />
+                    <path d={mancha.brillo} fill="#FFFFFF" opacity="0.28" />
+                  </g>
+                );
+              })}
+            </g>
+          </svg>
+
+          {/* Carnes al centro, vegetales alrededor */}
+          {armado.seleccion.carne.map((cid, i) => {
+            const carne = buscar(cid);
+            const lugar = geo.carnes[i % geo.carnes.length]!;
+            return carne ? (
+              <span
+                key={`${cid}-${i}`}
+                className={cn(cae, 'absolute z-[11]', geo.anchoCarne)}
+                style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
+              >
+                <ImagenIngrediente ingrediente={carne} className={cn('w-full', sombra)} />
+              </span>
+            ) : null;
+          })}
+          {armado.seleccion.vegetal.map((vid, i) => {
+            const vegetal = buscar(vid);
+            const lugar = geo.vegetales[i % geo.vegetales.length]!;
+            return vegetal ? (
+              <span
+                key={vid}
+                className={cn(cae, 'absolute z-[12]', geo.anchoVegetal)}
+                style={{ left: `${lugar[0]}%`, top: `${lugar[1]}%`, transform: 'translate(-50%, -50%)' }}
+              >
+                <ImagenIngrediente ingrediente={vegetal} className={cn('w-full', sombra)} />
+              </span>
+            ) : null;
+          })}
+        </>
+      )}
+    </>
   );
 }

@@ -2,7 +2,7 @@ import { contarRelleno, maximoRelleno, precioVistaPrevia, type Armado, type Cata
 import { ChevronUp } from 'lucide-react';
 import { formatoPesos } from '@/lib/formato';
 import { cn } from '@/lib/utils';
-import { ImagenIngrediente } from './ImagenIngrediente';
+import { PlatoArmado, esDobleTapa } from './Escenario';
 
 interface Props {
   visible: boolean;
@@ -19,14 +19,7 @@ interface Props {
  */
 export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado = false }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
-  const buscar = (id?: string) => (id ? catalogo.ingredientes.find((i) => i.id === id) : undefined);
-  const tortilla = buscar(armado.seleccion.tortilla[0]);
-  // Sin tortilla no se muestra el relleno (queda guardado para cuando elija una).
-  const encima = (tortilla ? [...armado.seleccion.carne, ...armado.seleccion.vegetal] : [])
-    .filter((id, i, todos) => todos.indexOf(id) === i)
-    .slice(-4)
-    .map(buscar)
-    .filter((i) => !!i);
+  const doble = esDobleTapa(armado, catalogo);
   const salsas = armado.seleccion.salsa.length;
   const precio = precioVistaPrevia(armado, catalogo);
 
@@ -45,24 +38,15 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
       )}
     >
       <span className="mx-auto flex max-w-md items-center gap-3 px-4 py-2 lg:max-w-6xl lg:px-6">
-        <span className="relative grid size-14 shrink-0 place-items-center rounded-full border-2 border-tinta bg-white">
-          {tortilla ? (
-            <ImagenIngrediente ingrediente={tortilla} className="w-12 rounded-full" />
-          ) : (
-            <span className="size-12 rounded-full border-2 border-dashed border-tinta/40" />
-          )}
-          {encima.map((ingrediente, i) => (
-            // de a dos por fila sobre la tortilla
-            <span key={ingrediente!.id} className="absolute w-6" style={{ left: 8 + (i % 2) * 18, top: 8 + Math.floor(i / 2) * 18 }}>
-              <ImagenIngrediente ingrediente={ingrediente!} className="w-full" />
-            </span>
-          ))}
+        {/* El mismo plato del armador, en chiquito: redondo (simple) u ovalado (doble) */}
+        <span aria-hidden className={cn('relative block shrink-0', doble ? 'h-14 w-24' : 'size-14')}>
+          <PlatoArmado armado={armado} catalogo={catalogo} mini />
         </span>
         <span className="min-w-0 flex-1 text-left">
           <span className="block font-heading text-lg leading-tight font-extrabold">
             Relleno {contarRelleno(armado)}/{tamano ? maximoRelleno(tamano) : 0}
           </span>
-          <span className="block text-sm font-semibold text-tinta-suave">
+          <span className="block truncate text-sm font-semibold text-tinta-suave">
             Salsas {salsas}/{tamano?.maximos.salsa ?? 0} · {tamano?.nombre}
           </span>
         </span>
