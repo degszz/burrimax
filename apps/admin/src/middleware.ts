@@ -13,7 +13,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.supabase = crearCliente(context);
   context.locals.usuario = null;
 
-  if (pathname.startsWith('/_astro/') || pathname.startsWith('/favicon')) return next();
+  // Archivos públicos de la app (íconos, manifest, service worker de avisos).
+  if (/^\/(_astro\/|favicon|icono-|apple-touch-icon|sw\.js$|site\.webmanifest$)/.test(pathname)) return next();
   if (SIN_SESION.has(pathname)) return next();
 
   const supabase = context.locals.supabase;

@@ -456,6 +456,36 @@ export type Database = {
           },
         ]
       }
+      push_suscripciones: {
+        Row: {
+          auth: string
+          created_at: string
+          dispositivo: string | null
+          endpoint: string
+          id: string
+          p256dh: string
+          usuario_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          dispositivo?: string | null
+          endpoint: string
+          id?: string
+          p256dh: string
+          usuario_id?: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          dispositivo?: string | null
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
       producto_ingredientes: {
         Row: {
           ingrediente_id: string

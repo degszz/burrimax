@@ -1,4 +1,6 @@
+import type { EstadoPedido } from '@burritos/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BotonAvisos } from './BotonAvisos';
 import { COLUMNAS, NOMBRE_PAGO, siguienteEstado, type PedidoTablero } from '@/lib/pedidos';
 
 /** Cada cuánto se buscan pedidos nuevos (la sesión vive en cookies httpOnly del servidor). */
@@ -22,6 +24,10 @@ export default function TableroPedidos() {
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [imprimir, setImprimir] = useState<PedidoTablero | null>(null);
+  const [aCancelar, setACancelar] = useState<PedidoTablero | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+  // Celular: una columna a la vez, con pestañas.
+  const [columnaMovil, setColumnaMovil] = useState<EstadoPedido>('confirmado');
   const [ahora, setAhora] = useState(() => Date.now());
   const conocidos = useRef<Set<string> | null>(null);
   const audio = useRef<AudioContext | null>(null);
@@ -102,7 +108,14 @@ export default function TableroPedidos() {
     sonar();
   }
 
-  async function accion(id: string, url: string, cuerpo: object) {
+  // Aviso corto arriba ("Pedido #0003 cancelado").
+  useEffect(() => {
+    if (!aviso) return;
+    const t = window.setTimeout(() => setAviso(null), 3500);
+    return () => window.clearTimeout(t);
+  }, [aviso]);
+
+  async function accion(id: string, url: string, cuerpo: object, exito: string): Promise<boolean> {
     setOcupado(id);
     setError(null);
     setNuevos((n) => {
@@ -113,21 +126,32 @@ export default function TableroPedidos() {
     try {
       const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(cuerpo) });
       const res = (await r.json().catch(() => ({}))) as { error?: string };
-      if (!r.ok) setError(res.error ?? 'No se pudo guardar el cambio');
+      if (r.status === 401) {
+        window.location.href = '/login';
+        return false;
+      }
+      if (!r.ok) {
+        setError(res.error ?? 'No se pudo guardar el cambio');
+        return false;
+      }
+      setAviso(exito);
       await cargar();
+      return true;
     } catch {
       setError('Sin conexión: no se guardó el cambio');
+      return false;
     } finally {
       setOcupado(null);
     }
   }
 
-  const avanzar = (p: PedidoTablero, estado: string) => accion(p.id, `/api/pedidos/${p.id}/estado`, { estado });
-  const marcarPagado = (p: PedidoTablero) => accion(p.id, `/api/pedidos/${p.id}/pagado`, {});
-  function cancelar(p: PedidoTablero) {
-    const motivo = window.prompt(`¿Por qué se cancela el pedido ${numero(p.numero)}?`);
-    if (!motivo?.trim()) return;
-    void accion(p.id, `/api/pedidos/${p.id}/estado`, { estado: 'cancelado', motivo });
+  const avanzar = (p: PedidoTablero, estado: EstadoPedido) =>
+    accion(p.id, `/api/pedidos/${p.id}/estado`, { estado }, `${numero(p.numero)} → ${COLUMNAS.find((c) => c.estado === estado)?.titulo ?? 'Entregado'}`);
+  const marcarPagado = (p: PedidoTablero) => accion(p.id, `/api/pedidos/${p.id}/pagado`, {}, `${numero(p.numero)}: pago confirmado`);
+  // Sin window.prompt: está bloqueado en varios navegadores (y en apps instaladas).
+  async function confirmarCancelacion(p: PedidoTablero, motivo: string) {
+    const ok = await accion(p.id, `/api/pedidos/${p.id}/estado`, { estado: 'cancelado', motivo }, `Pedido ${numero(p.numero)} cancelado`);
+    if (ok) setACancelar(null);
   }
 
   const terminados = (pedidos ?? []).filter((p) => p.estado === 'entregado' || p.estado === 'cancelado');
@@ -139,29 +163,65 @@ export default function TableroPedidos() {
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold">Pedidos</h1>
           {sinConexion && <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">Sin conexión · reintentando</span>}
-          {!sonido ? (
-            <button type="button" onClick={activarSonido} className="ml-auto h-12 rounded-xl bg-amber-400 px-5 text-base font-bold">
-              🔔 Activar sonido
-            </button>
-          ) : (
-            <span className="ml-auto text-sm font-semibold text-green-700">🔔 Sonido activado</span>
-          )}
+          <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+            <BotonAvisos />
+            {!sonido ? (
+              <button type="button" onClick={activarSonido} className="h-11 rounded-xl bg-amber-400 px-4 text-sm font-bold">
+                🔔 Activar sonido
+              </button>
+            ) : (
+              <span className="text-sm font-semibold text-green-700">🔔 Sonido activado</span>
+            )}
+          </div>
         </div>
         {error && (
           <p role="alert" className="mb-3 rounded-xl bg-red-50 p-3 font-semibold text-red-700">
             {error}
           </p>
         )}
+        {aviso && (
+          <p role="status" className="fixed inset-x-4 top-16 z-50 mx-auto max-w-md rounded-xl bg-zinc-900 p-3 text-center font-semibold text-white shadow-lg">
+            ✓ {aviso}
+          </p>
+        )}
+
+        {/* Celular: pestañas por estado (una lista a la vez) */}
+        {pedidos && (
+          <div role="tablist" aria-label="Estados" className="sticky top-[60px] z-20 -mx-4 mb-3 flex gap-2 overflow-x-auto bg-zinc-100 px-4 py-2 md:hidden">
+            {COLUMNAS.map((col) => {
+              const n = pedidos.filter((p) => p.estado === col.estado).length;
+              const hayNuevo = pedidos.some((p) => p.estado === col.estado && nuevos.has(p.id));
+              return (
+                <button
+                  key={col.estado}
+                  role="tab"
+                  type="button"
+                  aria-selected={columnaMovil === col.estado}
+                  onClick={() => setColumnaMovil(col.estado)}
+                  className={`relative flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 font-semibold ${columnaMovil === col.estado ? 'bg-zinc-900 text-white' : 'bg-white'}`}
+                >
+                  {col.titulo}
+                  <span className={`rounded-full px-2 text-sm ${n ? 'bg-amber-400 text-zinc-900' : 'bg-zinc-200 text-zinc-500'}`}>{n}</span>
+                  {hayNuevo && <span aria-label="nuevo" className="absolute -top-1 -right-1 size-3 rounded-full bg-red-600" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {pedidos === null ? (
           <p className="py-20 text-center text-lg text-zinc-500">Cargando pedidos…</p>
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 xl:grid xl:grid-cols-5 xl:overflow-visible">
+          <div className="pb-4 md:flex md:gap-4 md:overflow-x-auto xl:grid xl:grid-cols-5 xl:overflow-visible">
             {COLUMNAS.map((col) => {
               const lista = pedidos.filter((p) => p.estado === col.estado);
               return (
-                <section key={col.estado} aria-label={col.titulo} className="w-80 shrink-0 xl:w-auto">
-                  <h2 className="mb-2 flex items-center gap-2 text-lg font-bold">
+                <section
+                  key={col.estado}
+                  aria-label={col.titulo}
+                  className={`${columnaMovil === col.estado ? 'block' : 'hidden'} md:block md:w-80 md:shrink-0 xl:w-auto`}
+                >
+                  <h2 className="mb-2 hidden items-center gap-2 text-lg font-bold md:flex">
                     {col.titulo}
                     <span className="rounded-full bg-zinc-900 px-2.5 text-sm text-white">{lista.length}</span>
                   </h2>
@@ -176,7 +236,7 @@ export default function TableroPedidos() {
                         minutos={Math.floor((ahora - new Date(p.creado).getTime()) / 60000)}
                         onAvanzar={avanzar}
                         onPagado={marcarPagado}
-                        onCancelar={cancelar}
+                        onCancelar={setACancelar}
                         onImprimir={setImprimir}
                       />
                     ))}
@@ -212,6 +272,14 @@ export default function TableroPedidos() {
       </div>
 
       {imprimir && <Comanda pedido={imprimir} />}
+      {aCancelar && (
+        <DialogoCancelar
+          pedido={aCancelar}
+          ocupado={ocupado === aCancelar.id}
+          onCerrar={() => setACancelar(null)}
+          onConfirmar={(motivo) => void confirmarCancelacion(aCancelar, motivo)}
+        />
+      )}
     </>
   );
 }
@@ -221,7 +289,7 @@ interface TarjetaProps {
   nuevo: boolean;
   ocupado: boolean;
   minutos: number;
-  onAvanzar: (p: PedidoTablero, estado: string) => void;
+  onAvanzar: (p: PedidoTablero, estado: EstadoPedido) => void;
   onPagado: (p: PedidoTablero) => void;
   onCancelar: (p: PedidoTablero) => void;
   onImprimir: (p: PedidoTablero) => void;
@@ -360,6 +428,87 @@ function Comanda({ pedido: p }: { pedido: PedidoTablero }) {
       </p>
       <p className="text-xl font-black">TOTAL {pesos(p.total)}</p>
       {p.metodoPago === 'efectivo' && p.pagaCon ? <p>Vuelto: {pesos(p.pagaCon - p.total)}</p> : null}
+    </div>
+  );
+}
+
+const MOTIVOS = ['El cliente canceló', 'No hay stock', 'No llegó el pago', 'Fuera de la zona de envío', 'Pedido repetido'];
+
+/** Cancelar con motivo (queda en el historial). Ventana propia: anda en celular y en la app instalada. */
+function DialogoCancelar({
+  pedido,
+  ocupado,
+  onCerrar,
+  onConfirmar,
+}: {
+  pedido: PedidoTablero;
+  ocupado: boolean;
+  onCerrar: () => void;
+  onConfirmar: (motivo: string) => void;
+}) {
+  const [elegido, setElegido] = useState<string | null>(null);
+  const [otro, setOtro] = useState('');
+  const motivo = (elegido === 'Otro' ? otro : elegido ?? '').trim();
+
+  useEffect(() => {
+    const alTeclear = (e: KeyboardEvent) => e.key === 'Escape' && onCerrar();
+    window.addEventListener('keydown', alTeclear);
+    return () => window.removeEventListener('keydown', alTeclear);
+  }, [onCerrar]);
+
+  return (
+    <div className="fixed inset-0 z-[60] grid place-items-end bg-black/50 sm:place-items-center print:hidden" onClick={onCerrar}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-cancelar"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-t-3xl bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:rounded-3xl"
+      >
+        <h2 id="titulo-cancelar" className="text-xl font-bold">
+          ¿Cancelar el pedido {numero(pedido.numero)}?
+        </h2>
+        <p className="text-zinc-600">
+          {pedido.cliente} · {pesos(pedido.total)}. Elegí el motivo:
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[...MOTIVOS, 'Otro'].map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={elegido === m}
+              onClick={() => setElegido(m)}
+              className={`min-h-11 rounded-full border-2 px-4 font-semibold ${elegido === m ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white'}`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        {elegido === 'Otro' && (
+          <input
+            autoFocus
+            value={otro}
+            maxLength={200}
+            onChange={(e) => setOtro(e.target.value)}
+            placeholder="Escribí el motivo"
+            aria-label="Motivo"
+            className="mt-3 h-12 w-full rounded-xl border px-3 text-lg"
+          />
+        )}
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <button type="button" onClick={onCerrar} className="h-12 rounded-xl bg-zinc-100 font-bold">
+            Volver
+          </button>
+          <button
+            type="button"
+            disabled={!motivo || ocupado}
+            onClick={() => onConfirmar(motivo)}
+            className="h-12 rounded-xl bg-red-600 font-bold text-white disabled:opacity-40"
+          >
+            {ocupado ? 'Cancelando…' : 'Cancelar pedido'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

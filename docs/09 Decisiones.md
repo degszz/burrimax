@@ -113,3 +113,6 @@ En el escenario cada salsa es una mancha de su color, con borde irregular y bril
 
 ### 2026-10-28 · El `precio_extra` de la tapa se cobra una vez, también en la doble
 Regla de ejemplo hasta que se confirme (ver [[10 Preguntas abiertas]]).
+
+### 2026-10-30 · Avisos push al celular del admin
+Web Push estándar (VAPID): el panel registra `sw.js` y guarda la suscripción en `push_suscripciones` (RLS: solo las del admin con MFA). La tienda, al crear un pedido, manda el aviso con `web-push` 3.6.7 (máx. 4 s, nunca frena el pedido; borra suscripciones vencidas). La clave pública está en el código; la **privada (`VAPID_PRIVATE_KEY`) solo en variables del servidor de la tienda**. En iPhone (iOS 16.4+) los avisos solo funcionan con el panel instalado en la pantalla de inicio (manifest propio del admin).

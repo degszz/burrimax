@@ -1,3 +1,4 @@
+import { avisarPedidoNuevo } from '@/lib/avisosPush';
 import { PedidoInvalidoError, pedidoSchema } from '@burritos/shared';
 import type { APIRoute } from 'astro';
 import { cargarDatosTienda } from '@/lib/catalogo.server';
@@ -73,6 +74,15 @@ export const POST: APIRoute = async ({ request, clientAddress, url }) => {
     return json({ error: 'No pudimos guardar tu pedido. Probá de nuevo.' }, 500);
   }
   const creado = data as { id: string; numero: number; token: string };
+
+  // Aviso al celular del local (push). No frena el pedido si falla.
+  await avisarPedidoNuevo({
+    numero: creado.numero,
+    cliente: armado.payload.cliente_nombre,
+    total: armado.payload.total,
+    metodoPago: armado.payload.metodo_pago,
+    tipoEntrega: armado.payload.tipo_entrega,
+  });
 
   const sitio = (import.meta.env.PUBLIC_SITE_URL || url.origin).replace(/\/$/, '');
   const urlSeguimiento = `${sitio}/pedido/${creado.id}?t=${creado.token}`;

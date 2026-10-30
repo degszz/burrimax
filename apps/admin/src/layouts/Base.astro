@@ -28,6 +28,11 @@ const SECCIONES = [
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Instalable como app (en iPhone los avisos solo andan con la app instalada) -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Panel" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>{titulo} · Admin</title>
   </head>
   <body class="min-h-dvh bg-zinc-100 text-zinc-900 antialiased">

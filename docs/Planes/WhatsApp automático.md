@@ -12,6 +12,29 @@ actualizado: 2026-10-30
 > - Precios actuales de la API de WhatsApp para Argentina (cambiaron en 2025: cobran por mensaje de plantilla, las respuestas dentro de las 24 h son gratis).
 > - Si el número puede seguir usándose en la app de WhatsApp Business del celular al mismo tiempo ("coexistencia"). Si no, el número pasa a ser solo del bot.
 
+## Cómo trabaja Max (cocina él mismo)
+El celular de Max es la central: le llega el **aviso push** de cada pedido (hecho 2026-10-30) y desde el panel avanza el pedido con **un botón grande**. Todo lo demás debería pasar solo:
+
+| Momento | Qué pasa solo | Qué toca Max |
+|---|---|---|
+| Entra un pedido en efectivo | Queda confirmado · aviso push al celular · WhatsApp al cliente "¡Recibido!" | Nada |
+| Entra con Mercado Pago | Se confirma solo cuando MP avisa que pagó (webhook) · push · WhatsApp | Nada |
+| Entra con transferencia | WhatsApp con alias y monto · si en **X min** no hay pago → se cancela solo y avisa | "Llegó la transferencia" (hasta automatizar la verificación) |
+| Empieza a cocinar | WhatsApp "Lo estamos preparando" | "Empezar a preparar" |
+| Listo / sale el delivery | WhatsApp "¡Listo!" o "Va en camino" | "Está listo" / "Salió" |
+| Pedido olvidado en "Nuevos" más de N min | Nuevo push de recordatorio | — |
+
+## ¿n8n o lo hacemos en la web?
+| | **n8n** | **En nuestra web (Vercel + Supabase)** |
+|---|---|---|
+| Qué es | Herramienta de flujos visuales (cajitas conectadas) | Endpoints como los de Mercado Pago (`/api/webhooks/whatsapp`) |
+| Costo | n8n Cloud ~US$20–25/mes, o un servidor propio (~US$5/mes + mantenerlo) | Entra en lo que ya pagás (Vercel/Supabase gratis por ahora) |
+| Dónde viven los datos | En otro lado; hay que sincronizar pedidos y claves | Todo junto: pedidos, estados, historial y reglas de precios |
+| Cambios | Los podés tocar vos sin código | Los hago yo, con tests y versionado |
+| Riesgo | Otra pieza que se puede caer y otro lugar con claves | Menos piezas |
+
+**Recomendación:** el circuito principal (pedido → respuesta → estados → comprobantes) **en la web**, porque ya tiene los pedidos, las reglas y la seguridad. **n8n queda opcional** para cosas laterales que quieras armar vos sin depender de mí (reportes semanales por mail, planilla de Google con ventas, publicar en Instagram).
+
 ## La pieza central: WhatsApp Cloud API (oficial de Meta)
 - Es la única forma **segura** de automatizar. Las librerías "no oficiales" (whatsapp-web.js, Baileys) simulan un celular y **Meta banea el número** — descartadas.
 - Se conecta directo con Meta (gratis el acceso) o con un intermediario (360dialog, Twilio) si se quiere soporte. Arrancamos directo.
