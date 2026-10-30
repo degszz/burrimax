@@ -9,10 +9,9 @@ const SERVICIOS_PUSH = [
 ];
 
 export function esEndpointPushValido(endpoint: string): boolean {
-  try {
-    const url = new URL(endpoint);
-    return url.protocol === 'https:' && !url.port && SERVICIOS_PUSH.some((r) => r.test(url.hostname));
-  } catch {
-    return false;
-  }
+  // https://<host>/... sin puerto, sin usuario y sin nada raro antes de la ruta.
+  const partes = /^https:\/\/([a-z0-9.-]+)(\/\S*)?$/i.exec(endpoint);
+  if (!partes) return false;
+  const host = partes[1]!.toLowerCase();
+  return SERVICIOS_PUSH.some((r) => r.test(host));
 }
