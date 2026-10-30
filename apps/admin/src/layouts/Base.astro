@@ -5,7 +5,7 @@ interface Props {
   titulo: string;
   /** Muestra la barra de arriba (Pedidos · Horarios · Salir). */
   conMenu?: boolean;
-  activo?: 'pedidos' | 'horarios';
+  activo?: 'pedidos' | 'catalogo' | 'horarios';
 }
 
 const { titulo, conMenu = false, activo } = Astro.props;
@@ -33,6 +33,12 @@ const usuario = Astro.locals.usuario;
               class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'pedidos' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
             >
               Pedidos
+            </a>
+            <a
+              href="/catalogo"
+              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'catalogo' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
+            >
+              Catálogo
             </a>
             <a
               href="/horarios"

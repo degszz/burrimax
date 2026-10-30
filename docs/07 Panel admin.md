@@ -32,7 +32,9 @@ Hecho en `apps/admin`:
 - Cada cambio pasa por `cambiar_estado_pedido` / `marcar_pagado` (validan y dejan historial con usuario y motivo). El cliente ve cada paso **con su hora** en `/pedido/<id>`.
 - **Horarios** (`/horarios`): modo Automático / Abierto ahora / Cerrado ahora, turnos por día (hasta 3, cruzan la medianoche), "Copiar a todos" y vista previa de lo que ve el cliente.
 
-Falta: catálogo (precios, sin stock), resto de configuración (alias, zonas, medios de pago), historial con filtros, avisos por WhatsApp (ver [[Planes/WhatsApp automático]]).
+- **Catálogo** (`/catalogo`): ingredientes por categoría con foto (nombre, precio extra, Sin TACC en tortillas, **Disponible/Sin stock con un toque**, guarda al instante), tamaños (precio, carne mín./máx., vegetales y salsas máx., relleno total), combos de la casa (nombre, descripción, recomendado, disponible; el precio sale de la receta) y zonas de envío (nombre, costo, activa). Endpoint `/api/catalogo` con lista cerrada de columnas por tabla; la base valida el resto.
+
+Falta: editar recetas de combos, subir fotos nuevas, alta de ingredientes, resto de configuración (alias, medios de pago), historial con filtros, avisos por WhatsApp (ver [[Planes/WhatsApp automático]]).
 
 ## Cómo entrar por primera vez (lo hace Max)
 1. Supabase → **Authentication → Users → Add user → Create new user**: tu email y una contraseña larga, con "Auto Confirm User".

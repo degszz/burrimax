@@ -1,0 +1,69 @@
+---
+import EditorCatalogo from '@/components/EditorCatalogo';
+import Base from '@/layouts/Base.astro';
+import type { CategoriaSlug, FilaCombo, FilaIngrediente, FilaTamano, FilaZona } from '@/lib/catalogo';
+
+// El admin (rol + MFA) ve también lo desactivado: lo permite la RLS.
+const db = Astro.locals.supabase;
+const [ingredientes, tamanos, combos, zonas] = await Promise.all([
+  db
+    .from('ingredientes')
+    .select('id, slug, nombre, precio_extra, activo, sin_tacc, vegetariano, orden, imagen_url, categorias_ingrediente(slug)')
+    .order('orden'),
+  db.from('tamanos').select('id, slug, nombre, precio_base, min_carnes, max_carnes, max_salsas, max_vegetales, activo').order('orden'),
+  db
+    .from('productos')
+    .select('id, nombre, descripcion, activo, destacado, orden, tamanos(nombre), producto_ingredientes(porciones, ingredientes(nombre, orden, categorias_ingrediente(paso)))')
+    .eq('tipo', 'burrito')
+    .order('orden'),
+  db.from('zonas_envio').select('id, nombre, costo, activo').order('costo'),
+]);
+
+const error = ingredientes.error ?? tamanos.error ?? combos.error ?? zonas.error;
+
+const filasIngredientes: FilaIngrediente[] = (ingredientes.data ?? []).map((i) => ({
+  id: i.id,
+  slug: i.slug,
+  categoria: (i.categorias_ingrediente?.slug ?? 'vegetal') as CategoriaSlug,
+  nombre: i.nombre,
+  precio_extra: i.precio_extra,
+  activo: i.activo,
+  sin_tacc: i.sin_tacc,
+  vegetariano: i.vegetariano,
+  orden: i.orden,
+  imagen_url: i.imagen_url,
+}));
+
+const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {
+  const partes = [...(c.producto_ingredientes ?? [])]
+    .sort((a, b) => (a.ingredientes?.categorias_ingrediente?.paso ?? 0) - (b.ingredientes?.categorias_ingrediente?.paso ?? 0) || (a.ingredientes?.orden ?? 0) - (b.ingredientes?.orden ?? 0))
+    .map((p) => `${p.ingredientes?.nombre ?? '?'}${p.porciones > 1 ? ` ×${p.porciones}` : ''}`);
+  return {
+    id: c.id,
+    nombre: c.nombre,
+    descripcion: c.descripcion,
+    activo: c.activo,
+    destacado: c.destacado,
+    orden: c.orden,
+    receta: [c.tamanos?.nombre, partes.join(', ')].filter(Boolean).join(' · '),
+  };
+});
+---
+
+<Base titulo="Catálogo" conMenu activo="catalogo">
+  {
+    error ? (
+      <main class="mx-auto max-w-3xl px-4 py-10">
+        <p class="rounded-xl bg-red-50 p-4 font-semibold text-red-700">No pudimos cargar el catálogo. Recargá la página.</p>
+      </main>
+    ) : (
+      <EditorCatalogo
+        client:load
+        ingredientes={filasIngredientes}
+        tamanos={(tamanos.data ?? []) as FilaTamano[]}
+        combos={filasCombos}
+        zonas={(zonas.data ?? []) as FilaZona[]}
+      />
+    )
+  }
+</Base>

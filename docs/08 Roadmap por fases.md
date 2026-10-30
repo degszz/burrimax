@@ -31,7 +31,8 @@ tags: [burritos, roadmap]
 ## Fase 3 — Admin (3 días)
 - [x] Login + MFA + rol (MFA exigido también en la base)
 - [x] Pedidos en vivo con sonido (consulta cada 8 s; sesión httpOnly)
-- [ ] Catálogo y configuración — **horarios hechos** (automático por día y hora)
+- [x] Catálogo: precios, sin stock, tamaños, combos y zonas de envío · horarios automáticos
+- [ ] Configuración: alias/CVU, medios de pago; alta de ingredientes y fotos; recetas de combos
 - [x] Impresión de comanda (80 mm)
 
 ## Fase 4 — Mercado Pago
