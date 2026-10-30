@@ -34,7 +34,12 @@ interface Props {
   catalogo: Catalogo;
   combosCasa: ComboCasa[];
   abierto: boolean;
+  /** Solo dígitos, o null si todavía no está cargado. */
+  whatsapp: string | null;
 }
+
+// Ingredientes que se ven en la mini demostración del hero (uno de cada paso).
+const SLUGS_DEMO = ['tortilla-trigo', 'guacamole', 'pollo', 'vaca', 'choclo', 'tomate'];
 
 interface Aviso {
   texto: string;
@@ -48,7 +53,7 @@ const TITULOS: Record<PasoDeCategoria, string> = {
   4: 'Elegí tus vegetales',
 };
 
-export default function Tienda({ catalogo, combosCasa, abierto }: Props) {
+export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Props) {
   const estado = useArmador();
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
@@ -117,6 +122,11 @@ export default function Tienda({ catalogo, combosCasa, abierto }: Props) {
       porPaso[p] = catalogo.ingredientes.filter((i) => i.categoria === CATEGORIA_DEL_PASO[p]);
     }
     return porPaso;
+  }, [catalogo]);
+
+  const ingredientesDemo = useMemo(() => {
+    const elegidos = SLUGS_DEMO.map((s) => catalogo.ingredientes.find((i) => i.slug === s)).filter((i) => !!i);
+    return elegidos.length === SLUGS_DEMO.length ? elegidos : catalogo.ingredientes.slice(0, 6);
   }, [catalogo]);
 
   // Hasta dónde se puede saltar con la barra de pasos: el primer paso que bloquea.
@@ -270,12 +280,23 @@ export default function Tienda({ catalogo, combosCasa, abierto }: Props) {
 
   return (
     <div className={armando ? 'pb-48' : 'pb-10'}>
-      <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
+      {/* Encabezado + portada = una pantalla justa */}
+      <div className={`mx-auto flex max-w-md flex-col ${armadorAbierto ? '' : 'min-h-dvh'}`}>
+        <Encabezado abierto={abierto} cantidadEnCarrito={listo ? carrito.cantidadBurritos() : 0} onAbrirCarrito={() => setCarritoAbierto(true)} />
+        {!armadorAbierto && (
+          <HeroArmar
+            className="flex-1"
+            precioDesde={primerTamano.precioBase}
+            enCurso={listo && enCurso}
+            demo={ingredientesDemo}
+            whatsapp={whatsapp}
+            onArmar={abrirArmador}
+          />
+        )}
+      </div>
 
       <main className="mx-auto max-w-md space-y-4">
-        {!armadorAbierto ? (
-          <HeroArmar precioDesde={primerTamano.precioBase} enCurso={listo && enCurso} onArmar={abrirArmador} />
-        ) : (
+        {armadorAbierto && (
           <section id="armador" aria-label="Armá tu burrito" className="space-y-4">
             <div className="flex items-center justify-between px-4">
               <p className="font-heading text-2xl font-extrabold">Armá tu burrito</p>
