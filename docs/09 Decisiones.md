@@ -53,6 +53,9 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · "Tu burrito" primero en los combos de la casa
+Pedido de Max: el último burrito que la persona terminó de armar (al llegar a "¡Listo!", al agregarlo o al guardarlo) se guarda en el celular (`lib/ultimoBurrito.ts`) y va primero en la grilla, marcado en verde; después los recomendados. Reemplaza la sección fija "Tus combos", que ahora se abre con un botón. Abrir un combo de la casa con "Cambiarle algo" no lo convierte en "tuyo" hasta que lo agregues o lo guardes.
+
 ### 2026-10-29 · Pedidos por la función `crear_pedido` y Mercado Pago solo con credenciales
 `POST /api/pedidos` valida con `pedidoSchema`, recalcula con `calcularPedido` y guarda todo (pedido, ítems con snapshots, ingredientes con porciones e historial) en una sola transacción con la función `crear_pedido`, que solo puede ejecutar el servidor con la clave secreta. Mercado Pago aparece en el checkout solo si está prendido en `config_negocio` **y** el servidor tiene `MP_ACCESS_TOKEN`. El webhook marca un evento como procesado recién después de actualizar el pedido (si falla, responde 500 y Mercado Pago reintenta). Descartado: react-hook-form (el formulario es chico; alcanza con estado + Zod).
 

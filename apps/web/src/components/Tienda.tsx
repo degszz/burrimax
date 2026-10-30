@@ -26,6 +26,7 @@ import {
 } from '@/lib/armador/reglas';
 import type { ComboCasa } from '@/lib/catalogo.server';
 import * as misCombos from '@/lib/misCombos';
+import { guardarUltimo, leerUltimo } from '@/lib/ultimoBurrito';
 import { precioVistaPrevia } from '@burritos/shared';
 import { armadoActual, useArmador } from '@/stores/armador';
 import { useCarrito } from '@/stores/carrito';
@@ -69,6 +70,9 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [destino, setDestino] = useState<TamanoCatalogo | null>(null);
   const [combos, setCombos] = useState<misCombos.ComboGuardado[]>([]);
+  const [guardadosAbiertos, setGuardadosAbiertos] = useState(false);
+  // El último que la persona terminó de armar: va primero en los combos.
+  const [tuBurrito, setTuBurrito] = useState<Armado | null>(null);
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const escenario = useRef<HTMLDivElement>(null);
   const [escenarioALaVista, setEscenarioALaVista] = useState(true);
@@ -100,9 +104,16 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
       const quitadosCarrito = useCarrito.getState().actualizarConCatalogo(catalogo);
       if (quitadosCarrito.length) avisar(`Ya no tenemos ${quitadosCarrito.join(', ')}: lo sacamos de tu pedido.`);
       setCombos(misCombos.listar());
+      setTuBurrito(leerUltimo(catalogo));
       setListo(true);
     });
   }, []);
+
+  function recordarTuyo(a: Armado) {
+    if (validarArmado(a, catalogo).length) return;
+    guardarUltimo(a);
+    setTuBurrito({ ...a, cantidad: 1 });
+  }
 
   useEffect(() => {
     if (!aviso) return;
@@ -177,9 +188,9 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
     });
   }
 
-  function agregarComboCasa(combo: ComboCasa) {
-    carrito.agregar(combo.armado, nombresDe(combo.armado, catalogo));
-    avisar(`Sumamos "${combo.nombre}" a tu pedido.`, {
+  function agregarComboCasa(armadoCombo: Armado, nombre: string) {
+    carrito.agregar({ ...armadoCombo, nombrePersonalizado: nombre }, nombresDe(armadoCombo, catalogo));
+    avisar(`Sumamos "${nombre}" a tu pedido.`, {
       etiqueta: 'Ver pedido',
       hacer: () => {
         setCarritoAbierto(true);
@@ -188,8 +199,8 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
     });
   }
 
-  function personalizarComboCasa(combo: ComboCasa) {
-    estado.cargar(combo.armado);
+  function personalizarComboCasa(armadoCombo: Armado) {
+    estado.cargar(armadoCombo);
     abrirArmador();
   }
 
@@ -218,6 +229,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
       return;
     }
     const nombres = nombresDe(armado, catalogo);
+    recordarTuyo(armado);
     if (estado.editandoItemId) {
       carrito.reemplazar(estado.editandoItemId, armado, nombres);
       avisar('¡Listo! Guardamos los cambios.');
@@ -237,7 +249,8 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
       return;
     }
     setCombos(misCombos.listar());
-    avisar(`Guardado como "${combo.nombre}" en Mis combos.`);
+    recordarTuyo({ ...armado, nombrePersonalizado: combo.nombre });
+    avisar(`Guardado como "${combo.nombre}" en tus combos.`);
   }
 
   function cargarCombo(combo: misCombos.ComboGuardado, editandoItemId: string | null = null) {
@@ -357,19 +370,30 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
           </section>
         )}
 
-        {/* Lo propio, fijado arriba de los combos de la casa */}
-        <MisCombos
-          combos={combos}
+        {/* Tu último burrito va primero en la grilla; los guardados, a un toque */}
+        <CombosCasa
+          combos={combosCasa}
           catalogo={catalogo}
-          onPedir={pedirDeNuevo}
-          onEditar={(combo) => {
-            cargarCombo(combo);
-            abrirArmador();
-          }}
-          onBorrar={borrarCombo}
+          tuBurrito={listo ? tuBurrito : null}
+          guardados={combos.length}
+          guardadosAbiertos={guardadosAbiertos}
+          onAgregar={agregarComboCasa}
+          onPersonalizar={personalizarComboCasa}
+          onVerGuardados={() => setGuardadosAbiertos((v) => !v)}
         />
 
-        <CombosCasa combos={combosCasa} catalogo={catalogo} onAgregar={agregarComboCasa} onPersonalizar={personalizarComboCasa} />
+        {guardadosAbiertos && (
+          <MisCombos
+            combos={combos}
+            catalogo={catalogo}
+            onPedir={pedirDeNuevo}
+            onEditar={(combo) => {
+              cargarCombo(combo);
+              abrirArmador();
+            }}
+            onBorrar={borrarCombo}
+          />
+        )}
       </main>
 
       {armando && (
@@ -383,7 +407,11 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
           mensajeOk={mensajeOk}
           puedeVolver={paso > 1}
           puedeBorrar={enCurso}
-          onSiguiente={() => irAPaso((paso + 1) as Paso)}
+          onSiguiente={() => {
+            // Terminó de armarlo: pasa a ser "Tu burrito" en los combos.
+            if (paso === 4) recordarTuyo(armado);
+            irAPaso((paso + 1) as Paso);
+          }}
           onAnterior={() => irAPaso((paso - 1) as Paso)}
           onBorrar={borrarArmado}
         />

@@ -22,7 +22,7 @@ flowchart TD
 ### 1. Home (actualizado 2026-10-29)
 - Arriba: logo, estado "Abierto ahora / Cerrado", botón carrito.
 - **Hero (pantalla completa junto al encabezado):** título **"Burrito a tu Gusto"**, el burrito con papas chico ("desde $X"), botón **"Armá tu burrito"** y dos botones de redes (Instagram y WhatsApp), todos compactos. Debajo, **a todo el ancho y sin tarjeta**, asoma el armador: una fila y media de ingredientes nítida (se eligen solas) que se **desenfoca hacia abajo**, con el botón "Armá tu burrito" y "o elegí uno de la casa ↓" encima del desenfoque. El armador es **opcional**: se abre ahí mismo y se cierra con "Ver combos". Textos de marca en `apps/web/src/lib/marca.ts`.
-- **Tus combos:** los que el cliente armó y guardó, **fijados arriba** de los de la casa.
+- **Tu burrito:** si la persona ya terminó de armar uno (aunque no lo haya guardado ni pedido), aparece **primero en la grilla de combos** con la etiqueta verde "Tu burrito", borde verde que se degrada en la tarjeta, "Agregar" y "Editarlo". Solo se muestra si ya armó uno. Los combos guardados quedan a un toque con "Ver tus combos guardados (N)".
 - **Combos de la casa:** grilla de **2 columnas** con burritos prehechos con papas (salen de `productos` + su receta; hoy 4 de ejemplo: Clásico, Pollo y choclo, El Doble, Del Mar). Todos muestran la foto del burrito con papas. "Agregar" y "Cambiarle algo" (lo abre en el armador para modificarlo).
 - Debajo de "Siguiente" en el armador: "Borrar y empezar de nuevo" en gris, con "Deshacer".
 
