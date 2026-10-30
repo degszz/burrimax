@@ -38,7 +38,7 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
       tabIndex={visible ? 0 : -1}
       aria-label={encabezado ? 'Volver a los combos' : 'Ver tu burrito'}
       className={cn(
-        'inset-x-0 top-0 z-30 border-b-[2.5px] border-tinta bg-crema/95 backdrop-blur',
+        'inset-x-0 top-0 z-50 border-b-[2.5px] border-tinta bg-crema/95 backdrop-blur',
         encabezado
           ? 'sticky w-full'
           : cn('fixed transition-transform duration-200 motion-reduce:transition-none', visible ? 'translate-y-0' : '-translate-y-full'),
