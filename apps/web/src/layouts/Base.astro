@@ -72,6 +72,14 @@ const tituloCompartir = titulo ? `${titulo} · ${MARCA.nombre}` : `${MARCA.nombr
     />
     <meta name="generator" content={Astro.generator} />
     {datosEstructurados && <script type="application/ld+json" set:html={JSON.stringify(datosEstructurados)} />}
+    <!-- Guarda el "se puede instalar" del navegador para ofrecerlo después de pedir -->
+    <script is:inline>
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__eventoInstalar = e;
+        window.dispatchEvent(new Event('instalar-disponible'));
+      });
+    </script>
     <slot name="head" />
   </head>
   <body class="min-h-dvh bg-crema text-tinta antialiased">

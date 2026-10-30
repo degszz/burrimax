@@ -1,6 +1,7 @@
 import { Check, Copy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { formatoPesos } from '@/lib/formato';
+import { useInstalarApp } from '@/lib/useInstalarApp';
 import { IconoWhatsapp } from '../tienda/IconosRedes';
 
 export interface DatosTransferencia {
@@ -19,25 +20,45 @@ interface Props {
   transferencia?: DatosTransferencia | null;
 }
 
-/** Cuánto se ve el tilde antes de saltar a WhatsApp. */
-const ESPERA_MS = 1800;
-
 /**
- * Pantalla completa de "¡Listo!": un tilde grande que se dibuja y el número de
- * pedido. Con efectivo salta solo a WhatsApp con el mensaje ya escrito. Con
- * transferencia NO salta: primero muestra el alias y el monto para copiar con
- * un toque, y un botón para abrir Mercado Pago (o el banco) y pegarlo.
+ * Pantalla completa de "¡Listo!": un tilde grande que se dibuja, el número de
+ * pedido y, SIN tocar nada, salta a WhatsApp con el mensaje ya escrito.
+ * Con transferencia espera un poco más para poder copiar el alias.
+ * Mientras tanto ofrece instalar la app (si toca, la cuenta se pausa).
  */
 export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento, transferencia }: Props) {
   const conDatos = !!transferencia && !!(transferencia.alias || transferencia.cvu);
+  const [segundos, setSegundos] = useState(conDatos ? 8 : 3);
+  const [pausado, setPausado] = useState(false);
+  const [yaFue, setYaFue] = useState(false);
+  const { modo: modoInstalar, instalar } = useInstalarApp();
 
+  // Cuenta regresiva y salto a WhatsApp (una sola vez).
   useEffect(() => {
-    if (conDatos) return;
-    const espera = window.setTimeout(() => {
+    if (pausado || yaFue) return;
+    if (segundos <= 0) {
+      setYaFue(true);
       window.location.href = linkWhatsapp;
-    }, ESPERA_MS);
-    return () => window.clearTimeout(espera);
-  }, [linkWhatsapp, conDatos]);
+      return;
+    }
+    const t = window.setTimeout(() => setSegundos((s) => s - 1), 1000);
+    return () => window.clearTimeout(t);
+  }, [segundos, pausado, yaFue, linkWhatsapp]);
+
+  const cuenta = yaFue
+    ? 'Si no se abrió WhatsApp, tocá el botón.'
+    : pausado
+      ? 'En pausa mientras instalás…'
+      : `Te llevamos a WhatsApp en ${segundos}…`;
+  const masTiempo = () => setSegundos((s) => Math.max(s, 6));
+
+  async function alInstalar() {
+    setPausado(true);
+    await instalar().catch(() => false);
+    // Después de instalar (o no), sigue el camino a WhatsApp.
+    setSegundos(2);
+    setPausado(false);
+  }
 
   return (
     <div
@@ -72,9 +93,9 @@ export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento, transferen
             <section aria-label="Datos para transferir" className="juguete mt-5 rounded-3xl bg-white p-4 text-left">
               <h2 className="text-xl font-extrabold">1. Transferí {formatoPesos(transferencia.total)}</h2>
               <dl className="mt-2 space-y-2">
-                <FilaCopiar etiqueta="Monto" valor={String(transferencia.total)} mostrar={formatoPesos(transferencia.total)} />
-                {transferencia.alias && <FilaCopiar etiqueta="Alias" valor={transferencia.alias} />}
-                {transferencia.cvu && <FilaCopiar etiqueta="CVU" valor={transferencia.cvu} />}
+                <FilaCopiar etiqueta="Monto" valor={String(transferencia.total)} mostrar={formatoPesos(transferencia.total)} onCopiar={masTiempo} />
+                {transferencia.alias && <FilaCopiar etiqueta="Alias" valor={transferencia.alias} onCopiar={masTiempo} />}
+                {transferencia.cvu && <FilaCopiar etiqueta="CVU" valor={transferencia.cvu} onCopiar={masTiempo} />}
                 {transferencia.titular && (
                   <div>
                     <dt className="text-sm text-tinta-suave">Titular</dt>
@@ -98,23 +119,51 @@ export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento, transferen
               href={linkWhatsapp}
               className="juguete mt-4 flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-verde font-heading text-xl leading-tight font-extrabold text-white shadow-[0_4px_0_var(--tinta)]"
             >
-              <IconoWhatsapp className="size-6 shrink-0" /> 2. Mandar el pedido por WhatsApp
+              <IconoWhatsapp className="size-6 shrink-0" /> Mandar el pedido ahora
             </a>
-            <p className="mt-1.5 text-sm text-tinta-suave">Después mandanos el comprobante por el mismo chat.</p>
+            <p className="mt-1.5 text-sm text-tinta-suave" aria-live="polite">
+              {cuenta} Después mandanos el comprobante por el mismo chat.
+            </p>
           </>
         ) : (
           <>
             <p className="mt-4 text-lg text-tinta-suave" aria-live="polite">
               <IconoWhatsapp className="mr-1 inline size-5 align-[-4px] text-verde" />
-              Te llevamos a WhatsApp para mandarlo…
+              {cuenta}
             </p>
             <a
               href={linkWhatsapp}
               className="juguete mt-6 flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-verde font-heading text-xl font-extrabold text-white shadow-[0_4px_0_var(--tinta)]"
             >
-              <IconoWhatsapp className="size-6" /> Abrir WhatsApp
+              <IconoWhatsapp className="size-6" /> Abrir WhatsApp ahora
             </a>
           </>
+        )}
+
+        {/* Instalar la app: el próximo pedido, a un toque desde la pantalla de inicio */}
+        {modoInstalar !== 'ninguno' && (
+          <div className="mt-5 rounded-2xl border-2 border-dashed border-tinta/40 p-3">
+            <p className="flex items-center justify-center gap-2 font-heading text-lg font-extrabold">
+              <img src="/icono-192.png" alt="" className="size-8 rounded-lg" /> Tené Burrimax en tu celular
+            </p>
+            {modoInstalar === 'boton' ? (
+              <button
+                type="button"
+                onClick={alInstalar}
+                className="juguete mt-2 flex min-h-12 w-full items-center justify-center rounded-xl bg-white font-heading text-lg font-extrabold"
+              >
+                Instalar la app
+              </button>
+            ) : modoInstalar === 'iphone' ? (
+              <p className="mt-1 text-sm text-tinta-suave">
+                En Safari tocá <b>Compartir</b> y después <b>Agregar a inicio</b>.
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-tinta-suave">
+                En Chrome tocá <b>⋮</b> (arriba a la derecha) y después <b>Agregar a la pantalla principal</b>.
+              </p>
+            )}
+          </div>
         )}
 
         {urlSeguimiento ? (
@@ -132,7 +181,7 @@ export function PedidoEnviado({ numero, linkWhatsapp, urlSeguimiento, transferen
 }
 
 /** Un dato con su botón "Copiar" (cambia a "¡Copiado!" un momento). */
-function FilaCopiar({ etiqueta, valor, mostrar }: { etiqueta: string; valor: string; mostrar?: string }) {
+function FilaCopiar({ etiqueta, valor, mostrar, onCopiar }: { etiqueta: string; valor: string; mostrar?: string; onCopiar?: () => void }) {
   const [copiado, setCopiado] = useState(false);
 
   async function copiar() {
@@ -148,6 +197,7 @@ function FilaCopiar({ etiqueta, valor, mostrar }: { etiqueta: string; valor: str
       campo.remove();
     }
     setCopiado(true);
+    onCopiar?.();
     window.setTimeout(() => setCopiado(false), 1800);
   }
 
