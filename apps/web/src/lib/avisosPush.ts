@@ -1,3 +1,4 @@
+import { esEndpointPushValido } from '@burritos/shared';
 import webpush from 'web-push';
 import { formatoPesos } from './formato';
 import { MARCA } from './marca';
@@ -44,6 +45,11 @@ export async function avisarPedidoNuevo(p: PedidoParaAvisar): Promise<void> {
     await Promise.race([
       Promise.allSettled(
         suscripciones.map(async (s) => {
+          // Se vuelve a chequear acá: nunca se le pide nada a una URL que no sea de avisos.
+          if (!esEndpointPushValido(s.endpoint)) {
+            vencidas.push(s.id);
+            return;
+          }
           try {
             await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, contenido, { TTL: 60 * 30, urgency: 'high' });
           } catch (e) {

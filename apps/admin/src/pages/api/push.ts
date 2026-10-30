@@ -1,3 +1,4 @@
+import { esEndpointPushValido } from '@burritos/shared';
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 
@@ -15,6 +16,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const cuerpo = suscripcionSchema.safeParse(await request.json().catch(() => null));
   if (!cuerpo.success) return Response.json({ error: 'Suscripción inválida' }, { status: 400 });
   const { endpoint, keys, dispositivo } = cuerpo.data;
+  // Solo servicios de avisos oficiales (Google, Apple, Mozilla, Microsoft).
+  if (!esEndpointPushValido(endpoint)) return Response.json({ error: 'Servicio de avisos no admitido' }, { status: 400 });
+
+  // Tope de celulares por usuario (evita llenar la tabla).
+  const { count } = await locals.supabase.from('push_suscripciones').select('id', { count: 'exact', head: true });
+  if ((count ?? 0) >= 10) return Response.json({ error: 'Ya hay 10 dispositivos con avisos; apagá alguno' }, { status: 400 });
 
   const { error } = await locals.supabase
     .from('push_suscripciones')
