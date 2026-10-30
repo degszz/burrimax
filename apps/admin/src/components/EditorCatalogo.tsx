@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
-import { TIENDA, TITULO_CATEGORIA, type CategoriaSlug, type FilaCombo, type FilaIngrediente, type FilaTamano, type FilaZona, type TablaCatalogo } from '@/lib/catalogo';
+import { FotoIngrediente } from './FotoIngrediente';
+import { TITULO_CATEGORIA, type CategoriaSlug, type FilaCombo, type FilaIngrediente, type FilaTamano, type FilaZona, type TablaCatalogo } from '@/lib/catalogo';
 
 interface Props {
   ingredientes: FilaIngrediente[];
@@ -22,7 +23,9 @@ const CATEGORIAS: CategoriaSlug[] = ['tortilla', 'salsa', 'carne', 'vegetal'];
 /** Precios, disponibilidad y datos del catálogo. La tienda lo toma en la próxima visita. */
 export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }: Props) {
   const [pestana, setPestana] = useState<Pestana>('ingredientes');
-  const sinStock = ingredientes.filter((i) => !i.activo).length;
+  // Los nuevos se suman acá sin recargar la página.
+  const [listaIngredientes, setListaIngredientes] = useState(ingredientes);
+  const sinStock = listaIngredientes.filter((i) => !i.activo).length;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -47,8 +50,7 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
 
       {pestana === 'ingredientes' &&
         CATEGORIAS.map((cat) => {
-          const lista = ingredientes.filter((i) => i.categoria === cat);
-          if (!lista.length) return null;
+          const lista = listaIngredientes.filter((i) => i.categoria === cat);
           return (
             <section key={cat} className="mt-5">
               <h2 className="mb-2 text-lg font-bold">{TITULO_CATEGORIA[cat]}</h2>
@@ -57,6 +59,7 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
                   <Ingrediente key={i.id} inicial={i} />
                 ))}
               </ul>
+              <AgregarIngrediente categoria={cat} onAgregado={(nuevo) => setListaIngredientes((l) => [...l, nuevo])} />
             </section>
           );
         })}
@@ -179,7 +182,7 @@ function Interruptor({ encendido, onCambiar, etiqueta, deshabilitado, textos = [
   );
 }
 
-function CampoPesos({ valor, onCambiar, etiqueta }: { valor: number; onCambiar: (n: number) => void; etiqueta: string }) {
+function CampoPesos({ valor, onCambiar, etiqueta, opcional = false }: { valor: number; onCambiar: (n: number) => void; etiqueta: string; opcional?: boolean }) {
   return (
     <label className="flex items-center gap-1">
       <span className="text-sm text-zinc-500">{etiqueta}</span>
@@ -189,7 +192,8 @@ function CampoPesos({ valor, onCambiar, etiqueta }: { valor: number; onCambiar: 
         <input
           inputMode="numeric"
           aria-label={etiqueta}
-          value={String(valor)}
+          value={opcional && valor === 0 ? '' : String(valor)}
+          placeholder={opcional ? 'Sin cargo' : '0'}
           onChange={(e) => onCambiar(Number(e.target.value.replace(/\D/g, '').slice(0, 8) || 0))}
           className="w-24 bg-transparent px-1 text-right text-lg font-semibold tabular-nums outline-none"
         />
@@ -246,18 +250,17 @@ function Ingrediente({ inicial }: { inicial: FilaIngrediente }) {
     <li>
       <Tarjeta apagada={!i.activo}>
         <div className="flex flex-wrap items-center gap-3">
-          {i.imagen_url ? (
-            <img src={`${TIENDA}${i.imagen_url}`} alt="" className="size-12 shrink-0 rounded-lg bg-zinc-50 object-contain" loading="lazy" />
-          ) : (
-            <span className="size-12 shrink-0 rounded-lg bg-zinc-100" />
-          )}
+          <FotoIngrediente imagen={i.imagen_url} color={i.color_hex} />
           <input
             aria-label="Nombre"
             value={i.nombre}
             onChange={(e) => f.cambiar('nombre', e.target.value)}
-            className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-semibold"
+            className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold"
           />
-          <CampoPesos etiqueta="Extra" valor={i.precio_extra} onCambiar={(n) => f.cambiar('precio_extra', n)} />
+          <div className="flex flex-col items-end">
+            <CampoPesos etiqueta="Precio extra" opcional valor={i.precio_extra} onCambiar={(n) => f.cambiar('precio_extra', n)} />
+            <span className="text-xs text-zinc-500">{i.categoria === 'carne' ? 'opcional · se suma por porción' : 'opcional'}</span>
+          </div>
           {i.categoria === 'tortilla' && (
             <label className="flex h-11 items-center gap-2 text-sm font-semibold">
               <input type="checkbox" checked={i.sin_tacc} onChange={() => f.cambiar('sin_tacc', !i.sin_tacc)} className="size-5" /> Sin TACC
@@ -279,7 +282,7 @@ function Tamano({ inicial }: { inicial: FilaTamano }) {
   return (
     <Tarjeta apagada={!t.activo}>
       <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre" value={t.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-bold" />
+        <input aria-label="Nombre" value={t.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-bold" />
         <CampoPesos etiqueta="Precio" valor={t.precio_base} onCambiar={(n) => f.cambiar('precio_base', n)} />
         <Interruptor encendido={t.activo} etiqueta={`${t.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
       </div>
@@ -306,7 +309,7 @@ function Combo({ inicial }: { inicial: FilaCombo }) {
   return (
     <Tarjeta apagada={!c.activo}>
       <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre" value={c.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-bold" />
+        <input aria-label="Nombre" value={c.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-bold" />
         <label className="flex h-11 items-center gap-2 font-semibold">
           <input type="checkbox" checked={c.destacado} onChange={() => f.alternar('destacado')} className="size-5" /> Recomendado
         </label>
@@ -334,7 +337,7 @@ function Zona({ inicial }: { inicial: FilaZona }) {
   return (
     <Tarjeta apagada={!z.activo}>
       <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre de la zona" value={z.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-semibold" />
+        <input aria-label="Nombre de la zona" value={z.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold" />
         <CampoPesos etiqueta="Envío" valor={z.costo} onCambiar={(n) => f.cambiar('costo', n)} />
         <Interruptor encendido={z.activo} textos={["Activa", "Pausada"]} etiqueta={`${z.nombre}: activa`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
       </div>
@@ -342,5 +345,112 @@ function Zona({ inicial }: { inicial: FilaZona }) {
         <BotonesGuardar sucio={f.sucio} estado={f.estado} error={f.error} onGuardar={f.guardar} onDescartar={f.descartar} />
       </div>
     </Tarjeta>
+  );
+}
+
+// ─── Alta ─────────────────────────────────────────────────────────────
+
+const NOMBRE_SINGULAR: Record<CategoriaSlug, string> = { tortilla: 'tortilla', salsa: 'salsa', carne: 'carne', vegetal: 'vegetal' };
+const EJEMPLO: Record<CategoriaSlug, string> = { tortilla: 'Ej. Integral', salsa: 'Ej. Chipotle', carne: 'Ej. Salmón', vegetal: 'Ej. Palta' };
+
+/**
+ * "+ Agregar" de cada categoría. Se crea disponible y sin foto: en la tienda
+ * se ve con un círculo de su color hasta que se suba la imagen.
+ */
+function AgregarIngrediente({ categoria, onAgregado }: { categoria: CategoriaSlug; onAgregado: (fila: FilaIngrediente) => void }) {
+  const [abierto, setAbierto] = useState(false);
+  const [nombre, setNombre] = useState('');
+  const [precio, setPrecio] = useState(0);
+  const [color, setColor] = useState('#E9C46A');
+  const [sinTacc, setSinTacc] = useState(false);
+  const [estado, setEstado] = useState<'quieto' | 'guardando' | 'error'>('quieto');
+  const [error, setError] = useState<string | null>(null);
+
+  if (!abierto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="mt-2 flex h-12 w-full items-center justify-center rounded-xl border-2 border-dashed border-zinc-300 font-semibold text-zinc-600 hover:border-zinc-500"
+      >
+        + Agregar {NOMBRE_SINGULAR[categoria]}
+      </button>
+    );
+  }
+
+  async function agregar() {
+    setEstado('guardando');
+    setError(null);
+    try {
+      const r = await fetch('/api/ingredientes', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ categoria, nombre, precio_extra: precio, color_hex: color, sin_tacc: sinTacc }),
+      });
+      const res = (await r.json().catch(() => ({}))) as { error?: string; ingrediente?: FilaIngrediente };
+      if (r.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
+      if (!r.ok || !res.ingrediente) {
+        setEstado('error');
+        setError(res.error ?? 'No se pudo agregar');
+        return;
+      }
+      onAgregado(res.ingrediente);
+      setNombre('');
+      setPrecio(0);
+      setSinTacc(false);
+      setEstado('quieto');
+      setAbierto(false);
+    } catch {
+      setEstado('error');
+      setError('Sin conexión');
+    }
+  }
+
+  return (
+    <div className="mt-2 rounded-xl border-2 border-zinc-900 bg-white p-3">
+      <p className="font-bold">Nuevo: {NOMBRE_SINGULAR[categoria]}</p>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2" title="Color mientras no haya foto">
+          <span className="sr-only">Color</span>
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="size-12 cursor-pointer rounded-full border-2" />
+        </label>
+        <input
+          autoFocus
+          aria-label="Nombre"
+          placeholder={EJEMPLO[categoria]}
+          value={nombre}
+          maxLength={60}
+          onChange={(e) => setNombre(e.target.value)}
+          className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold"
+        />
+        <div className="flex flex-col items-end">
+          <CampoPesos etiqueta="Precio extra" opcional valor={precio} onCambiar={setPrecio} />
+          <span className="text-xs text-zinc-500">{categoria === 'carne' ? 'opcional · se suma por porción' : 'opcional'}</span>
+        </div>
+        {categoria === 'tortilla' && (
+          <label className="flex h-11 items-center gap-2 text-sm font-semibold">
+            <input type="checkbox" checked={sinTacc} onChange={() => setSinTacc((v) => !v)} className="size-5" /> Sin TACC
+          </label>
+        )}
+      </div>
+      <p className="mt-2 text-sm text-zinc-600">Se agrega disponible. Sin foto, la tienda lo muestra con un círculo de este color.</p>
+      {error && <p className="mt-1 font-semibold text-red-700">{error}</p>}
+      <div className="mt-3 flex justify-end gap-2">
+        <button type="button" onClick={() => setAbierto(false)} className="h-11 rounded-lg px-4 font-semibold text-zinc-600 hover:bg-zinc-100">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          onClick={agregar}
+          disabled={nombre.trim().length < 2 || estado === 'guardando'}
+          className="h-11 rounded-lg bg-zinc-900 px-5 font-bold text-white disabled:opacity-40"
+        >
+          {estado === 'guardando' ? 'Agregando…' : 'Agregar'}
+        </button>
+      </div>
+    </div>
   );
 }

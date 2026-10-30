@@ -1,0 +1,36 @@
+---
+import PanelStock from '@/components/PanelStock';
+import Base from '@/layouts/Base.astro';
+import type { CategoriaSlug, FilaIngrediente } from '@/lib/catalogo';
+
+const { data, error } = await Astro.locals.supabase
+  .from('ingredientes')
+  .select('id, slug, nombre, precio_extra, activo, sin_tacc, vegetariano, orden, imagen_url, color_hex, categorias_ingrediente(slug)')
+  .order('orden');
+
+const filas: FilaIngrediente[] = (data ?? []).map((i) => ({
+  id: i.id,
+  slug: i.slug,
+  categoria: (i.categorias_ingrediente?.slug ?? 'vegetal') as CategoriaSlug,
+  nombre: i.nombre,
+  precio_extra: i.precio_extra,
+  activo: i.activo,
+  sin_tacc: i.sin_tacc,
+  vegetariano: i.vegetariano,
+  orden: i.orden,
+  imagen_url: i.imagen_url,
+  color_hex: i.color_hex,
+}));
+---
+
+<Base titulo="Stock" conMenu activo="stock">
+  {
+    error ? (
+      <main class="mx-auto max-w-3xl px-4 py-10">
+        <p class="rounded-xl bg-red-50 p-4 font-semibold text-red-700">No pudimos cargar el stock. Recargá la página.</p>
+      </main>
+    ) : (
+      <PanelStock client:load ingredientes={filas} />
+    )
+  }
+</Base>

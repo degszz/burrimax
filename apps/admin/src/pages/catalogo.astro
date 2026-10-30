@@ -8,7 +8,7 @@ const db = Astro.locals.supabase;
 const [ingredientes, tamanos, combos, zonas] = await Promise.all([
   db
     .from('ingredientes')
-    .select('id, slug, nombre, precio_extra, activo, sin_tacc, vegetariano, orden, imagen_url, categorias_ingrediente(slug)')
+    .select('id, slug, nombre, precio_extra, activo, sin_tacc, vegetariano, orden, imagen_url, color_hex, categorias_ingrediente(slug)')
     .order('orden'),
   db.from('tamanos').select('id, slug, nombre, precio_base, min_carnes, max_carnes, max_salsas, max_vegetales, activo').order('orden'),
   db
@@ -32,6 +32,7 @@ const filasIngredientes: FilaIngrediente[] = (ingredientes.data ?? []).map((i) =
   vegetariano: i.vegetariano,
   orden: i.orden,
   imagen_url: i.imagen_url,
+  color_hex: i.color_hex,
 }));
 
 const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {

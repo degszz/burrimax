@@ -1,5 +1,6 @@
 import type { IngredienteCatalogo } from '@burritos/shared';
 import { Check, Minus, Plus, WheatOff } from 'lucide-react';
+import { formatoPesos } from '@/lib/formato';
 import { useLatido } from '@/lib/useLatido';
 import { cn } from '@/lib/utils';
 import { ImagenIngrediente } from './ImagenIngrediente';
@@ -33,6 +34,13 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
       )}
       <ImagenIngrediente ingrediente={ingrediente} prioridad={prioridad} className="mx-auto w-[64%] [@media(max-height:720px)]:w-[50%]" />
       <span className="mt-1 block font-heading text-lg leading-tight font-extrabold">{ingrediente.nombre}</span>
+      {/* Precio extra opcional (lo carga el admin; si es 0 no se muestra nada) */}
+      {ingrediente.precioExtra > 0 && (
+        <span className="mt-0.5 inline-block rounded-full bg-amarillo px-2 text-sm font-bold">
+          + {formatoPesos(ingrediente.precioExtra)}
+          {porciones ? ' por porción' : ''}
+        </span>
+      )}
       {ingrediente.categoria === 'tortilla' && ingrediente.sinTacc && (
         <span className="mt-1 inline-flex items-center gap-1 rounded-full border-2 border-verde bg-verde-claro px-2 text-sm font-bold text-verde">
           <WheatOff className="size-4" aria-hidden /> Sin TACC

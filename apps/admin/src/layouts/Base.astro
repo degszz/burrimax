@@ -5,11 +5,17 @@ interface Props {
   titulo: string;
   /** Muestra la barra de arriba (Pedidos · Horarios · Salir). */
   conMenu?: boolean;
-  activo?: 'pedidos' | 'catalogo' | 'horarios';
+  activo?: 'pedidos' | 'stock' | 'catalogo' | 'horarios';
 }
 
 const { titulo, conMenu = false, activo } = Astro.props;
 const usuario = Astro.locals.usuario;
+const SECCIONES = [
+  { id: 'pedidos', href: '/', texto: 'Pedidos' },
+  { id: 'stock', href: '/stock', texto: 'Stock' },
+  { id: 'catalogo', href: '/catalogo', texto: 'Catálogo' },
+  { id: 'horarios', href: '/horarios', texto: 'Horarios' },
+] as const;
 ---
 
 <!doctype html>
@@ -28,26 +34,18 @@ const usuario = Astro.locals.usuario;
     {
       conMenu && (
         <header class="sticky top-0 z-30 border-b bg-zinc-900 text-white print:hidden">
-          <nav class="mx-auto flex max-w-[1600px] items-center gap-2 px-4 py-2">
-            <span class="mr-2 text-lg font-bold">🌯 Admin</span>
-            <a
-              href="/"
-              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'pedidos' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
-            >
-              Pedidos
-            </a>
-            <a
-              href="/catalogo"
-              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'catalogo' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
-            >
-              Catálogo
-            </a>
-            <a
-              href="/horarios"
-              class:list={['rounded-lg px-4 py-2.5 text-base font-semibold', activo === 'horarios' ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
-            >
-              Horarios
-            </a>
+          <nav class="mx-auto flex max-w-[1600px] items-center gap-2 overflow-x-auto px-4 py-2">
+            <span class="mr-2 shrink-0 text-lg font-bold">🌯 Admin</span>
+            {
+              SECCIONES.map((s) => (
+                <a
+                  href={s.href}
+                  class:list={['shrink-0 rounded-lg px-4 py-2.5 text-base font-semibold', activo === s.id ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
+                >
+                  {s.texto}
+                </a>
+              ))
+            }
             <span class="ml-auto hidden text-sm text-zinc-400 sm:inline">{usuario?.email}</span>
             <form method="post" action="/api/auth/salir">
               <button class="rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-zinc-800">Salir</button>

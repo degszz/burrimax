@@ -14,6 +14,8 @@ export interface FilaIngrediente {
   vegetariano: boolean;
   orden: number;
   imagen_url: string | null;
+  /** Color de respaldo cuando todavía no hay foto. */
+  color_hex?: string | null;
 }
 
 export interface FilaTamano {
