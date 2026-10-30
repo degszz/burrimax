@@ -127,3 +127,11 @@ La pantalla de "¡Listo!" salta sola a WhatsApp con cuenta regresiva (3 s; 8 s c
 - Mercado Pago se puede prender, pero la tienda lo ofrece solo si además existe `MP_ACCESS_TOKEN` en el servidor (la pantalla lo avisa). Solo se guardan datos públicos: **nunca claves** (la tabla es de lectura pública).
 - Sin migración: las columnas ya existían y la tienda ya leía alias, CVU, titular y medios activos de `config_publica`.
 - Descartado: editar desde acá el WhatsApp (ya está confirmado y un error rompe el envío de pedidos) y `pago_stripe_activo` (sigue detrás de su propio interruptor).
+
+### 2026-10-30 · Mercado Pago: import con nombre, y las claves se graban al compilar
+- En Vercel el cobro fallaba con `MercadoPagoConfig is not a constructor`: `mercadopago` es CommonJS y en Node (ESM) el import por defecto trae el módulo entero. Se usa `import { MercadoPagoConfig } from 'mercadopago'`. En `pnpm dev` no se veía (Vite convierte distinto) y los tests no cargan el SDK. **Para probar algo así: compilar con un token falso y ejecutar el chunk con Node** (tiene que llegar a la API y volver 403).
+- Astro reemplaza `import.meta.env.MP_ACCESS_TOKEN` (y las otras claves del servidor) **al compilar**: cambiar una variable en Vercel no sirve sin **Redeploy**. Quedan en el código del servidor, nunca en el del navegador. Más adelante se puede pasar a `astro:env` con `access: "secret"` para leerlas al ejecutar.
+- El checkout de Mercado Pago bloquea navegadores automáticos ("Hubo un error accediendo a esta página"): el pago de prueba lo hace una persona.
+
+### 2026-10-30 · Capas a pantalla completa por portal al `<body>`
+"Verlo en mi mesa" quedaba con el header encima y había que scrollear: la animación `animate-aparecer` (con `transform`, `both`) convierte a la sección del paso "¡Listo!" en el marco de cualquier `fixed` de adentro. `CapaPantallaCompleta` manda la capa al `<body>` con `createPortal` y bloquea el scroll mientras está abierta. Toda capa nueva de pantalla completa (cámara, 3D, visores) va con ese componente.

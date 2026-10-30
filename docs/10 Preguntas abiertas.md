@@ -33,7 +33,7 @@ tags: [burritos, pendientes]
 - [ ] ¿Stripe se va a usar realmente? ¿Hay o habrá empresa en el exterior?
 - [ ] ¿La transferencia es al alias de MP o a un banco? Cargar **alias, CVU y titular** desde el admin → **Pagos** (`/pagos`) (hoy vacíos: el seguimiento dice "te pasamos el alias por WhatsApp")
 - [x] **Número de WhatsApp** del local: +54 9 2271 468521 (`5492271468521` en `config_negocio.whatsapp`, 2026-10-30)
-- [ ] Claves del servidor: ~~`SUPABASE_SECRET_KEY`~~ (cargada) · faltan `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`
+- [x] Claves del servidor: `SUPABASE_SECRET_KEY`, `MP_ACCESS_TOKEN` (de **prueba**) y `MP_WEBHOOK_SECRET` cargadas (2026-10-30). Falta pasar a las credenciales de **producción** cuando termine la prueba
 
 ## Contenido con IA (Fase 8, secundaria) → [[Planes/Fase 8 - Contenido visual con IA]]
 - [ ] ¿Se crea la cuenta de Higgsfield? Presupuesto aprox. US$10–15

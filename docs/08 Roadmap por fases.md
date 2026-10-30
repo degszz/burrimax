@@ -40,7 +40,8 @@ tags: [burritos, roadmap]
 ## Fase 4 — Mercado Pago
 - [x] Checkout Pro (SDK `mercadopago` 3.6.1): preferencia con `external_reference` = pedido
 - [x] Webhook con firma (validador oficial), idempotencia y control de monto
-- [ ] Pruebas con usuarios de prueba — **faltan `MP_ACCESS_TOKEN` (prueba), deploy y `MP_WEBHOOK_SECRET`**
+- [x] Claves de prueba cargadas en Vercel (2026-10-30) y cobro creando la preferencia en producción (arreglado el import del SDK)
+- [ ] Pago de prueba con tarjeta (lo hace Max: MP bloquea navegadores automáticos) y verificar que pase a pagado **solo por webhook**; después, credenciales de producción
 
 ## Fase 5 — Pulido visual del armador
 > [!note] El 3D real (WebGL) quedó descartado por ahora: el "3D" lo dan los renders de Max. Ver [[09 Decisiones]].
