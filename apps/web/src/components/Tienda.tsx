@@ -38,8 +38,15 @@ interface Props {
   whatsapp: string | null;
 }
 
-// Ingredientes que se ven en la mini demostración del hero (uno de cada paso).
-const SLUGS_DEMO = ['tortilla-trigo', 'guacamole', 'pollo', 'vaca', 'choclo', 'tomate'];
+// Ingredientes de la mini demostración del hero: alcanzan para llenar la zona
+// (la primera fila y media se ve nítida, el resto queda desenfocado).
+const SLUGS_DEMO = [
+  'tortilla-trigo', 'guacamole', 'pollo',
+  'vaca', 'choclo', 'tomate',
+  'tortilla-maiz', 'cheddar', 'pescado',
+  'lechuga', 'cebolla-morada', 'zanahoria',
+  'barbacoa', 'morron', 'huevo',
+];
 
 interface Aviso {
   texto: string;
@@ -126,7 +133,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
 
   const ingredientesDemo = useMemo(() => {
     const elegidos = SLUGS_DEMO.map((s) => catalogo.ingredientes.find((i) => i.slug === s)).filter((i) => !!i);
-    return elegidos.length === SLUGS_DEMO.length ? elegidos : catalogo.ingredientes.slice(0, 6);
+    return elegidos.length >= 9 ? elegidos : catalogo.ingredientes.slice(0, SLUGS_DEMO.length);
   }, [catalogo]);
 
   // Hasta dónde se puede saltar con la barra de pasos: el primer paso que bloquea.

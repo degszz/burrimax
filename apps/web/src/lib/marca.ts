@@ -4,9 +4,8 @@
 
 export const MARCA = {
   nombre: '[NOMBRE]',
-  /** Frase del hero: corta, que se lea de un vistazo. */
-  frase: 'El burrito como vos lo querés',
-  bajada: 'Elegí tortilla, salsas, carne y verduras. Las papas van de regalo.',
+  /** Título del hero (pedido de Max). */
+  frase: 'Burrito a tu Gusto',
   /** Usuario de Instagram sin @. Vacío = no se muestra el botón. */
   instagram: '',
 } as const;

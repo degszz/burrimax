@@ -5,7 +5,7 @@ tags: [burritos, pendientes]
 
 ## Negocio
 - [ ] Nombre del emprendimiento, logo y colores (hoy dice `[NOMBRE]`)
-- [ ] Frase del hero (hoy "El burrito como vos lo querés") y bajada — en `apps/web/src/lib/marca.ts`
+- [x] Título del hero: "Burrito a tu Gusto" (2026-10-30)
 - [ ] Usuario de **Instagram** (en `marca.ts`; mientras falte, el botón se ve apagado)
 - [x] Ingredientes: tortilla maíz (sin TACC) o trigo · salsas · carne pollo/vaca/cerdo/pescado · vegetales (ver [[02 Reglas de negocio]])
 - [ ] Precios base con papas: simple (hoy $9.000) y doble (hoy $13.500)
