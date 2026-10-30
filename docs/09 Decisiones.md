@@ -53,6 +53,13 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Transferencia: alias y monto para copiar, y Mercado Pago como camino "automático"
+- Mercado Pago **no tiene un link oficial** para abrir "Transferir" con el alias puesto. Lo más parecido y mejor es el botón **Mercado Pago (Checkout Pro)**: abre la app con el monto y el destinatario cargados, se paga con saldo, tarjeta o cuotas, y el pedido pasa a "pagado" solo por webhook (sin comprobante). Ya está programado; se prende con `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET` en Vercel.
+- Transferencia común: la pantalla de "¡Listo!" ya no salta sola a WhatsApp; muestra **Monto / Alias / CVU con "Copiar"** y "Abrir Mercado Pago", y después "Mandar el pedido por WhatsApp". Se activa cuando se cargue el alias en `config_negocio`.
+
+### 2026-10-30 · "Ver en mi mesa" en 3D real
+`<model-viewer>` con AR nativo; se activa sola cuando existen `public/modelos/burrito.glb` y `.usdz`. Ver [[Planes/Fase 8 - Contenido visual con IA]].
+
 ### 2026-10-30 · Metadatos, vista previa al compartir y Google
 - Marca en un solo lugar (`lib/marca.ts`): nombre provisorio **Burrimax**, frase, descripción, ciudad, redes, dominio. `Base.astro` arma título, descripción, canónica, Open Graph + Twitter (lo que muestra WhatsApp al compartir el link), íconos y manifest.
 - `public/og.png` 1200×630 (~260 KB, por debajo del límite de 300 KB que se recomienda para WhatsApp): el plato armado con los ingredientes reales de la tienda, nombre, "Armá tu burrito a tu gusto" y papas. Se generó con Edge en modo sin ventana desde un HTML (no hay librería de imágenes en el repo).

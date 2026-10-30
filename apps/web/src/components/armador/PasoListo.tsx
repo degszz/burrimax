@@ -1,11 +1,13 @@
 import { precioVistaPrevia, type Armado, type Catalogo, type CategoriaSlug } from '@burritos/shared';
 import { Camera, Check, HeartPlus, Minus, Plus, ShoppingBag, WheatOff } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { hayModelo3D } from '@/lib/modelo3d';
 import { CATEGORIA_DEL_PASO, describir, type PasoDeCategoria } from '@/lib/armador/reglas';
 import { formatoPesos } from '@/lib/formato';
 import { BurritoConPapas } from './BurritoConPapas';
 import { ImagenIngrediente } from './ImagenIngrediente';
 import { VerEnMiMesa } from './VerEnMiMesa';
+import { VerEnMiMesa3D } from './VerEnMiMesa3D';
 
 interface Props {
   armado: Armado;
@@ -28,7 +30,16 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
   const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
   const precio = precioVistaPrevia(armado, catalogo);
   const doble = (tamano?.cantTapas ?? 1) > 1;
-  const [camara, setCamara] = useState(false);
+  // 'foto': cámara con la imagen encima · '3d': modelo real en AR (si está subido).
+  const [camara, setCamara] = useState<false | 'foto' | '3d'>(false);
+  const [con3D, setCon3D] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    hayModelo3D().then((hay) => vivo && setCon3D(hay));
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   return (
     <section aria-labelledby="titulo-listo" className="animate-aparecer px-4 pb-8">
@@ -44,13 +55,14 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
         <BurritoConPapas doble={doble} tortilla={tortilla?.slug} className="pt-2 pb-4" />
         <button
           type="button"
-          onClick={() => setCamara(true)}
+          onClick={() => setCamara(con3D ? '3d' : 'foto')}
           className="juguete mx-auto mb-2 flex min-h-12 items-center gap-2 rounded-2xl bg-white px-4 font-heading text-lg font-extrabold"
         >
           <Camera aria-hidden className="size-5" strokeWidth={2.5} /> Verlo en mi mesa
         </button>
       </div>
-      {camara && <VerEnMiMesa doble={doble} tortilla={tortilla?.slug} onCerrar={() => setCamara(false)} />}
+      {camara === 'foto' && <VerEnMiMesa doble={doble} tortilla={tortilla?.slug} onCerrar={() => setCamara(false)} />}
+      {camara === '3d' && <VerEnMiMesa3D onCerrar={() => setCamara(false)} />}
 
       <div className="juguete mt-5 overflow-hidden rounded-3xl bg-white">
         <div className="flex items-center justify-between px-4 py-3">

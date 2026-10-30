@@ -7,7 +7,7 @@ import { formatoPesos } from '@/lib/formato';
 import { linkWhatsapp, mensajePedido } from '@/lib/mensajeWhatsapp';
 import { cn } from '@/lib/utils';
 import { useCarrito } from '@/stores/carrito';
-import { PedidoEnviado } from './checkout/PedidoEnviado';
+import { PedidoEnviado, type DatosTransferencia } from './checkout/PedidoEnviado';
 import { IconoWhatsapp } from './tienda/IconosRedes';
 
 interface Props {
@@ -16,6 +16,8 @@ interface Props {
   abierto: boolean;
   /** Número del local para mandar el pedido (solo dígitos). */
   whatsapp: string | null;
+  /** Alias/CVU/titular para mostrar al pagar por transferencia. */
+  transferencia: { alias: string | null; cvu: string | null; titular: string | null };
 }
 
 type MetodoVisible = Exclude<MetodoPago, 'stripe'>;
@@ -37,7 +39,7 @@ const MENSAJES: Record<string, string> = {
   'pago.pagaCon': 'Revisá con cuánto pagás',
 };
 
-export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) {
+export default function Checkout({ catalogo, pagos, abierto, whatsapp, transferencia }: Props) {
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
   const [datos, setDatos] = useState<DatosCliente>(DATOS_VACIOS);
@@ -48,7 +50,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
-  const [enviado, setEnviado] = useState<{ numero: number | null; link: string; url: string | null } | null>(null);
+  const [enviado, setEnviado] = useState<{ numero: number | null; link: string; url: string | null; transferencia: DatosTransferencia | null } | null>(null);
 
   const metodosActivos = METODOS.filter((m) => pagos[m.id]);
 
@@ -151,7 +153,12 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
           catalogo,
         );
         carrito.vaciar();
-        setEnviado({ numero, link: linkWhatsapp(whatsapp, mensaje), url: url ? `${url}&nuevo=1` : null });
+        setEnviado({
+          numero,
+          link: linkWhatsapp(whatsapp, mensaje),
+          url: url ? `${url}&nuevo=1` : null,
+          transferencia: metodo === 'transferencia' ? { ...transferencia, total } : null,
+        });
         return;
       }
       window.location.href = cuerpo.redirectUrl ?? `${cuerpo.url}&nuevo=1`;
@@ -164,7 +171,10 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp }: Props) 
 
   if (!listo) return null;
 
-  if (enviado) return <PedidoEnviado numero={enviado.numero} linkWhatsapp={enviado.link} urlSeguimiento={enviado.url} />;
+  if (enviado)
+    return (
+      <PedidoEnviado numero={enviado.numero} linkWhatsapp={enviado.link} urlSeguimiento={enviado.url} transferencia={enviado.transferencia} />
+    );
 
   if (carrito.items.length === 0) {
     return (

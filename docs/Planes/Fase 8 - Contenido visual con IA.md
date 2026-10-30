@@ -43,11 +43,12 @@ Pasos:
 
 ## 2 · "Ver en mi mesa" (realidad aumentada)
 - [x] Paso intermedio hecho (2026-10-29): "Verlo en mi mesa" con la cámara y la foto del burrito + papas encima (`VerEnMiMesa.tsx`). Al tener el `.glb`, el mismo botón pasa a AR real
-- [ ] Max saca 2–3 fotos del burrito **cerrado en plato con papas** (simple y doble)
-- [ ] Generar el modelo `.glb` con una IA de imagen a 3D (Meshy, Tripo, Rodin o Luma) — **Higgsfield no hace 3D**, pero sus imágenes sirven de entrada
-- [ ] Retocar y comprimir a **2–3 MB**
-- [ ] Botón en "¡Listo!" con `<model-viewer>` (Google): abre el AR nativo de Android/iPhone; en celulares sin AR muestra el 3D para girar. Se carga **solo al tocar**
-- [ ] Verificar la versión actual de `<model-viewer>` antes de instalar
+- [x] (2026-10-30) Código listo: `<model-viewer>` 4.4.0 + `three` 0.183.2, `VerEnMiMesa3D.tsx`. Se carga **solo al tocar** (archivo aparte de ~1 MB). El botón "Verlo en mi mesa" detecta solo si existe `public/modelos/burrito.glb`: si está, abre el 3D con "Ponerlo en mi mesa" (AR nativo: Scene Viewer en Android, Quick Look en iPhone, anclado a la mesa y a tamaño real); si no, sigue la versión con la foto.
+- [ ] **Max consigue el modelo** (la opción más real es escanear un burrito de verdad):
+  1. **Escaneo con el celular (recomendado, gratis):** app **Polycam**, **KIRI Engine** o **Luma AI**, modo "Photo/Object capture". Burrito cerrado en el plato con papas, sobre una mesa con buena luz pareja (sin sol directo), girando alrededor despacio en 2–3 alturas (50–100 fotos). Exportar **GLB** y **USDZ**.
+  2. **Con IA de imagen a 3D** (si el escaneo no sale): Meshy, Tripo o Rodin a partir de 2–3 fotos. Menos fiel que el escaneo.
+- [ ] Dejar `burrito.glb` y `burrito.usdz` en `apps/web/public/modelos/` (escala real: ~0,22 m de largo; menos de 5 MB cada uno). Si pesa más, se comprime con `gltf-transform` (Draco/Meshopt + texturas WebP).
+- [ ] Probar en un Android y en un iPhone con la web publicada
 - Un modelo por tamaño, **genérico** (cerrado no se ve el relleno). Descartado: generar el burrito exacto de cada cliente con IA (lento, caro, puede no coincidir con lo que llega)
 
 ## 3 · Renders faltantes con Higgsfield
