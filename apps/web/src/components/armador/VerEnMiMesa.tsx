@@ -1,6 +1,7 @@
 import { Camera, X } from 'lucide-react';
 import { useEffect, useRef, useState, type PointerEvent as EventoPuntero } from 'react';
 import { BurritoConPapas } from './BurritoConPapas';
+import { CapaPantallaCompleta } from './CapaPantallaCompleta';
 
 interface Props {
   doble: boolean;
@@ -132,58 +133,60 @@ export function VerEnMiMesa({ doble, tortilla, onCerrar }: Props) {
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Ver el burrito en tu mesa" className="fixed inset-0 z-[70] bg-black">
-      <div ref={escena} className="absolute inset-0 overflow-hidden">
-        <video ref={video} playsInline muted className="absolute inset-0 size-full object-cover" />
+    <CapaPantallaCompleta>
+      <div role="dialog" aria-modal="true" aria-label="Ver el burrito en tu mesa" className="fixed inset-0 z-[70] h-dvh bg-black">
+        <div ref={escena} className="absolute inset-0 overflow-hidden">
+          <video ref={video} playsInline muted className="absolute inset-0 size-full object-cover" />
+
+          {estado === 'lista' && (
+            <div
+              ref={burrito}
+              onPointerDown={alApoyar}
+              onPointerMove={alMover}
+              onPointerUp={alSoltar}
+              onPointerCancel={alSoltar}
+              className="absolute bottom-[22%] left-1/2 w-[85%] max-w-md cursor-grab touch-none select-none active:cursor-grabbing"
+              style={{ transform: `translate(calc(-50% + ${pos.x}px), ${pos.y}px) scale(${pos.escala})` }}
+            >
+              <BurritoConPapas doble={doble} tortilla={tortilla} />
+            </div>
+          )}
+
+          {estado !== 'lista' && (
+            <div className="absolute inset-0 grid place-items-center p-8 text-center text-white">
+              <p className="max-w-xs text-lg font-bold">
+                {estado === 'pidiendo' && 'Abriendo la cámara…'}
+                {estado === 'sin-permiso' && 'Para verlo en tu mesa necesitamos permiso para usar la cámara. Activalo en los ajustes del navegador y probá de nuevo.'}
+                {estado === 'sin-camara' && 'No pudimos abrir la cámara de este dispositivo.'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={onCerrar}
+          aria-label="Cerrar la cámara"
+          className="juguete absolute top-[max(1rem,env(safe-area-inset-top))] right-4 grid size-12 place-items-center rounded-2xl bg-white"
+        >
+          <X className="size-6" strokeWidth={2.5} />
+        </button>
 
         {estado === 'lista' && (
-          <div
-            ref={burrito}
-            onPointerDown={alApoyar}
-            onPointerMove={alMover}
-            onPointerUp={alSoltar}
-            onPointerCancel={alSoltar}
-            className="absolute bottom-[22%] left-1/2 w-[85%] max-w-md cursor-grab touch-none select-none active:cursor-grabbing"
-            style={{ transform: `translate(calc(-50% + ${pos.x}px), ${pos.y}px) scale(${pos.escala})` }}
-          >
-            <BurritoConPapas doble={doble} tortilla={tortilla} />
-          </div>
-        )}
-
-        {estado !== 'lista' && (
-          <div className="absolute inset-0 grid place-items-center p-8 text-center text-white">
-            <p className="max-w-xs text-lg font-bold">
-              {estado === 'pidiendo' && 'Abriendo la cámara…'}
-              {estado === 'sin-permiso' && 'Para verlo en tu mesa necesitamos permiso para usar la cámara. Activalo en los ajustes del navegador y probá de nuevo.'}
-              {estado === 'sin-camara' && 'No pudimos abrir la cámara de este dispositivo.'}
+          <div className="absolute inset-x-0 bottom-0 px-4 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center">
+            <p aria-live="polite" className="mb-3 inline-block rounded-full bg-black/55 px-3 py-1 text-base font-bold text-white">
+              {aviso ?? 'Movelo con el dedo · pellizcá para agrandarlo'}
             </p>
+            <button
+              type="button"
+              onClick={sacarFoto}
+              className="juguete mx-auto flex min-h-14 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-amarillo font-heading text-xl font-extrabold"
+            >
+              <Camera aria-hidden className="size-6" strokeWidth={2.5} /> Sacar foto
+            </button>
           </div>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={onCerrar}
-        aria-label="Cerrar la cámara"
-        className="juguete absolute top-[max(1rem,env(safe-area-inset-top))] right-4 grid size-12 place-items-center rounded-2xl bg-white"
-      >
-        <X className="size-6" strokeWidth={2.5} />
-      </button>
-
-      {estado === 'lista' && (
-        <div className="absolute inset-x-0 bottom-0 px-4 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center">
-          <p aria-live="polite" className="mb-3 inline-block rounded-full bg-black/55 px-3 py-1 text-base font-bold text-white">
-            {aviso ?? 'Movelo con el dedo · pellizcá para agrandarlo'}
-          </p>
-          <button
-            type="button"
-            onClick={sacarFoto}
-            className="juguete mx-auto flex min-h-14 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-amarillo font-heading text-xl font-extrabold"
-          >
-            <Camera aria-hidden className="size-6" strokeWidth={2.5} /> Sacar foto
-          </button>
-        </div>
-      )}
-    </div>
+    </CapaPantallaCompleta>
   );
 }
