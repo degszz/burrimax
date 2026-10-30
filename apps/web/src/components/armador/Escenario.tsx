@@ -1,13 +1,12 @@
 import { contarRelleno, maximoRelleno, type Armado, type Catalogo, type IngredienteCatalogo } from '@burritos/shared';
 import { Smile } from 'lucide-react';
+import { useLatido } from '@/lib/useLatido';
 import { cn } from '@/lib/utils';
 import { ImagenIngrediente } from './ImagenIngrediente';
 
 interface Props {
   armado: Armado;
   catalogo: Catalogo;
-  /** Más grande cuando ya no están los botones de tamaño y sobra lugar. */
-  grande?: boolean;
 }
 
 // Posiciones (en % del plato): carnes juntas al centro y vegetales en una
@@ -40,7 +39,7 @@ const MANCHAS_SALSA = [
   },
 ] as const;
 
-export function Escenario({ armado, catalogo, grande = false }: Props) {
+export function Escenario({ armado, catalogo }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
   const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
@@ -48,13 +47,18 @@ export function Escenario({ armado, catalogo, grande = false }: Props) {
   const relleno = contarRelleno(armado);
   const maximo = tamano ? maximoRelleno(tamano) : 0;
   const doble = (tamano?.cantTapas ?? 1) > 1;
+  // Animaciones que responden a lo que se elige.
+  const cambio = `${armado.seleccion.tortilla.join()}|${armado.seleccion.salsa.join()}|${relleno}`;
+  const latidoPlato = useLatido<HTMLDivElement>(cambio, 'animate-plato');
+  const latidoRelleno = useLatido<HTMLDivElement>(relleno, 'animate-latido');
 
   return (
-    <section aria-label="Tu burrito" className="px-4">
-      {/* Sin tarjeta: el plato apoyado sobre el fondo, con los dos carteles */}
-      <div className={cn("relative transition-[height] duration-300", grande ? "h-[min(29dvh,15rem)]" : "h-[min(19dvh,10rem)]")}>
+    <section aria-label="Tu burrito" className="flex min-h-0 flex-1 flex-col px-4">
+      {/* Sin tarjeta: el plato apoyado sobre el fondo, con los dos carteles.
+          Ocupa el lugar que sobra; el plato es un cuadrado del lado más corto. */}
+      <div className="relative min-h-20 flex-1 [container-type:size]">
         {/* Contador de relleno */}
-        <div className="absolute top-1 left-0 z-20 rounded-2xl border-2 border-tinta bg-white px-3 py-1.5">
+        <div ref={latidoRelleno} className="absolute top-1 left-0 z-20 rounded-2xl border-2 border-tinta bg-white px-3 py-1.5">
           <p className="font-heading text-lg leading-none font-extrabold">
             Relleno {relleno}/{maximo}
           </p>
@@ -66,7 +70,9 @@ export function Escenario({ armado, catalogo, grande = false }: Props) {
         </div>
 
         {/* Plato con la tortilla */}
-        <div className="absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute top-1/2 left-1/2 @container size-[min(100cqh,100cqw,18rem)] -translate-x-1/2 -translate-y-1/2">
+          {/* Se hunde apenas cuando le cae algo encima */}
+          <div ref={latidoPlato} className="absolute inset-0">
           <div className="absolute inset-0 rounded-full border-[3px] border-tinta bg-white shadow-[0_5px_0_var(--tinta)]" />
 
           {tortilla ? (
@@ -85,7 +91,7 @@ export function Escenario({ armado, catalogo, grande = false }: Props) {
               />
             </>
           ) : (
-            <div className="absolute inset-[9%] grid place-items-center rounded-full border-[3px] border-dashed border-tinta/45 text-center">
+            <div className="absolute inset-[9%] grid place-items-center rounded-full border-[3px] border-dashed border-tinta/45 text-center @max-[9rem]:hidden">
               <div>
                 <Smile aria-hidden className="mx-auto size-9 text-tinta/70" />
                 <p className="mt-1 font-heading text-lg leading-tight font-bold text-tinta/80">
@@ -151,6 +157,7 @@ export function Escenario({ armado, catalogo, grande = false }: Props) {
               </span>
             ) : null;
           })}
+          </div>
         </div>
 
         {/* Papas incluidas */}

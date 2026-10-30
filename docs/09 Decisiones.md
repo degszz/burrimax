@@ -53,6 +53,10 @@ Pedido de Max. La grilla muestra todo de un vistazo, no hay que descubrir que se
 ### 2026-10-29 · Catálogo de ejemplo rearmado en `burritos-dev`
 La base de desarrollo no tenía pedidos: se vació el catálogo viejo (tapa/proteína/relleno/agregado) y se cargó el nuevo con `seed.sql`. Imágenes con nombre = `slug` del ingrediente; si falta el `.avif`, se usa el `.svg` provisorio.
 
+### 2026-10-30 · Animaciones que responden a lo que tocás + armador que nunca se pisa
+- **Animaciones** (solo como respuesta a un toque, nunca solas): la tarjeta elegida se aplasta y vuelve, aparece el tilde verde, el plato se hunde apenas cuando le cae algo, laten el contador de relleno, el precio del encabezado y el paso actual, el paso nuevo entra desde el lado hacia donde vas y "Siguiente" da un saltito cuando se habilita. Hook `lib/useLatido.ts`; keyframes en `global.css`. Todas se apagan con `prefers-reduced-motion`.
+- **Nada pisa la barra de abajo**: la barra publica su alto real (`--alto-barra`) y el armador ocupa `100dvh - barra`. El plato es lo único elástico (cuadrado del lado más corto, con container queries); el carrusel se dimensiona también por alto (`22dvh`). En pantallas bajas (≤720px) se ocultan el subtítulo del paso y el rótulo "Armá tu burrito", y la foto de la tarjeta es más chica. Probado a 375×667 y 375×812.
+
 ### 2026-10-30 · Pedido por WhatsApp con pantalla de "¡Listo!"
 Con efectivo o transferencia, el botón final es **"Enviar pedido por WhatsApp"** (verde). Primero el pedido se guarda igual por `POST /api/pedidos` (el precio lo sigue calculando el servidor); después aparece un tilde grande con el número de pedido y a los 1,8 s se abre WhatsApp (`wa.me`) con el mensaje ya escrito: detalle de cada burrito, entrega, pago, total y link de seguimiento. Si el salto no anda, hay botón "Abrir WhatsApp". Mercado Pago sigue yendo a pagar. Texto en `lib/mensajeWhatsapp.ts` (con test).
 

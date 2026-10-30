@@ -200,6 +200,58 @@
   animation: aparecer 260ms ease-out both;
 }
 
+/* Respuestas a lo que toca la persona (todas se apagan con reduced-motion). */
+
+/* Contadores y precio: un latido corto cuando cambian. */
+@keyframes latido {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+/* Tarjeta elegida: se aplasta y vuelve, como un botón de goma. */
+@keyframes pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.94, 0.9); }
+  70% { transform: scale(1.04, 1.06); }
+  100% { transform: scale(1); }
+}
+
+/* El plato recibe el ingrediente: se hunde apenas cuando "aterriza". */
+@keyframes plato {
+  0%, 45% { transform: scale(1); }
+  65% { transform: scale(1.04, 0.95); }
+  85% { transform: scale(0.99, 1.02); }
+  100% { transform: scale(1); }
+}
+
+/* "Siguiente" se habilita: un saltito para que se vea. */
+@keyframes listo {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-7px) scale(1.03); }
+  55% { transform: translateY(0) scale(0.99, 1.02); }
+  75% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+/* Cambio de paso: entra desde el lado hacia donde vas. */
+@keyframes entrar-der {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes entrar-izq {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+
+.animate-latido { animation: latido 300ms ease-out; }
+.animate-pop { animation: pop 340ms cubic-bezier(0.34, 1.4, 0.64, 1); }
+.animate-plato { animation: plato 520ms ease-out; }
+.animate-listo { animation: listo 560ms cubic-bezier(0.34, 1.4, 0.64, 1); }
+.animate-entrar-der { animation: entrar-der 260ms ease-out both; }
+.animate-entrar-izq { animation: entrar-izq 260ms ease-out both; }
+
 /* Pedido enviado: el círculo verde aparece y el tilde se dibuja. */
 @keyframes sello {
   0% { transform: scale(0.3); opacity: 0; }
@@ -222,6 +274,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-latido,
+  .animate-pop,
+  .animate-plato,
+  .animate-listo,
+  .animate-entrar-der,
+  .animate-entrar-izq,
   .animate-sello,
   .animate-tilde,
   .animate-caer,

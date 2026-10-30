@@ -27,6 +27,7 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
     .map(buscar)
     .filter((i) => !!i);
   const salsas = armado.seleccion.salsa.length;
+  const precio = precioVistaPrevia(armado, catalogo);
 
   return (
     <button
@@ -64,7 +65,10 @@ export function ResumenFlotante({ visible, armado, catalogo, onVer, encabezado =
             Salsas {salsas}/{tamano?.maximos.salsa ?? 0} · {tamano?.nombre}
           </span>
         </span>
-        <span className="font-heading text-xl font-extrabold">{formatoPesos(precioVistaPrevia(armado, catalogo))}</span>
+        {/* key: el precio late cada vez que cambia */}
+        <span key={precio} className="animate-latido font-heading text-xl font-extrabold">
+          {formatoPesos(precio)}
+        </span>
         <ChevronUp aria-hidden className="size-6 shrink-0" strokeWidth={2.5} />
       </span>
     </button>

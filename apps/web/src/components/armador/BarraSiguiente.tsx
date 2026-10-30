@@ -1,5 +1,7 @@
 import { ArrowLeft, ArrowRight, CircleAlert, Check } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { formatoPesos } from '@/lib/formato';
+import { useLatido } from '@/lib/useLatido';
 
 interface Props {
   precio: number;
@@ -15,8 +17,28 @@ interface Props {
 
 /** Barra fija abajo: qué falta (o qué viene) y el botón Siguiente con el precio. */
 export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBorrar, onSiguiente, onAnterior, onBorrar }: Props) {
+  // El armador ocupa la pantalla menos esta barra: publica su alto real
+  // (cambia con el mensaje, la zona segura del celular, el tamaño de letra).
+  const barra = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const elemento = barra.current;
+    if (!elemento) return;
+    const raiz = document.documentElement;
+    const medir = () => raiz.style.setProperty('--alto-barra', `${elemento.offsetHeight}px`);
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(elemento);
+    return () => {
+      observador.disconnect();
+      raiz.style.removeProperty('--alto-barra');
+    };
+  }, []);
+
+  // Cuando "Siguiente" se habilita, da un saltito para que se note.
+  const saltito = useLatido<HTMLButtonElement>(!motivo, 'animate-listo', (habilitado) => habilitado === true);
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+    <div ref={barra} className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t-[2.5px] border-tinta bg-crema px-4 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
       <p aria-live="polite" className="mb-1.5 flex min-h-6 items-center justify-center gap-1.5 text-center text-base font-bold">
         {motivo ? (
           <span className="flex items-center gap-1.5 text-rojo">
@@ -35,6 +57,7 @@ export function BarraSiguiente({ precio, motivo, mensajeOk, puedeVolver, puedeBo
           </button>
         )}
         <button
+          ref={saltito}
           type="button"
           onClick={onSiguiente}
           disabled={!!motivo}

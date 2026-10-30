@@ -1,5 +1,6 @@
 import { contarRelleno, validarArmado, type Armado, type Catalogo, type TamanoCatalogo } from '@burritos/shared';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { BarraPasos } from './armador/BarraPasos';
 import { BarraSiguiente } from './armador/BarraSiguiente';
 import { Carrusel } from './armador/Carrusel';
@@ -305,7 +306,13 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
   return (
     <div className={armando ? 'pb-48' : 'pb-10'}>
       {/* Encabezado + portada = una pantalla justa */}
-      <div className={`mx-auto flex max-w-md flex-col ${armadorAbierto ? '' : 'min-h-dvh'}`}>
+      {/* Armando: encabezado + armador ocupan justo la pantalla menos la barra de abajo */}
+      <div
+        className={cn(
+          'mx-auto flex max-w-md flex-col',
+          armando ? 'h-[calc(100dvh-var(--alto-barra,8.5rem))]' : !armadorAbierto && 'min-h-dvh',
+        )}
+      >
         {armadorAbierto ? (
           // Armando: el encabezado es el pedido en curso; la flecha vuelve a los combos.
           <ResumenFlotante visible encabezado armado={armado} catalogo={catalogo} onVer={() => setArmadorAbierto(false)} />
@@ -322,35 +329,38 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
             onArmar={abrirArmador}
           />
         )}
-      </div>
-
-      <main className="mx-auto max-w-md space-y-4">
-        {armadorAbierto && (
-          <section id="armador" aria-label="Armá tu burrito" className="space-y-2 pt-1">
+        {armando && (
+          // El plato es lo único elástico: se achica para que el carrusel nunca pise la barra.
+          <section id="armador" aria-label="Armá tu burrito" className="flex min-h-0 flex-1 flex-col gap-2 pt-1 pb-1">
             {/* Simple o doble: se elige una vez y desaparece; vuelve con "Atrás" desde el paso 1 */}
-            {paso < 5 && !estado.tamanoConfirmado && (
-              <div className="space-y-1.5">
-                <p className="px-4 font-heading text-xl font-extrabold">Armá tu burrito</p>
+            {!estado.tamanoConfirmado && (
+              <div className="shrink-0 space-y-1.5">
+                <p className="px-4 font-heading text-xl font-extrabold [@media(max-height:720px)]:sr-only">Armá tu burrito</p>
                 <SelectorTamano tamanos={catalogo.tamanos} elegidoId={armado.tamanoId} onElegir={elegirTamano} />
               </div>
             )}
-
-        {paso < 5 ? (
-          <>
-            <div ref={escenario}>
-              <Escenario armado={armado} catalogo={catalogo} grande={estado.tamanoConfirmado} />
+            <div ref={escenario} className="flex min-h-0 flex-1 flex-col">
+              <Escenario armado={armado} catalogo={catalogo} />
             </div>
-            <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
-            <PasoActual
-              paso={paso as PasoDeCategoria}
-              armado={armado}
-              catalogo={catalogo}
-              tamano={tamano}
-              ingredientes={ingredientesPorPaso[paso as PasoDeCategoria]}
-            />
-          </>
-        ) : (
-          <>
+            <div className="shrink-0">
+              <BarraPasos actual={paso} alcanzable={alcanzable} onIr={irAPaso} />
+            </div>
+            <div className="shrink-0">
+              <PasoActual
+                paso={paso as PasoDeCategoria}
+                armado={armado}
+                catalogo={catalogo}
+                tamano={tamano}
+                ingredientes={ingredientesPorPaso[paso as PasoDeCategoria]}
+              />
+            </div>
+          </section>
+        )}
+      </div>
+
+      <main className="mx-auto max-w-md space-y-4">
+        {armadorAbierto && paso === 5 && (
+          <section id="armador" aria-label="Tu burrito está listo" className="space-y-2 pt-1">
             <BarraPasos actual={5} alcanzable={5} onIr={irAPaso} />
             <PasoListo
               armado={armado}
@@ -370,8 +380,6 @@ export default function Tienda({ catalogo, combosCasa, abierto, whatsapp }: Prop
             >
               Borrar y empezar de nuevo
             </button>
-          </>
-        )}
           </section>
         )}
 
@@ -494,6 +502,13 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
   const lleno = categoria !== 'tortilla' && elegidos >= maximo;
   const porciones = catalogo.categorias[categoria].permiteRepetir;
 
+  // El paso nuevo entra desde el lado hacia donde vas (adelante: derecha).
+  const pasoAnterior = useRef(paso);
+  const haciaAtras = paso < pasoAnterior.current;
+  useEffect(() => {
+    pasoAnterior.current = paso;
+  }, [paso]);
+
   // El subtítulo dice siempre cuánto llevás y cuánto entra.
   const subtitulo =
     paso === 1 ? (
@@ -511,7 +526,7 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
     );
 
   return (
-    <section aria-labelledby="titulo-paso" className="animate-aparecer" key={paso}>
+    <section aria-labelledby="titulo-paso" className={haciaAtras ? 'animate-entrar-izq' : 'animate-entrar-der'} key={paso}>
       <div className="px-4">
         <h1 id="titulo-paso" className="text-2xl font-extrabold">
           {TITULOS[paso]}
@@ -521,7 +536,7 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes }: PasoActual
             ✓ Llegaste al máximo ({elegidos}/{maximo}){porciones ? '' : ' · tocá uno para cambiarlo'}
           </p>
         ) : (
-          <p className="text-base text-tinta-suave">{subtitulo}</p>
+          <p className="text-base text-tinta-suave [@media(max-height:720px)]:hidden">{subtitulo}</p>
         )}
       </div>
       <Carrusel

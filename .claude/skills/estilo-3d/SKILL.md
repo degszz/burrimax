@@ -17,7 +17,9 @@ description: Usar para todo lo visual — estilo caricatura con renders 3D en .a
 - Salsas como ondas SVG del color del ingrediente; carnes al centro; vegetales en ronda (posiciones fijas por índice para que no se tapen).
 - Animación `.animate-caer` (caída con rebote, squash & stretch) definida en `global.css`; con reduced-motion no se mueve nada.
 - Imágenes: `apps/web/public/armador/<slug>.avif`, fondo transparente; `ImagenIngrediente` cae a `.svg` y luego a un círculo de color.
-- Opciones en **grilla de 2 columnas** (no carrusel) + `ResumenFlotante` arriba cuando el escenario sale de pantalla.
+- Opciones en **carrusel coverflow** (`Carrusel.tsx`: el del centro grande y nítido, los costados chicos y desenfocados). `ResumenFlotante` es el encabezado del armador.
+- El armador entra en `100dvh - var(--alto-barra)`; el plato es lo elástico. Nada puede quedar debajo de `BarraSiguiente` (probar a 375×667 y 375×812).
+- Animaciones de respuesta con `useLatido(valor, 'animate-…')`: `animate-pop`, `animate-latido`, `animate-plato`, `animate-listo`, `animate-entrar-der/izq`, `animate-sello`. Solo responden a un toque; todas apagadas con reduced-motion.
 - Utilidades CSS: `juguete` (borde tinta + sombra dura que se hunde), `fondo-puntos`.
 
 ## Checklist antes de terminar una tarea visual

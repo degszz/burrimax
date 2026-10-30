@@ -71,10 +71,10 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>)
         ref={pista_}
         role="list"
         aria-label={etiqueta}
-        className="sin-scrollbar relative flex snap-x snap-mandatory gap-1 overflow-x-auto px-[calc(50%-min(22vw,5.75rem))] py-2.5"
+        className="sin-scrollbar relative flex snap-x snap-mandatory gap-1 overflow-x-auto px-[calc(50%-min(22vw,5.75rem,11dvh))] py-2.5"
       >
         {items.map((item, i) => (
-          <div key={clave(item)} role="listitem" className="w-[min(44vw,11.5rem)] shrink-0 snap-center will-change-[transform,filter]">
+          <div key={clave(item)} role="listitem" className="w-[min(44vw,11.5rem,22dvh)] shrink-0 snap-center will-change-[transform,filter]">
             {render(item, i === centro)}
           </div>
         ))}

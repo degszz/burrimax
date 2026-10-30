@@ -32,7 +32,7 @@ export function BarraPasos({ actual, alcanzable, onIr }: Props) {
                   aria-label={`Paso ${paso}: ${NOMBRES[paso]}${hecho ? ' (hecho)' : ''}`}
                   className={cn(
                     'flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border-2 font-heading font-extrabold',
-                    esActual && 'border-tinta bg-tinta pr-4 pl-1.5 text-white',
+                    esActual && 'animate-latido border-tinta bg-tinta pr-4 pl-1.5 text-white',
                     hecho && 'border-verde bg-verde-claro text-verde',
                     !esActual && !hecho && 'border-tinta/40 bg-white text-tinta',
                   )}

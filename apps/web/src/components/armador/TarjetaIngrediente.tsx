@@ -1,5 +1,6 @@
 import type { IngredienteCatalogo } from '@burritos/shared';
 import { Check, Minus, Plus, WheatOff } from 'lucide-react';
+import { useLatido } from '@/lib/useLatido';
 import { cn } from '@/lib/utils';
 import { ImagenIngrediente } from './ImagenIngrediente';
 
@@ -19,15 +20,18 @@ interface Props {
 
 export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, puedeSumar, prioridad, onTocar, onSumar, onRestar }: Props) {
   const elegida = cantidad > 0;
+  // Al elegir o sacar, la tarjeta se aplasta y vuelve.
+  const latidoBoton = useLatido<HTMLButtonElement>(cantidad, 'animate-pop');
+  const latidoCaja = useLatido<HTMLDivElement>(cantidad, 'animate-pop');
 
   const contenido = (
     <>
       {elegida && (
-        <span className="absolute -top-3 -right-3 grid size-9 place-items-center rounded-full border-2 border-tinta bg-verde text-white">
+        <span className="animate-sello absolute -top-3 -right-3 grid size-9 place-items-center rounded-full border-2 border-tinta bg-verde text-white">
           <Check className="size-5" strokeWidth={3.5} aria-hidden />
         </span>
       )}
-      <ImagenIngrediente ingrediente={ingrediente} prioridad={prioridad} className="mx-auto w-[64%]" />
+      <ImagenIngrediente ingrediente={ingrediente} prioridad={prioridad} className="mx-auto w-[64%] [@media(max-height:720px)]:w-[50%]" />
       <span className="mt-1 block font-heading text-lg leading-tight font-extrabold">{ingrediente.nombre}</span>
       {ingrediente.categoria === 'tortilla' && ingrediente.sinTacc && (
         <span className="mt-1 inline-flex items-center gap-1 rounded-full border-2 border-verde bg-verde-claro px-2 text-sm font-bold text-verde">
@@ -48,7 +52,7 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
 
   if (!porciones) {
     return (
-      <button type="button" aria-pressed={elegida} aria-disabled={apagada} onClick={() => !apagada && onTocar()} className={clases}>
+      <button ref={latidoBoton} type="button" aria-pressed={elegida} aria-disabled={apagada} onClick={() => !apagada && onTocar()} className={clases}>
         {contenido}
       </button>
     );
@@ -56,7 +60,7 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
 
   // Carne: la tarjeta suma una porción y el control − n + ajusta.
   return (
-    <div className={clases}>
+    <div ref={latidoCaja} className={clases}>
       <button
         type="button"
         aria-disabled={apagada}
@@ -76,7 +80,7 @@ export function TarjetaIngrediente({ ingrediente, cantidad, apagada, porciones, 
         >
           <Minus className="size-6" strokeWidth={3} />
         </button>
-        <span aria-live="polite" className="w-6 font-heading text-2xl font-extrabold">
+        <span key={cantidad} aria-live="polite" className="animate-latido w-6 font-heading text-2xl font-extrabold">
           {cantidad}
         </span>
         <button
