@@ -1,16 +1,17 @@
 ---
 tags: [burritos, plan, whatsapp, automatizacion]
-estado: propuesta
+estado: programado (falta el alta en Meta)
 prioridad: alta (después del admin)
-actualizado: 2026-10-30
+actualizado: 2026-11-02
 ---
 # WhatsApp automático (sin una persona contestando)
 
 **Objetivo:** que el cliente mande su pedido por WhatsApp y todo lo demás pase solo: confirmación, datos para pagar, verificación del pago y avisos de "en preparación / en camino / listo". Una persona solo interviene si algo sale raro.
 
-> [!warning] Cosas a confirmar antes de empezar (las verifico con la documentación oficial de Meta al arrancar)
-> - Precios actuales de la API de WhatsApp para Argentina (cambiaron en 2025: cobran por mensaje de plantilla, las respuestas dentro de las 24 h son gratis).
-> - Si el número puede seguir usándose en la app de WhatsApp Business del celular al mismo tiempo ("coexistencia"). Si no, el número pasa a ser solo del bot.
+> [!success] Verificado con la documentación de Meta (2026-11-02)
+> - **Precios**: por mensaje. Desde el 1/10/2026 también se cobran las respuestas dentro de las 24 h, con **1.000 gratis por mes por número**. Plantillas: utilidad ≈ US$0,026 y marketing ≈ US$0,062 en Argentina (dato de terceros).
+> - **Coexistencia**: solo vía Tech Provider / Solution Partner. Max eligió **chip nuevo** para el bot; su número queda para "Hablar con Max".
+> - Código hecho: [[superpowers/specs/2026-11-02-whatsapp-bot-design|diseño]]. Pasos de Max: [[Guías/WhatsApp - pasos de Max]].
 
 ## Cómo trabaja Max (cocina él mismo)
 El celular de Max es la central: le llega el **aviso push** de cada pedido (hecho 2026-10-30) y desde el panel avanza el pedido con **un botón grande**. Todo lo demás debería pasar solo:
@@ -61,17 +62,17 @@ Una foto de comprobante **se puede falsificar**, así que nunca alcanza sola. De
 
 **Propuesta:** empujar A (botón Mercado Pago bien visible), usar C para responder al instante ("¡Recibimos tu comprobante de $9.017!") y B para confirmar de verdad. Si B no es posible, C + "Marcar pagado" en el admin con un toque.
 
-## Qué necesita Max
-- [ ] Un número de teléfono para el negocio (puede ser el actual si se confirma la coexistencia; si no, un chip nuevo)
+## Qué necesita Max → [[Guías/WhatsApp - pasos de Max]]
+- [ ] Un chip nuevo para el bot (decidido 2026-11-02)
 - [ ] Cuenta de **Meta Business** (business.facebook.com) verificada con los datos del emprendimiento
 - [ ] Nombre visible del negocio en WhatsApp (Meta lo aprueba)
 - [ ] Tarjeta para los mensajes de plantilla (los avisos de estado); el costo es de centavos de dólar por mensaje
 
 ## Qué hago yo (fases)
-1. Webhook de WhatsApp con firma + tabla `whatsapp_mensajes` (idempotente, como `pagos_eventos`)
-2. Respuestas automáticas al pedido (efectivo / transferencia / Mercado Pago)
-3. Plantillas de estado disparadas desde el admin
-4. Comprobantes: lectura con IA (C) + cruce con Mercado Pago (B, si la API lo permite)
-5. Preguntas frecuentes con datos de la base; derivar a persona si no sabe
+1. [x] Webhook de WhatsApp con firma + tabla `whatsapp_mensajes` (idempotente, como `pagos_eventos`)
+2. [x] Respuestas automáticas al pedido (efectivo / transferencia / Mercado Pago)
+3. [x] Avisos de estado disparados desde el admin (texto libre en 24 h, plantilla después; textos para aprobar en la guía)
+4. [x] Comprobantes: lectura con IA (C) como pre-aprobación · [ ] cruce con Mercado Pago (B, a verificar)
+5. [x] Preguntas frecuentes con datos de la base; "Hablar con Max" con aviso push
 
 Relacionado: [[06 Pagos]] · [[07 Panel admin]] · [[09 Decisiones]]

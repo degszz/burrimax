@@ -21,7 +21,8 @@ const tortillas = datos?.catalogo.ingredientes.filter((i) => i.categoria === 'to
 const sitio = (import.meta.env.PUBLIC_SITE_URL || MARCA.sitio).replace(/\/$/, '');
 const ficha = datosRestaurante({
   sitio,
-  whatsapp: datos?.config.whatsapp ?? null,
+  // El teléfono del local es el de Max (el del bot de WhatsApp no atiende llamadas).
+  whatsapp: datos?.config.whatsappAtencion ?? datos?.config.whatsapp ?? null,
   precioDesde: datos?.catalogo.tamanos[0]?.precioBase ?? null,
 });
 ---

@@ -54,10 +54,23 @@ tags: [burritos, roadmap]
 ## Fase 7 — Pulido y lanzamiento
 - [ ] Prueba con 5 personas reales (al menos una mayor de 60)
 - [ ] Lighthouse mobile > 85
-- [ ] Textos legales (celíacos, términos)
+- [ ] Textos legales (celíacos, términos). Ya está `/privacidad` (2026-11-02); falta nombre legal y CUIT
 - [ ] Dominio propio (SEO, Open Graph, íconos y ficha de Google ya hechos)
+
+## WhatsApp automático → [[Planes/WhatsApp automático|plan]] · [[superpowers/specs/2026-11-02-whatsapp-bot-design|diseño]]
+- [x] Webhook `/api/webhooks/whatsapp` con firma + tabla `whatsapp_mensajes` (2026-11-02)
+- [x] Respuesta al pedido según el pago (efectivo, transferencia con alias, link de Mercado Pago)
+- [x] Comprobantes: guardado privado + lectura con IA solo como pre-aprobación; se ven en el tablero
+- [x] Avisos de estado desde el admin (texto libre dentro de las 24 h, plantilla después)
+- [x] Preguntas frecuentes con datos de la base y "Hablar con Max" con aviso push
+- [ ] Max: alta en Meta con chip nuevo → [[Guías/WhatsApp - pasos de Max]]
+- [ ] Plantillas aprobadas por Meta
+- [ ] Prueba en vivo y cambio de `config_negocio.whatsapp` al número del bot
 
 ## Fase 8 — Contenido visual con IA (secundaria) → [[Planes/Fase 8 - Contenido visual con IA|plan]]
 - [ ] Paseo con scroll "Así hacemos tu burrito" en `/como-lo-hacemos` (fotos reales + clips de Higgsfield)
 - [ ] "Ver en mi mesa": burrito cerrado en plato con realidad aumentada
+  - [x] Código: un modelo por tamaño (`burrito-simple.glb` / `burrito-doble.glb`), USDZ opcional (lo arma el visor), textos claros (2026-11-02)
+  - [ ] Max escanea el simple y el doble → [[Guías/Escaneo 3D del burrito]]
+  - [ ] Achicar (< 5 MB), escala real y probar en Android y iPhone
 - [ ] Renders faltantes con Higgsfield: cerdo, burrito enrollado

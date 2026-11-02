@@ -96,6 +96,7 @@ export type Database = {
           titular: string | null
           updated_at: string
           whatsapp: string | null
+          whatsapp_atencion: string | null
         }
         Insert: {
           abierto?: boolean
@@ -112,6 +113,7 @@ export type Database = {
           titular?: string | null
           updated_at?: string
           whatsapp?: string | null
+          whatsapp_atencion?: string | null
         }
         Update: {
           abierto?: boolean
@@ -128,6 +130,7 @@ export type Database = {
           titular?: string | null
           updated_at?: string
           whatsapp?: string | null
+          whatsapp_atencion?: string | null
         }
         Relationships: []
       }
@@ -618,6 +621,71 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_mensajes: {
+        Row: {
+          analisis: Json | null
+          created_at: string
+          direccion: string
+          error: string | null
+          estado: string
+          id: string
+          media_path: string | null
+          nombre_perfil: string | null
+          payload: Json | null
+          pedido_id: string | null
+          procesado: boolean
+          procesando_desde: string | null
+          texto: string | null
+          tipo: string
+          wa_id: string
+          wa_message_id: string
+        }
+        Insert: {
+          analisis?: Json | null
+          created_at?: string
+          direccion: string
+          error?: string | null
+          estado?: string
+          id?: string
+          media_path?: string | null
+          nombre_perfil?: string | null
+          payload?: Json | null
+          pedido_id?: string | null
+          procesado?: boolean
+          procesando_desde?: string | null
+          texto?: string | null
+          tipo: string
+          wa_id: string
+          wa_message_id: string
+        }
+        Update: {
+          analisis?: Json | null
+          created_at?: string
+          direccion?: string
+          error?: string | null
+          estado?: string
+          id?: string
+          media_path?: string | null
+          nombre_perfil?: string | null
+          payload?: Json | null
+          pedido_id?: string | null
+          procesado?: boolean
+          procesando_desde?: string | null
+          texto?: string | null
+          tipo?: string
+          wa_id?: string
+          wa_message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_mensajes_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       zonas_envio: {
         Row: {
           activo: boolean
@@ -655,6 +723,7 @@ export type Database = {
           pago_transferencia_activo: boolean | null
           titular: string | null
           whatsapp: string | null
+          whatsapp_atencion: string | null
         }
         Insert: {
           abierto?: boolean | null
@@ -669,6 +738,7 @@ export type Database = {
           pago_transferencia_activo?: boolean | null
           titular?: string | null
           whatsapp?: string | null
+          whatsapp_atencion?: string | null
         }
         Update: {
           abierto?: boolean | null
@@ -683,6 +753,7 @@ export type Database = {
           pago_transferencia_activo?: boolean | null
           titular?: string | null
           whatsapp?: string | null
+          whatsapp_atencion?: string | null
         }
         Relationships: []
       }

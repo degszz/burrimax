@@ -135,3 +135,29 @@ La pantalla de "¡Listo!" salta sola a WhatsApp con cuenta regresiva (3 s; 8 s c
 
 ### 2026-10-30 · Capas a pantalla completa por portal al `<body>`
 "Verlo en mi mesa" quedaba con el header encima y había que scrollear: la animación `animate-aparecer` (con `transform`, `both`) convierte a la sección del paso "¡Listo!" en el marco de cualquier `fixed` de adentro. `CapaPantallaCompleta` manda la capa al `<body>` con `createPortal` y bloquea el scroll mientras está abierta. Toda capa nueva de pantalla completa (cámara, 3D, visores) va con ese componente.
+
+
+### 2026-11-02 · Bot de WhatsApp con un chip nuevo (sin coexistencia)
+Meta permite usar el mismo número en la app del celular y en la API ("coexistencia"), pero solo a través de un Tech Provider o Solution Partner (Embedded Signup): verificar el negocio con documentos y pasar una revisión con video, o pagar un intermediario. Max eligió un **chip nuevo para el bot**. Su número de siempre queda como `config_negocio.whatsapp_atencion` ("Hablar con Max"); `whatsapp` pasa a ser el del bot recién cuando el bot responda bien en vivo. Descartado: coexistencia (por ahora) y librerías no oficiales (Meta banea el número).
+
+### 2026-11-02 · Bot de WhatsApp programado en la tienda, avisos de estado desde el admin
+- Webhook `/api/webhooks/whatsapp`: firma `X-Hub-Signature-256` (HMAC-SHA256 del cuerpo crudo con el App Secret, comparación en tiempo constante) o 401; ignora otros números. Cada mensaje se "reserva" (`procesado = true` + `procesando_desde`) **antes** de contestar: si Meta reintenta mientras tanto, no sale dos veces; si falla, se libera y Meta reintenta; si la función se corta (timeout o caída), la reserva vence a los 3 minutos y el reintento la retoma.
+- El pedido se encuentra por el **link de seguimiento** (id + token) del mensaje del checkout; si no, por `#número` + el mismo teléfono (comparando el número nacional de 10 dígitos, con 0 y 15). Nunca crea pedidos ni marca pagado.
+- Lógica pura (textos, intención por palabras clave, teléfonos, firma, cliente de la Graph API v26.0 con `fetch`) en `packages/shared/src/whatsapp` (`@burritos/shared/whatsapp`, aparte para no sumar nada al navegador), con tests.
+- Los avisos de estado los manda el **servidor del admin** (necesita `WHATSAPP_TOKEN` y `WHATSAPP_PHONE_NUMBER_ID`; sigue sin clave secreta de Supabase). Solo a clientes que escribieron al bot por ese pedido; nunca frenan el cambio de estado.
+- Preguntas frecuentes por palabras clave, sin IA: predecible y gratis. Más de 6 mensajes de texto por minuto de un número → no contesta ese minuto; fotos y PDF llevan su propio límite (5 cada 10 minutos) para que un comprobante no se pierda.
+- Mercado Pago por WhatsApp: se reusa el link de la preferencia que ya tiene el pedido; solo se crea otro si no queda ninguno vigente (nunca dos links para pagar lo mismo).
+- El admin no repite un aviso que ya salió para ese pedido (doble toque o dos celulares) y espera a Meta 4 s como mucho.
+- Descartado: n8n para el circuito principal y bandeja de chats en el admin (Max contesta desde su número con el link del aviso push).
+
+### 2026-11-02 · Desde octubre de 2026 Meta cobra también las respuestas
+Según la documentación de precios de Meta, desde el 1/10/2026 los mensajes de servicio (respuestas dentro de las 24 h) se cobran, con **1.000 gratis por mes por número**; las plantillas de utilidad dentro de la ventana también dejaron de ser gratis. Por eso: dentro de las 24 h el bot manda texto libre (entra en las 1.000), fuera usa plantilla, y en "entregado" no manda plantilla. Tarifas de Argentina sin confirmar en la planilla oficial (terceros: utilidad ≈ US$0,026, marketing ≈ US$0,062).
+
+### 2026-11-02 · Comprobantes de transferencia: guardados privados y leídos con IA como pre-aprobación
+La foto o PDF va al bucket privado `comprobantes` (solo lo lee el admin, con link firmado de 1 h en el tablero). Si existe `ANTHROPIC_API_KEY`, Claude (`claude-opus-5-5`, salida estructurada, esfuerzo bajo, `fallbacks: "default"`) lee monto, destino y número de operación y se compara con el pedido (monto exacto, alias/CVU/titular, operación no usada en otro pedido). Solo sirve para contestarle rápido al cliente y avisar a Max: **el pago lo confirma Max** con "Llegó la transferencia". Descartado: marcar pagado por la foto (se puede falsificar). Cruce con los movimientos de Mercado Pago: queda para más adelante.
+
+### 2026-11-02 · Realidad aumentada: un modelo por tamaño y sin USDZ obligatorio
+`lib/modelo3d.ts` busca `burrito-simple.glb` o `burrito-doble.glb` según lo armado; si falta, usa el del otro tamaño y lo avisa, y si no hay ninguno queda la versión con foto. El `.usdz` es opcional: `<model-viewer>` lo genera solo desde el GLB si no hay `ios-src` (verificado en su código, `generateUsdz = !this.iosSrc`). Así alcanza con el plan gratis de KIRI Engine (exporta GLB).
+
+### 2026-11-02 · Página de privacidad
+Meta pide una URL de política de privacidad para pasar la app a modo Activo. `/privacidad` dice qué datos se usan, para qué, con quién se comparten (Supabase, Vercel, Meta, Mercado Pago, Anthropic) y el aviso de la Ley 25.326. Falta el nombre legal y el CUIT del responsable.

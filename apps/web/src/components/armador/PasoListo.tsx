@@ -1,7 +1,7 @@
 import { precioVistaPrevia, type Armado, type Catalogo, type CategoriaSlug } from '@burritos/shared';
 import { Camera, Check, HeartPlus, Minus, Plus, ShoppingBag, WheatOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { hayModelo3D } from '@/lib/modelo3d';
+import { modelo3D, type Modelo3D } from '@/lib/modelo3d';
 import { CATEGORIA_DEL_PASO, describir, type PasoDeCategoria } from '@/lib/armador/reglas';
 import { formatoPesos } from '@/lib/formato';
 import { BurritoConPapas } from './BurritoConPapas';
@@ -32,14 +32,15 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
   const doble = (tamano?.cantTapas ?? 1) > 1;
   // 'foto': cámara con la imagen encima · '3d': modelo real en AR (si está subido).
   const [camara, setCamara] = useState<false | 'foto' | '3d'>(false);
-  const [con3D, setCon3D] = useState(false);
+  // El modelo 3D de su tamaño (o el del otro tamaño); null: todavía no hay modelos subidos.
+  const [modelo, setModelo] = useState<Modelo3D | null>(null);
   useEffect(() => {
     let vivo = true;
-    hayModelo3D().then((hay) => vivo && setCon3D(hay));
+    modelo3D(doble ? 'doble' : 'simple').then((m) => vivo && setModelo(m));
     return () => {
       vivo = false;
     };
-  }, []);
+  }, [doble]);
 
   return (
     <section aria-labelledby="titulo-listo" className="animate-aparecer px-4 pb-8">
@@ -55,14 +56,14 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
         <BurritoConPapas doble={doble} tortilla={tortilla?.slug} className="pt-2 pb-4" />
         <button
           type="button"
-          onClick={() => setCamara(con3D ? '3d' : 'foto')}
+          onClick={() => setCamara(modelo ? '3d' : 'foto')}
           className="juguete mx-auto mb-2 flex min-h-12 items-center gap-2 rounded-2xl bg-white px-4 font-heading text-lg font-extrabold"
         >
           <Camera aria-hidden className="size-5" strokeWidth={2.5} /> Verlo en mi mesa
         </button>
       </div>
       {camara === 'foto' && <VerEnMiMesa doble={doble} tortilla={tortilla?.slug} onCerrar={() => setCamara(false)} />}
-      {camara === '3d' && <VerEnMiMesa3D onCerrar={() => setCamara(false)} />}
+      {camara === '3d' && modelo && <VerEnMiMesa3D modelo={modelo} pedido={doble ? 'doble' : 'simple'} onCerrar={() => setCamara(false)} />}
 
       <div className="juguete mt-5 overflow-hidden rounded-3xl bg-white">
         <div className="flex items-center justify-between px-4 py-3">

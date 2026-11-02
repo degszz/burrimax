@@ -1,0 +1,46 @@
+---
+import Base from '@/layouts/Base.astro';
+import { MARCA } from '@/lib/marca';
+
+// Política de privacidad. Meta la pide para activar el bot de WhatsApp.
+// Falta el nombre legal y el CUIT del responsable (docs/10 Preguntas abiertas.md).
+export const prerender = true;
+const actualizada = '2 de noviembre de 2026';
+---
+
+<Base titulo="Política de privacidad" descripcion={`Qué datos usa ${MARCA.nombre} para tu pedido y cómo los cuida.`}>
+  <main class="mx-auto max-w-2xl px-4 py-10 text-lg leading-relaxed">
+    <a href="/" class="font-heading font-extrabold text-rojo underline">← Volver a la tienda</a>
+    <h1 class="mt-4 text-4xl font-extrabold">Política de privacidad</h1>
+    <p class="mt-2 text-tinta-suave">Última actualización: {actualizada}</p>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Qué datos usamos</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Para tu pedido: nombre, teléfono, dirección de entrega (si pedís delivery) y, solo si querés, tu email.</li>
+      <li>Si nos escribís por WhatsApp: tu número, tu nombre de perfil y los mensajes que nos mandás, incluidas las fotos de los comprobantes de transferencia.</li>
+      <li>Tu carrito y tus combos guardados quedan en tu celular, no en nuestros servidores.</li>
+    </ul>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Para qué</h2>
+    <p class="mt-2">Solo para preparar y entregar tu pedido, cobrarlo y avisarte cómo va. No vendemos tus datos ni los usamos para publicidad.</p>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Con quién se comparten</h2>
+    <p class="mt-2">Con los servicios que hacen funcionar la tienda, únicamente para eso:</p>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Supabase (base de datos) y Vercel (servidor de la web).</li>
+      <li>Meta, si nos escribís por WhatsApp.</li>
+      <li>Mercado Pago, si pagás con Mercado Pago.</li>
+      <li>Anthropic, que lee los comprobantes de transferencia para ayudarnos a revisarlos.</li>
+    </ul>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Tus derechos</h2>
+    <p class="mt-2">
+      Podés pedirnos ver, corregir o borrar tus datos cuando quieras: escribinos por WhatsApp al número de la tienda. Te respondemos dentro de los plazos de la Ley
+      25.326 de Protección de Datos Personales.
+    </p>
+    <p class="mt-4 text-base text-tinta-suave">
+      La Agencia de Acceso a la Información Pública, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos
+      que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.
+    </p>
+  </main>
+</Base>

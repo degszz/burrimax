@@ -29,7 +29,7 @@ tags: [burritos, supabase, datos]
 **zonas_envio**: `id` · `nombre` · `costo` int · `activo`
 
 **config_negocio** (una sola fila)
-`abierto` bool · `horarios` jsonb · `alias_transferencia` · `cvu` · `titular` · `whatsapp` · `aviso_celiacos` text · `pago_mp_activo` · `pago_stripe_activo` · `pago_transferencia_activo` · `pago_efectivo_activo`
+`abierto` bool · `horarios` jsonb · `alias_transferencia` · `cvu` · `titular` · `whatsapp` (a donde va el pedido: el bot cuando esté andando) · `whatsapp_atencion` (el de Max, para hablar con una persona) · `aviso_celiacos` text · `pago_mp_activo` · `pago_stripe_activo` · `pago_transferencia_activo` · `pago_efectivo_activo`
 
 ## Pedidos
 **pedidos**
@@ -46,6 +46,10 @@ tags: [burritos, supabase, datos]
 **pagos_eventos** (log e idempotencia de webhooks)
 `id` · `proveedor` · `evento_id` · `tipo` · `payload` jsonb · `procesado` bool · `created_at` — UNIQUE (`proveedor`, `evento_id`)
 
+**whatsapp_mensajes** (bot de WhatsApp: lo que entra y sale, e idempotencia)
+`id` · `wa_message_id` UNIQUE (wamid de Meta) · `direccion` ('entrante' | 'saliente') · `wa_id` (número del cliente, 549…) · `nombre_perfil` · `pedido_id` null → pedidos · `tipo` · `texto` · `media_path` (comprobante en Storage) · `analisis` jsonb (lo que leyó la IA: solo pre-aprobación) · `estado` (recibido/enviado/entregado/leido/fallido) · `error` · `procesado` · `procesando_desde` (reserva: vence a los 3 min si la función se cortó) · `payload` jsonb · `created_at`
+Storage: bucket privado `comprobantes` (`<pedido_id>/<wamid>.<ext>`), solo lo lee el admin.
+
 **pedido_historial**
 `id` · `pedido_id` · `estado_anterior` · `estado_nuevo` · `usuario_id` · `created_at`
 
@@ -60,6 +64,8 @@ tags: [burritos, supabase, datos]
 | pedidos / items | **nada** (se crean por endpoint con service role) | todo |
 | seguimiento | función RPC `ver_pedido(id, token)` devuelve solo estado y resumen | — |
 | pagos_eventos | nada | SELECT |
+| whatsapp_mensajes | nada (escribe el webhook con service role) | SELECT + INSERT de salientes |
+| Storage `comprobantes` | nada | SELECT |
 
 Admin = `auth.jwt() -> 'app_metadata' ->> 'role' = 'admin'`.
 

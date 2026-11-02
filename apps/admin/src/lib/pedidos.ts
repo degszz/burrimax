@@ -31,6 +31,18 @@ export interface PedidoTablero {
   pagaCon: number | null;
   creado: string;
   items: ItemPedido[];
+  /** Comprobante de transferencia que mandó por WhatsApp (el último), si hay. */
+  comprobante: ComprobanteTablero | null;
+}
+
+/** Lo que leyó la IA es solo una ayuda: el pago se confirma con "Llegó la transferencia". */
+export interface ComprobanteTablero {
+  /** Link privado que dura 1 hora. */
+  url: string | null;
+  /** null: no se pudo leer (o no hay IA configurada). */
+  coincide: boolean | null;
+  monto: number | null;
+  motivo: string | null;
 }
 
 /** Columnas del tablero, en orden. "Entregado" y "Cancelado" salen del tablero. */

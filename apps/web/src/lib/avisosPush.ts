@@ -22,8 +22,27 @@ export interface PedidoParaAvisar {
   tipoEntrega: 'delivery' | 'retiro';
 }
 
-/** Manda el aviso a todos los celulares anotados. Nunca rompe el pedido: si falla, solo lo registra. */
-export async function avisarPedidoNuevo(p: PedidoParaAvisar): Promise<void> {
+/** Aviso de pedido nuevo. Nunca rompe el pedido: si falla, solo lo registra. */
+export function avisarPedidoNuevo(p: PedidoParaAvisar): Promise<void> {
+  return avisarAlLocal({
+    titulo: `🌯 Pedido #${String(p.numero).padStart(4, '0')} · ${formatoPesos(p.total)}`,
+    cuerpo: `${p.cliente} · ${p.tipoEntrega === 'delivery' ? 'Delivery' : 'Retira'} · ${NOMBRE_PAGO[p.metodoPago] ?? p.metodoPago}`,
+    etiqueta: `pedido-${p.numero}`,
+    url: '/',
+  });
+}
+
+export interface AvisoLocal {
+  titulo: string;
+  cuerpo: string;
+  /** Avisos con la misma etiqueta se reemplazan (no se apilan). */
+  etiqueta: string;
+  /** '/' abre el panel; un link de WhatsApp abre el chat con el cliente. */
+  url: string;
+}
+
+/** Manda el aviso a todos los celulares anotados. Nunca rompe lo que lo llama: si falla, solo lo registra. */
+export async function avisarAlLocal(aviso: AvisoLocal): Promise<void> {
   const privada = import.meta.env.VAPID_PRIVATE_KEY;
   const db = clienteServidor();
   if (!privada || !db) return;
@@ -33,12 +52,7 @@ export async function avisarPedidoNuevo(p: PedidoParaAvisar): Promise<void> {
     if (!suscripciones?.length) return;
 
     webpush.setVapidDetails(MARCA.sitio, VAPID_PUBLICA, privada);
-    const contenido = JSON.stringify({
-      titulo: `🌯 Pedido #${String(p.numero).padStart(4, '0')} · ${formatoPesos(p.total)}`,
-      cuerpo: `${p.cliente} · ${p.tipoEntrega === 'delivery' ? 'Delivery' : 'Retira'} · ${NOMBRE_PAGO[p.metodoPago] ?? p.metodoPago}`,
-      etiqueta: `pedido-${p.numero}`,
-      url: '/',
-    });
+    const contenido = JSON.stringify(aviso);
 
     const vencidas: string[] = [];
     // Máximo 4 s: el cliente no espera por el aviso.

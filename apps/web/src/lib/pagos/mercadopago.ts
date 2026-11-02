@@ -62,6 +62,19 @@ export async function crearCobro({ pedidoId, numero, urlSeguimiento, sitio, item
   return { preferenciaId: preferencia.id, redirectUrl: destino };
 }
 
+/**
+ * El link de pago de una preferencia ya creada (para no armar uno nuevo cada vez
+ * y que el cliente termine con dos links que se pueden pagar). null si no existe.
+ */
+export async function linkDePreferencia(preferenciaId: string): Promise<string | null> {
+  try {
+    const preferencia = await new Preference(config()).get({ preferenceId: preferenciaId });
+    return preferencia.init_point ?? preferencia.sandbox_init_point ?? null;
+  } catch {
+    return null; // ya no es una preferencia (ej. quedó el id de un pago rechazado)
+  }
+}
+
 /** Valida que la notificación venga de Mercado Pago (firma `x-signature`). */
 export function firmaValida(request: Request, dataId: string | null): boolean {
   const secret = import.meta.env.MP_WEBHOOK_SECRET;

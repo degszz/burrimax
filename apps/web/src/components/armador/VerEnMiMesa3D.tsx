@@ -1,9 +1,12 @@
 import { Box, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { MODELO_3D } from '@/lib/modelo3d';
+import type { Modelo3D, TamanoModelo } from '@/lib/modelo3d';
 import { CapaPantallaCompleta } from './CapaPantallaCompleta';
 
 interface Props {
+  modelo: Modelo3D;
+  /** El tamaño que armó: si el modelo es del otro, se avisa (el AR va a tamaño real). */
+  pedido: TamanoModelo;
   onCerrar: () => void;
 }
 
@@ -23,10 +26,11 @@ declare module 'react' {
  * iPhone: Quick Look). Queda apoyado en la mesa, a tamaño real, y se puede
  * rodear y acercar.
  */
-export function VerEnMiMesa3D({ onCerrar }: Props) {
+export function VerEnMiMesa3D({ modelo, pedido, onCerrar }: Props) {
   const [listo, setListo] = useState(false);
   const [sinAR, setSinAR] = useState(false);
   const visor = useRef<HTMLElement & { canActivateAR?: boolean }>(null);
+  const otroTamano = modelo.tamano !== 'generico' && modelo.tamano !== pedido;
   const sinMovimiento = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   useEffect(() => {
@@ -62,8 +66,8 @@ export function VerEnMiMesa3D({ onCerrar }: Props) {
         {listo ? (
           <model-viewer
             ref={visor}
-            src={MODELO_3D.glb}
-            ios-src={MODELO_3D.usdz}
+            src={modelo.glb}
+            {...(modelo.usdz ? { 'ios-src': modelo.usdz } : {})}
             alt="Burrito con papas fritas en 3D"
             ar=""
             ar-modes="webxr scene-viewer quick-look"
@@ -73,7 +77,7 @@ export function VerEnMiMesa3D({ onCerrar }: Props) {
             touch-action="pan-y"
             shadow-intensity="1"
             exposure="1"
-            {...(sinMovimiento ? {} : { 'auto-rotate': '' })}
+            {...(sinMovimiento ? { 'interaction-prompt': 'none' } : { 'auto-rotate': '' })}
             class="min-h-0 w-full flex-1"
           >
             <button
@@ -88,9 +92,10 @@ export function VerEnMiMesa3D({ onCerrar }: Props) {
           <div className="grid flex-1 place-items-center text-lg font-semibold text-tinta-suave">Cargando el burrito…</div>
         )}
 
-        <p className="px-6 pb-6 text-center text-base text-tinta-suave">
-          {sinAR ? 'Giralo con el mouse. Para verlo en tu mesa, abrí la web desde el celular.' : 'Giralo con el dedo · tocá "Ponerlo en mi mesa" y apuntá a la mesa'}
-        </p>
+        <div className="px-6 pb-6 text-center text-lg text-tinta-suave">
+          {otroTamano && <p className="mb-1 text-base font-semibold">Te mostramos el burrito {modelo.tamano}: el {pedido} todavía no está en 3D.</p>}
+          <p>{sinAR ? 'Giralo con el mouse. Para verlo en tu mesa, abrí la web desde el celular.' : 'Apuntá a la mesa y mové el celular despacio.'}</p>
+        </div>
       </div>
     </CapaPantallaCompleta>
   );

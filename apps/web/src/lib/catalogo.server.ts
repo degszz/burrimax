@@ -1,4 +1,4 @@
-import { CATEGORIAS, estadoApertura, normalizarHorarios, textoApertura, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database, type ModoApertura } from '@burritos/shared';
+import { CATEGORIAS, estadoApertura, normalizarHorarios, textoApertura, validarArmado, type Armado, type Catalogo, type CategoriaSlug, type Database, type Horarios, type ModoApertura } from '@burritos/shared';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_CLAVE_PUBLICA, SUPABASE_URL } from './supabasePublico';
 
@@ -24,6 +24,10 @@ export interface ConfigTienda {
   /** Solo dígitos, o null si todavía no está cargado. */
   whatsapp: string | null;
   avisoCeliacos: string | null;
+  /** Horarios de la semana (para el bot de WhatsApp). */
+  horarios: Horarios;
+  /** Número de Max para hablar con una persona (solo dígitos). */
+  whatsappAtencion: string | null;
 }
 
 export interface DatosTienda {
@@ -116,7 +120,9 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
   const whatsapp = c?.whatsapp?.replace(/\D/g, '') ?? '';
   // Abierto o cerrado según los horarios de la semana (o el interruptor manual del admin).
   const modo: ModoApertura = c?.modo_apertura === 'abierto' || c?.modo_apertura === 'cerrado' ? c.modo_apertura : 'automatico';
-  const apertura = estadoApertura(modo, normalizarHorarios(c?.horarios));
+  const horarios = normalizarHorarios(c?.horarios);
+  const apertura = estadoApertura(modo, horarios);
+  const atencion = c?.whatsapp_atencion?.replace(/\D/g, '') ?? '';
   return {
     catalogo,
     combosCasa: armarCombosCasa(burritos.data!, catalogo),
@@ -132,6 +138,8 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       transferencia: { alias: c?.alias_transferencia ?? null, cvu: c?.cvu ?? null, titular: c?.titular ?? null },
       whatsapp: whatsapp.length >= 10 ? whatsapp : null,
       avisoCeliacos: c?.aviso_celiacos ?? null,
+      horarios,
+      whatsappAtencion: atencion.length >= 10 ? atencion : null,
     },
   };
 }

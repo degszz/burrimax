@@ -3,6 +3,9 @@
 interface ImportMetaEnv {
   readonly PUBLIC_SUPABASE_URL: string;
   readonly PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+  /** Solo servidor: avisos de estado por WhatsApp (los mismos valores que en la tienda). */
+  readonly WHATSAPP_TOKEN?: string;
+  readonly WHATSAPP_PHONE_NUMBER_ID?: string;
 }
 
 interface ImportMeta {

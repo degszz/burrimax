@@ -28,6 +28,11 @@ self.addEventListener('push', (evento) => {
 self.addEventListener('notificationclick', (evento) => {
   evento.notification.close();
   const destino = new URL(evento.notification.data?.url ?? '/', self.location.origin).href;
+  // Link de afuera (ej. el chat de WhatsApp con el cliente): se abre aparte, sin sacar al panel.
+  if (!destino.startsWith(self.location.origin)) {
+    evento.waitUntil(self.clients.openWindow(destino));
+    return;
+  }
   evento.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((ventanas) => {
       const abierta = ventanas.find((v) => v.url.startsWith(self.location.origin));

@@ -1,10 +1,14 @@
-# Modelo 3D del burrito
+# Modelos 3D del burrito
 
-Poné acá dos archivos con estos nombres exactos:
+Uno por tamaño, con estos nombres exactos:
 
-- `burrito.glb`  → Android y el visor 3D de la web
-- `burrito.usdz` → iPhone (Quick Look)
+- `burrito-simple.glb` → simple
+- `burrito-doble.glb`  → doble tapa
 
-Apenas estén, "Verlo en mi mesa" usa el 3D real (anclado a la mesa, tamaño real).
-Peso recomendado: menos de 5 MB cada uno. Escala: 1 unidad = 1 metro (un burrito mide ~0,22 m).
-Ver docs/Planes/Fase 8 - Contenido visual con IA.md.
+Opcional: `burrito-simple.usdz` / `burrito-doble.usdz` para iPhone. Si no están,
+la web arma el de iPhone sola a partir del GLB.
+
+Apenas esté uno, "Verlo en mi mesa" usa el 3D real (anclado a la mesa, tamaño real).
+Si falta el de un tamaño, se muestra el otro y se avisa.
+Peso: menos de 5 MB cada uno. Escala: 1 unidad = 1 metro (el simple mide ~0,22 m).
+Cómo escanearlo: docs/Guías/Escaneo 3D del burrito.md.

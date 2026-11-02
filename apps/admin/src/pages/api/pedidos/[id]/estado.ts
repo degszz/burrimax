@@ -1,6 +1,7 @@
 import { ESTADOS_PEDIDO } from '@burritos/shared';
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
+import { avisarEstadoPorWhatsapp } from '@/lib/whatsapp';
 
 const cuerpoSchema = z.object({
   estado: z.enum(ESTADOS_PEDIDO),
@@ -14,11 +15,13 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   const cuerpo = cuerpoSchema.safeParse(await request.json().catch(() => null));
   if (!cuerpo.success || !params.id) return Response.json({ error: 'Datos inválidos' }, { status: 400 });
 
-  const { error } = await locals.supabase.rpc('cambiar_estado_pedido', {
+  const { data: pedido, error } = await locals.supabase.rpc('cambiar_estado_pedido', {
     p_id: params.id,
     p_estado: cuerpo.data.estado,
     p_motivo: cuerpo.data.motivo,
   });
   if (error) return Response.json({ error: error.message }, { status: 400 });
+  // Si el cliente pidió por el bot de WhatsApp, le llega el aviso (nunca frena el cambio).
+  if (pedido) await avisarEstadoPorWhatsapp(locals.supabase, pedido, cuerpo.data.estado, cuerpo.data.motivo);
   return Response.json({ ok: true });
 };

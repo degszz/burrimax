@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./whatsapp": "./src/whatsapp/index.ts",
     "./test/catalogoEjemplo": "./src/test/catalogoEjemplo.ts"
   },
   "scripts": {

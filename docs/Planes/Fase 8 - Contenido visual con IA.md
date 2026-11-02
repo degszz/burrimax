@@ -44,10 +44,11 @@ Pasos:
 ## 2 · "Ver en mi mesa" (realidad aumentada)
 - [x] Paso intermedio hecho (2026-10-29): "Verlo en mi mesa" con la cámara y la foto del burrito + papas encima (`VerEnMiMesa.tsx`). Al tener el `.glb`, el mismo botón pasa a AR real
 - [x] (2026-10-30) Código listo: `<model-viewer>` 4.4.0 + `three` 0.183.2, `VerEnMiMesa3D.tsx`. Se carga **solo al tocar** (archivo aparte de ~1 MB). El botón "Verlo en mi mesa" detecta solo si existe `public/modelos/burrito.glb`: si está, abre el 3D con "Ponerlo en mi mesa" (AR nativo: Scene Viewer en Android, Quick Look en iPhone, anclado a la mesa y a tamaño real); si no, sigue la versión con la foto.
-- [ ] **Max consigue el modelo** (la opción más real es escanear un burrito de verdad):
+- [x] (2026-11-02) Un modelo por tamaño: `burrito-simple.glb` y `burrito-doble.glb`. Si falta uno se usa el otro (avisando); el `.usdz` es opcional porque `<model-viewer>` lo arma solo desde el GLB.
+- [ ] **Max escanea el burrito** → guía paso a paso: [[Guías/Escaneo 3D del burrito]] (KIRI Engine gratis exporta GLB; Polycam gratis solo glTF):
   1. **Escaneo con el celular (recomendado, gratis):** app **Polycam**, **KIRI Engine** o **Luma AI**, modo "Photo/Object capture". Burrito cerrado en el plato con papas, sobre una mesa con buena luz pareja (sin sol directo), girando alrededor despacio en 2–3 alturas (50–100 fotos). Exportar **GLB** y **USDZ**.
   2. **Con IA de imagen a 3D** (si el escaneo no sale): Meshy, Tripo o Rodin a partir de 2–3 fotos. Menos fiel que el escaneo.
-- [ ] Dejar `burrito.glb` y `burrito.usdz` en `apps/web/public/modelos/` (escala real: ~0,22 m de largo; menos de 5 MB cada uno). Si pesa más, se comprime con `gltf-transform` (Draco/Meshopt + texturas WebP).
+- [ ] Dejar `burrito-simple.glb` y `burrito-doble.glb` en `apps/web/public/modelos/` (escala real: ~0,22 m de largo el simple; medir el doble; menos de 5 MB cada uno). Si pesa más, se comprime con `gltf-transform`. Antes de elegir Meshopt o texturas WebP, verificar que Scene Viewer (Android) las soporte; si no, Draco + JPEG.
 - [ ] Probar en un Android y en un iPhone con la web publicada
 - Un modelo por tamaño, **genérico** (cerrado no se ve el relleno). Descartado: generar el burrito exacto de cada cliente con IA (lento, caro, puede no coincidir con lo que llega)
 

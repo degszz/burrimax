@@ -35,10 +35,17 @@ tags: [burritos, pendientes]
 - [x] **Número de WhatsApp** del local: +54 9 2271 468521 (`5492271468521` en `config_negocio.whatsapp`, 2026-10-30)
 - [x] Claves del servidor: `SUPABASE_SECRET_KEY`, `MP_ACCESS_TOKEN` (de **prueba**) y `MP_WEBHOOK_SECRET` cargadas (2026-10-30). Falta pasar a las credenciales de **producción** cuando termine la prueba
 
+## WhatsApp (bot)
+- [ ] Número del chip nuevo del bot (lo carga Max en Meta; después cambio `config_negocio.whatsapp`)
+- [ ] ¿Se carga `ANTHROPIC_API_KEY` para leer comprobantes? (≈ 1–2 centavos de dólar por comprobante; sin la clave, el comprobante igual llega para revisarlo)
+- [ ] Plantillas de estado aprobadas por Meta (textos en [[Guías/WhatsApp - pasos de Max]])
+- [ ] Nombre legal y CUIT del responsable para `/privacidad`
+
 ## Contenido con IA (Fase 8, secundaria) → [[Planes/Fase 8 - Contenido visual con IA]]
 - [ ] ¿Se crea la cuenta de Higgsfield? Presupuesto aprox. US$10–15
 - [ ] Las 7 fotos del proceso (plancha → tortilla → carne → vegetales → armado → enrollado → plato con papas)
-- [ ] Fotos del burrito cerrado en plato, simple y doble (para la realidad aumentada)
+- [ ] Escaneo 3D del burrito simple y doble (para la realidad aumentada) → [[Guías/Escaneo 3D del burrito]]
+- [ ] Medidas reales: largo del burrito simple (~0,22 m [A CONFIRMAR]) y del doble, y ancho de cada plato
 - [ ] ¿El paseo va en página propia `/como-lo-hacemos` (recomendado) o como sección de la home?
 
 ## Imágenes
@@ -47,4 +54,4 @@ tags: [burritos, pendientes]
 
 ## Técnico
 - [ ] Dominio
-- [ ] ¿Notificar al cliente por WhatsApp automáticamente? (API de WhatsApp Business = costo)
+- [x] ¿Notificar al cliente por WhatsApp automáticamente? Sí, con el bot (chip nuevo). Respuestas dentro de las 24 h: 1.000 gratis por mes; después y las plantillas se pagan (2026-11-02)

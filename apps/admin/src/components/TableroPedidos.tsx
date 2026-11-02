@@ -354,6 +354,24 @@ function Tarjeta({ pedido: p, nuevo, ocupado, minutos, onAvanzar, onPagado, onCa
         </span>
         <span className="text-xl font-black">{pesos(p.total)}</span>
       </div>
+      {p.comprobante && (
+        <a
+          href={p.comprobante.url ?? undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`mt-2 block rounded-lg p-2 text-sm font-semibold ${
+            p.comprobante.coincide === true ? 'bg-green-50 text-green-800' : p.comprobante.coincide === false ? 'bg-red-50 text-red-800' : 'bg-zinc-100'
+          }`}
+        >
+          📸 Comprobante:{' '}
+          {p.comprobante.coincide === true
+            ? `✅ ${p.comprobante.monto != null ? pesos(p.comprobante.monto) : ''} coincide`
+            : p.comprobante.coincide === false
+              ? `⚠️ ${p.comprobante.motivo ?? 'revisar'}`
+              : 'llegó, revisalo'}{' '}
+          · <u>Ver</u>
+        </a>
+      )}
 
       <div className="mt-3 grid gap-2">
         {cobrable && (
