@@ -40,7 +40,6 @@ export interface PedidoParaGuardar {
   tipo_entrega: 'delivery' | 'retiro';
   direccion: string | null;
   referencias: string | null;
-  zona_envio_id: string | null;
   metodo_pago: MetodoPago;
   paga_con: number | null;
   subtotal: number;
@@ -58,8 +57,8 @@ export function armarPedido(
   const metodo = entrada.pago.metodoPago;
   if (metodo === 'stripe' || !pagosActivos[metodo]) throw new ErrorDePedido('Ese medio de pago no está disponible ahora');
 
-  // Tira PedidoInvalidoError si algo no vale (límites, inactivos, zona).
-  const calculado = calcularPedido(entrada.items, entrada.entrega, catalogo);
+  // Tira PedidoInvalidoError si algo no vale (límites, inactivos).
+  const calculado = calcularPedido(entrada.items, catalogo);
 
   if (metodo === 'efectivo' && entrada.pago.pagaCon !== undefined && entrada.pago.pagaCon < calculado.total) {
     throw new ErrorDePedido(`Con ${formatoPesos(entrada.pago.pagaCon)} no alcanza: el total es ${formatoPesos(calculado.total)}`);
@@ -119,11 +118,11 @@ export function armarPedido(
       tipo_entrega: entrega.tipoEntrega,
       direccion: entrega.tipoEntrega === 'delivery' ? entrega.direccion : null,
       referencias: entrega.tipoEntrega === 'delivery' ? (entrega.referencias ?? null) : null,
-      zona_envio_id: entrega.tipoEntrega === 'delivery' ? entrega.zonaEnvioId : null,
       metodo_pago: metodo,
       paga_con: metodo === 'efectivo' ? (pago.pagaCon ?? null) : null,
-      subtotal: calculado.subtotal,
-      costo_envio: calculado.costoEnvio,
+      subtotal: calculado.total,
+      // El envío no suma nada (mismo precio en cualquier zona).
+      costo_envio: 0,
       total: calculado.total,
       notas: entrada.notas ?? null,
       items,

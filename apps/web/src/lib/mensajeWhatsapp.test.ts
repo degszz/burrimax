@@ -15,10 +15,9 @@ describe('mensaje de WhatsApp', () => {
         numero: 12,
         nombre: ' Ana ',
         items: [{ armado, precio: 9000 }],
-        entrega: { tipo: 'delivery', direccion: 'Mitre 123', zona: 'Centro' },
+        entrega: { tipo: 'delivery', direccion: 'Mitre 123' },
         pago: { metodo: 'efectivo', pagaCon: 20000 },
-        envio: 1500,
-        total: 19500,
+        total: 18000,
         urlSeguimiento: 'https://x.test/pedido/1?t=a',
       },
       catalogoEjemplo,
@@ -26,7 +25,9 @@ describe('mensaje de WhatsApp', () => {
     expect(texto).toContain('Soy Ana y te mando mi pedido #0012');
     expect(texto).toContain('2 × Burrito simple');
     expect(texto).toMatch(/Carne: .+×2/);
-    expect(texto).toContain('Envío a: Mitre 123 (Centro)');
+    expect(texto).toContain('📍 Envío a: Mitre 123\n');
+    // Ni zona ni costo de envío: el precio es el mismo en cualquier lado.
+    expect(texto).not.toContain('🛵');
     expect(texto).toContain('Pago: Efectivo');
     expect(texto).toContain('Total:');
     expect(texto).toContain('https://x.test/pedido/1?t=a');
@@ -34,7 +35,7 @@ describe('mensaje de WhatsApp', () => {
 
   it('retiro no menciona dirección', () => {
     const texto = mensajePedido(
-      { numero: 1, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'transferencia' }, envio: 0, total: 18000, urlSeguimiento: 'u' },
+      { numero: 1, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'transferencia' }, total: 18000, urlSeguimiento: 'u' },
       catalogoEjemplo,
     );
     expect(texto).toContain('Retiro en el local');
@@ -43,7 +44,7 @@ describe('mensaje de WhatsApp', () => {
 
   it('sin número ni seguimiento (la web no pudo guardarlo) igual arma el mensaje', () => {
     const texto = mensajePedido(
-      { numero: null, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'efectivo' }, envio: 0, total: 18000, urlSeguimiento: null },
+      { numero: null, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'efectivo' }, total: 18000, urlSeguimiento: null },
       catalogoEjemplo,
     );
     expect(texto).toContain('te mando mi pedido 🌯');

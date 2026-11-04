@@ -33,7 +33,7 @@ tags: [burritos, negocio]
 ```
 precio_item = tamaño.precio_base           (incluye papas)
             + Σ precio_extra de cada porción/ingrediente
-total = Σ (precio_item × cantidad) + costo_envio
+total = Σ (precio_item × cantidad)          (el envío no suma nada)
 ```
 - Hoy todos los extras son $0. Si el pescado o el maíz tienen extra, se carga en `precio_extra` y cada porción lo suma. `[A CONFIRMAR]`
 - **Se calcula en el servidor.** El cliente solo muestra una vista previa con la misma función.
@@ -62,4 +62,4 @@ Rama: `cancelado` (desde cualquier estado anterior a `entregado`).
 ## Operación
 - Horario de atención y botón "Abierto/Cerrado" en el admin. Cerrado = no se pueden hacer pedidos.
 - Ingrediente sin stock → se desactiva y desaparece del armador.
-- Zonas de envío con costo fijo por zona. `[A CONFIRMAR]`
+- **Sin zonas ni costo de envío**: el delivery sale lo mismo viva donde viva el cliente. El checkout no pregunta zona (2026-11-03).

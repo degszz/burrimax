@@ -7,9 +7,8 @@ export interface DatosMensaje {
   numero: number | null;
   nombre: string;
   items: { armado: Armado; precio: number }[];
-  entrega: { tipo: 'delivery'; direccion: string; referencias?: string; zona?: string } | { tipo: 'retiro' };
+  entrega: { tipo: 'delivery'; direccion: string; referencias?: string } | { tipo: 'retiro' };
   pago: { metodo: string; pagaCon?: number };
-  envio: number;
   total: number;
   notas?: string;
   urlSeguimiento: string | null;
@@ -45,10 +44,8 @@ export function mensajePedido(datos: DatosMensaje, catalogo: Catalogo): string {
 
   lineas.push('');
   if (datos.entrega.tipo === 'delivery') {
-    const zona = datos.entrega.zona ? ` (${datos.entrega.zona})` : '';
-    lineas.push(`📍 Envío a: ${datos.entrega.direccion}${zona}`);
+    lineas.push(`📍 Envío a: ${datos.entrega.direccion}`);
     if (datos.entrega.referencias) lineas.push(`   ${datos.entrega.referencias}`);
-    lineas.push(`🛵 Envío: ${formatoPesos(datos.envio)}`);
   } else {
     lineas.push('🏪 Retiro en el local');
   }

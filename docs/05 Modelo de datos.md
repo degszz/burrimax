@@ -26,14 +26,14 @@ tags: [burritos, supabase, datos]
 `combo_id` → productos · `producto_id` → productos · `cantidad`
 
 ## Operación
-**zonas_envio**: `id` · `nombre` · `costo` int · `activo`
+**zonas_envio**: `id` · `nombre` · `costo` int · `activo` — **sin uso desde 2026-11-03** (el envío no tiene costo); queda por los pedidos viejos.
 
 **config_negocio** (una sola fila)
 `abierto` bool · `horarios` jsonb · `alias_transferencia` · `cvu` · `titular` · `whatsapp` (a donde va el pedido: el bot cuando esté andando) · `whatsapp_atencion` (el de Max, para hablar con una persona) · `aviso_celiacos` text · `pago_mp_activo` · `pago_stripe_activo` · `pago_transferencia_activo` · `pago_efectivo_activo`
 
 ## Pedidos
 **pedidos**
-`id` uuid · `numero` serial (el que ve el cliente: #0042) · `token_seguimiento` text · `estado` enum · `cliente_nombre` · `cliente_telefono` · `cliente_email` null · `tipo_entrega` ('delivery' | 'retiro') · `direccion` null · `referencias` null · `zona_envio_id` null · `metodo_pago` enum ('mercadopago' | 'stripe' | 'transferencia' | 'efectivo') · `paga_con` int null · `estado_pago` enum ('pendiente' | 'aprobado' | 'rechazado' | 'reembolsado') · `pago_proveedor_id` null · `subtotal` · `costo_envio` · `total` · `notas` · `created_at` · `updated_at`
+`id` uuid · `numero` serial (el que ve el cliente: #0042) · `token_seguimiento` text · `estado` enum · `cliente_nombre` · `cliente_telefono` · `cliente_email` null · `tipo_entrega` ('delivery' | 'retiro') · `direccion` null · `referencias` null · `zona_envio_id` null (ya no se carga; delivery solo exige `direccion`) · `metodo_pago` enum ('mercadopago' | 'stripe' | 'transferencia' | 'efectivo') · `paga_con` int null · `estado_pago` enum ('pendiente' | 'aprobado' | 'rechazado' | 'reembolsado') · `pago_proveedor_id` null · `subtotal` · `costo_envio` · `total` · `notas` · `created_at` · `updated_at`
 
 **pedido_items**
 `id` · `pedido_id` · `tipo` ('armado' | 'producto') · `producto_id` null · `tamano_id` null · `nombre` (snapshot) · `cantidad` · `precio_unitario` (snapshot) · `detalle` jsonb (snapshot completo de lo elegido)

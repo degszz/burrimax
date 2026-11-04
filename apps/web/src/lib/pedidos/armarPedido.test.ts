@@ -50,14 +50,15 @@ describe('armarPedido', () => {
     expect(armarPedido(sinNombre, catalogoEjemplo, pagosTodos).payload.items[0]!.nombre).toBe('Burrito simple');
   });
 
-  it('efectivo entra confirmado y suma el envío de la zona', () => {
+  it('efectivo entra confirmado y el delivery no suma nada', () => {
     const conDelivery: PedidoEntrada = {
       ...base,
-      entrega: { tipoEntrega: 'delivery', direccion: 'Calle Falsa 123', zonaEnvioId: IDS.zonaCentro },
+      entrega: { tipoEntrega: 'delivery', direccion: 'Calle Falsa 123' },
       pago: { metodoPago: 'efectivo', pagaCon: 25000 },
     };
     const { payload } = armarPedido(conDelivery, catalogoEjemplo, pagosTodos);
-    expect(payload).toMatchObject({ estado: 'confirmado', costo_envio: 1500, total: 21500, paga_con: 25000, direccion: 'Calle Falsa 123' });
+    expect(payload).toMatchObject({ estado: 'confirmado', costo_envio: 0, total: 20000, paga_con: 25000, direccion: 'Calle Falsa 123' });
+    expect(payload).not.toHaveProperty('zona_envio_id');
   });
 
   it('"¿Con cuánto pagás?" menor al total da error claro', () => {

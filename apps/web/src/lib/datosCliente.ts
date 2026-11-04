@@ -12,7 +12,6 @@ const datosSchema = z.object({
   tipoEntrega: z.enum(['delivery', 'retiro']).default('delivery'),
   direccion: z.string().default(''),
   referencias: z.string().default(''),
-  zonaEnvioId: z.string().default(''),
 });
 
 export type DatosCliente = z.infer<typeof datosSchema>;

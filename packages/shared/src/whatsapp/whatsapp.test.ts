@@ -13,7 +13,6 @@ const negocio: NegocioBot = {
   sitio: 'https://burrimax.vercel.app',
   textoApertura: 'Abierto · cierra 23:30',
   horarios: HORARIOS_VACIOS,
-  zonas: [{ nombre: 'Centro', costo: 1500 }],
   tamanos: [{ nombre: 'Simple', precioBase: 9000 }],
   transferencia: { alias: 'burri.max.mp', cvu: '0000003100012345678901', titular: 'Maximiliano Figuera' },
   avisoCeliacos: null,

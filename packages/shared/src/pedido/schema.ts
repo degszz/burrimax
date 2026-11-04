@@ -26,7 +26,6 @@ export const entregaSchema = z.discriminatedUnion('tipoEntrega', [
     tipoEntrega: z.literal('delivery'),
     direccion: z.string().trim().min(5, 'Ingresá tu dirección').max(150),
     referencias: z.string().trim().max(200).optional(),
-    zonaEnvioId: z.uuid(),
   }),
   z.object({ tipoEntrega: z.literal('retiro') }),
 ]);

@@ -161,3 +161,6 @@ La foto o PDF va al bucket privado `comprobantes` (solo lo lee el admin, con lin
 
 ### 2026-11-02 · Página de privacidad
 Meta pide una URL de política de privacidad para pasar la app a modo Activo. `/privacidad` dice qué datos se usan, para qué, con quién se comparten (Supabase, Vercel, Meta, Mercado Pago, Anthropic) y el aviso de la Ley 25.326. Falta el nombre legal y el CUIT del responsable.
+
+### 2026-11-03 · El delivery no tiene zonas ni costo
+Max: "no importa en la zona que viva, el precio va a ser el mismo". El checkout ya no muestra "Tu zona" ni la línea de envío; el mensaje de WhatsApp tampoco dice zona ni costo; el bot contesta "Envíos" sin lista de zonas. `calcularPedido(items, catalogo)` ya no recibe la entrega y `costo_envio` se guarda en 0. Migración `delivery_sin_zona`: la base pide solo `direccion` para delivery. Se dejaron `zonas_envio`, `zona_envio_id` y `costo_envio` (pedidos viejos y el cobro de Mercado Pago de esos pedidos). Pendiente: la pestaña "Zonas de envío" del admin ya no hace nada.

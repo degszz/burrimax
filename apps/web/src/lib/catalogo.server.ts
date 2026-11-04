@@ -46,7 +46,7 @@ const esCategoria = (slug: string): slug is CategoriaSlug => (CATEGORIAS as read
 
 export async function cargarDatosTienda(): Promise<DatosTienda> {
   const db = cliente();
-  const [tamanos, categorias, ingredientes, productos, zonas, config, burritos] = await Promise.all([
+  const [tamanos, categorias, ingredientes, productos, config, burritos] = await Promise.all([
     db.from('tamanos').select('*').eq('activo', true).order('orden'),
     db.from('categorias_ingrediente').select('*').order('paso'),
     db
@@ -55,7 +55,6 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       .eq('activo', true)
       .order('orden'),
     db.from('productos').select('id, nombre, precio, activo').eq('activo', true),
-    db.from('zonas_envio').select('id, nombre, costo, activo').eq('activo', true),
     db.from('config_publica').select('*').maybeSingle(),
     db
       .from('productos')
@@ -66,7 +65,7 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
   ]);
 
   const error =
-    tamanos.error ?? categorias.error ?? ingredientes.error ?? productos.error ?? zonas.error ?? config.error ?? burritos.error;
+    tamanos.error ?? categorias.error ?? ingredientes.error ?? productos.error ?? config.error ?? burritos.error;
   if (error) throw new Error(`No se pudo leer el catálogo: ${error.message}`);
 
   const porSlug = new Map(categorias.data!.map((c) => [c.slug, c]));
@@ -113,7 +112,6 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       ];
     }),
     productos: productos.data!,
-    zonasEnvio: zonas.data!,
   };
 
   const c = config.data;

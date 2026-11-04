@@ -25,8 +25,6 @@ export const IDS = {
   huevo: id(46),
   comboClasico: id(60),
   bebidaInactiva: id(61),
-  zonaCentro: id(70),
-  zonaInactiva: id(71),
   noExiste: id(999),
 };
 
@@ -101,9 +99,5 @@ export const catalogoEjemplo: Catalogo = {
   productos: [
     { id: IDS.comboClasico, nombre: 'Combo clásico', precio: 10500, activo: true },
     { id: IDS.bebidaInactiva, nombre: 'Gaseosa', precio: 2000, activo: false },
-  ],
-  zonasEnvio: [
-    { id: IDS.zonaCentro, nombre: 'Centro', costo: 1500, activo: true },
-    { id: IDS.zonaInactiva, nombre: 'Afueras', costo: 3000, activo: false },
   ],
 };

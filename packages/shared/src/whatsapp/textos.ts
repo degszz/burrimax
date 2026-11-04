@@ -12,7 +12,6 @@ export interface NegocioBot {
   /** "Abierto · cierra 23:30", "Abrimos mañana a las 19:30"… */
   textoApertura: string;
   horarios: Horarios;
-  zonas: { nombre: string; costo: number }[];
   tamanos: { nombre: string; precioBase: number }[];
   transferencia: { alias: string | null; cvu: string | null; titular: string | null };
   avisoCeliacos: string | null;
@@ -69,9 +68,7 @@ export function respuestaHorarios(n: NegocioBot): string {
 }
 
 export function respuestaEnvios(n: NegocioBot): string {
-  if (!n.zonas.length) return `🛵 Al armar tu pedido en ${n.sitio} elegís envío o retiro y ves el costo antes de confirmar.`;
-  const zonas = n.zonas.map((z) => `• ${z.nombre}: ${z.costo ? pesos(z.costo) : 'sin cargo'}`).join('\n');
-  return `🛵 Hacemos envíos a:\n${zonas}\n\nElegís la zona al armar tu pedido en ${n.sitio}`;
+  return `🛵 Te lo llevamos a tu casa y el precio es el mismo: no se suma nada al pedido.\nTambién podés retirarlo en el local.\n\nPedí en ${n.sitio}`;
 }
 
 export function respuestaPrecios(n: NegocioBot): string {

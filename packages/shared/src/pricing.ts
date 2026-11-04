@@ -1,15 +1,12 @@
 import { type Armado, type ErrorArmado, validarArmado } from './armador/schema';
 import type { Catalogo, TamanoCatalogo } from './catalogo';
 import { CATEGORIAS } from './constantes';
-import type { Entrega, ItemPedido } from './pedido/schema';
+import type { ItemPedido } from './pedido/schema';
 
 // Fuente única del precio. En el servidor es la verdad; en el cliente solo
 // se usa para mostrar la vista previa con los mismos números.
 
-export type ErrorPedido =
-  | ErrorArmado
-  | { tipo: 'producto_invalido'; productoId: string }
-  | { tipo: 'zona_invalida'; zonaEnvioId: string };
+export type ErrorPedido = ErrorArmado | { tipo: 'producto_invalido'; productoId: string };
 
 export class PedidoInvalidoError extends Error {
   constructor(readonly errores: ErrorPedido[]) {
@@ -65,17 +62,14 @@ export interface ItemCalculado {
 
 export interface PedidoCalculado {
   items: ItemCalculado[];
-  subtotal: number;
-  costoEnvio: number;
   total: number;
 }
 
-/** Calcula todo el pedido. Junta todos los errores antes de tirar, para mostrarlos juntos. */
-export function calcularPedido(
-  items: ItemPedido[],
-  entrega: Pick<Extract<Entrega, { tipoEntrega: 'delivery' }>, 'tipoEntrega' | 'zonaEnvioId'> | { tipoEntrega: 'retiro' },
-  catalogo: Catalogo,
-): PedidoCalculado {
+/**
+ * Calcula todo el pedido. Junta todos los errores antes de tirar, para mostrarlos juntos.
+ * El envío no suma nada: el precio es el mismo con delivery o retiro, en cualquier zona.
+ */
+export function calcularPedido(items: ItemPedido[], catalogo: Catalogo): PedidoCalculado {
   const errores: ErrorPedido[] = [];
   const calculados: ItemCalculado[] = [];
 
@@ -99,15 +93,7 @@ export function calcularPedido(
     }
   }
 
-  let costoEnvio = 0;
-  if (entrega.tipoEntrega === 'delivery') {
-    const zona = catalogo.zonasEnvio.find((z) => z.id === entrega.zonaEnvioId && z.activo);
-    if (zona) costoEnvio = zona.costo;
-    else errores.push({ tipo: 'zona_invalida', zonaEnvioId: entrega.zonaEnvioId });
-  }
-
   if (errores.length > 0) throw new PedidoInvalidoError(errores);
 
-  const subtotal = calculados.reduce((suma, i) => suma + i.subtotal, 0);
-  return { items: calculados, subtotal, costoEnvio, total: subtotal + costoEnvio };
+  return { items: calculados, total: calculados.reduce((suma, i) => suma + i.subtotal, 0) };
 }

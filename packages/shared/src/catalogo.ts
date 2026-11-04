@@ -46,17 +46,9 @@ export interface ProductoCatalogo {
   activo: boolean;
 }
 
-export interface ZonaEnvioCatalogo {
-  id: string;
-  nombre: string;
-  costo: number;
-  activo: boolean;
-}
-
 export interface Catalogo {
   tamanos: TamanoCatalogo[];
   categorias: Record<CategoriaSlug, CategoriaCatalogo>;
   ingredientes: IngredienteCatalogo[];
   productos: ProductoCatalogo[];
-  zonasEnvio: ZonaEnvioCatalogo[];
 }

@@ -57,7 +57,6 @@ export function negocioParaBot(datos: DatosTienda, sitio: string): NegocioBot {
     sitio,
     textoApertura: datos.config.textoApertura,
     horarios: datos.config.horarios,
-    zonas: datos.catalogo.zonasEnvio.map((z) => ({ nombre: z.nombre, costo: z.costo })),
     tamanos: datos.catalogo.tamanos.map((t) => ({ nombre: t.nombre, precioBase: t.precioBase })),
     transferencia: datos.config.transferencia,
     avisoCeliacos: datos.config.avisoCeliacos,

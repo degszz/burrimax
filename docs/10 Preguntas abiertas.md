@@ -24,7 +24,7 @@ tags: [burritos, pendientes]
 - [ ] Foto del burrito cerrado con **tortilla de maíz** (`burrito-cerrado-maiz.avif`; hoy se simula con un tono más amarillo)
 - [ ] Combos: ¿cuáles? (ej. burrito + bebida + nachos)
 - [ ] ¿Hay retiro en el local además de delivery?
-- [ ] Zonas de envío y costos
+- [x] Zonas de envío y costos: **no hay**. El delivery cuesta lo mismo en cualquier zona y no se suma nada al pedido (2026-11-03)
 - [ ] Horarios reales: cargarlos en el admin → Horarios (hoy la tienda está "abierta a mano")
 - [ ] ¿Cuánto tiempo se espera una transferencia antes de cancelar?
 

@@ -161,37 +161,23 @@ describe('relleno', () => {
 });
 
 describe('calcularPedido', () => {
-  it('suma ítems por cantidad más el envío de la zona', () => {
+  it('suma ítems por cantidad, sin nada extra por el envío', () => {
     const resultado = calcularPedido(
       [
         { tipo: 'armado', armado: doble },
         { tipo: 'producto', productoId: IDS.comboClasico, cantidad: 1 },
       ],
-      { tipoEntrega: 'delivery', zonaEnvioId: IDS.zonaCentro },
       catalogoEjemplo,
     );
     expect(resultado.items.map((i) => [i.precioUnitario, i.cantidad, i.subtotal])).toEqual([
       [14000, 2, 28000],
       [10500, 1, 10500],
     ]);
-    expect(resultado.total).toBe(28000 + 10500 + 1500);
+    expect(resultado.total).toBe(28000 + 10500);
   });
 
-  it('retiro en el local no cobra envío', () => {
-    const resultado = calcularPedido([{ tipo: 'armado', armado: simple }], { tipoEntrega: 'retiro' }, catalogoEjemplo);
-    expect(resultado.costoEnvio).toBe(0);
-    expect(resultado.total).toBe(9000);
-  });
-
-  it('zona inactiva o producto inactivo da error', () => {
-    const errores = erroresDe(() =>
-      calcularPedido(
-        [{ tipo: 'producto', productoId: IDS.bebidaInactiva, cantidad: 1 }],
-        { tipoEntrega: 'delivery', zonaEnvioId: IDS.zonaInactiva },
-        catalogoEjemplo,
-      ),
-    );
+  it('producto inactivo da error', () => {
+    const errores = erroresDe(() => calcularPedido([{ tipo: 'producto', productoId: IDS.bebidaInactiva, cantidad: 1 }], catalogoEjemplo));
     expect(errores).toContainEqual({ tipo: 'producto_invalido', productoId: IDS.bebidaInactiva });
-    expect(errores).toContainEqual({ tipo: 'zona_invalida', zonaEnvioId: IDS.zonaInactiva });
   });
 });

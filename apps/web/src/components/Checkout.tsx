@@ -34,7 +34,6 @@ const MENSAJES: Record<string, string> = {
   'cliente.telefono': 'Falta tu teléfono con código de área (ej. 11 2345-6789)',
   'cliente.email': 'Revisá el email',
   'entrega.direccion': 'Falta la dirección',
-  'entrega.zonaEnvioId': 'Elegí tu zona',
   'pago.metodoPago': 'Elegí cómo pagás',
   'pago.pagaCon': 'Revisá con cuánto pagás',
 };
@@ -65,10 +64,8 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
 
   const items = carrito.items.map((i) => ({ tipo: 'armado' as const, armado: i.armado }));
   const delivery = datos.tipoEntrega === 'delivery';
-  const zona = catalogo.zonasEnvio.find((z) => z.id === datos.zonaEnvioId);
-  const subtotal = carrito.items.reduce((s, i) => s + precioVistaPrevia(i.armado, catalogo) * i.armado.cantidad, 0);
-  const envio = delivery ? (zona?.costo ?? 0) : 0;
-  const total = subtotal + envio;
+  // El envío no suma nada: el precio es el mismo en cualquier zona.
+  const total = carrito.items.reduce((s, i) => s + precioVistaPrevia(i.armado, catalogo) * i.armado.cantidad, 0);
   // Efectivo y transferencia se mandan por WhatsApp; Mercado Pago va a pagar.
   const porWhatsapp = !!whatsapp && metodo !== 'mercadopago';
 
@@ -76,7 +73,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
     return {
       cliente: { nombre: datos.nombre, telefono: datos.telefono, email: datos.email },
       entrega: delivery
-        ? { tipoEntrega: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined, zonaEnvioId: datos.zonaEnvioId }
+        ? { tipoEntrega: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined }
         : { tipoEntrega: 'retiro' },
       pago: { metodoPago: metodo, ...(metodo === 'efectivo' && pagaCon ? { pagaCon: Number(pagaCon.replace(/\D/g, '')) } : {}) },
       items,
@@ -108,7 +105,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
 
     // Antes de mandar, que lo armado siga valiendo con el menú actual.
     try {
-      calcularPedido(items, entrada.entrega as never, catalogo);
+      calcularPedido(items, catalogo);
     } catch {
       setErrorGeneral('Algo de tu pedido cambió en el menú. Volvé a revisarlo.');
       return;
@@ -142,10 +139,9 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
             nombre: datos.nombre,
             items: carrito.items.map((i) => ({ armado: i.armado, precio: precioVistaPrevia(i.armado, catalogo) })),
             entrega: delivery
-              ? { tipo: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined, zona: zona?.nombre }
+              ? { tipo: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined }
               : { tipo: 'retiro' },
             pago: { metodo: metodo ?? '', pagaCon: metodo === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined },
-            envio,
             total,
             notas: entrada.notas,
             urlSeguimiento: url,
@@ -249,27 +245,6 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
           </div>
           {delivery && (
             <>
-              <fieldset aria-invalid={!!errores['entrega.zonaEnvioId']}>
-                <legend className="font-heading text-lg font-extrabold">Tu zona</legend>
-                <div className="mt-2 grid gap-2">
-                  {catalogo.zonasEnvio.map((z) => (
-                    <label
-                      key={z.id}
-                      className={cn(
-                        'juguete flex min-h-14 cursor-pointer items-center justify-between rounded-2xl px-4 font-bold',
-                        datos.zonaEnvioId === z.id ? 'bg-amarillo' : 'bg-white',
-                      )}
-                    >
-                      <span className="flex items-center gap-3">
-                        <input type="radio" name="zona" className="size-5 accent-[var(--rojo)]" checked={datos.zonaEnvioId === z.id} onChange={() => cambiar('zonaEnvioId', z.id)} />
-                        {z.nombre}
-                      </span>
-                      <span>{formatoPesos(z.costo)}</span>
-                    </label>
-                  ))}
-                </div>
-                {errores['entrega.zonaEnvioId'] && <Error texto={errores['entrega.zonaEnvioId']} />}
-              </fieldset>
               <Campo etiqueta="Dirección" error={errores['entrega.direccion']}>
                 {(props) => <input {...props} autoComplete="street-address" placeholder="Calle y número" value={datos.direccion} onChange={(e) => cambiar('direccion', e.target.value)} />}
               </Campo>
@@ -299,8 +274,6 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
         </Campo>
 
         <section aria-label="Total" className="space-y-1 border-t-2 border-dashed border-tinta/30 pt-4 text-lg">
-          <p className="flex justify-between"><span>Subtotal</span><span>{formatoPesos(subtotal)}</span></p>
-          <p className="flex justify-between"><span>Envío</span><span>{delivery ? (zona ? formatoPesos(envio) : 'Elegí tu zona') : 'Gratis'}</span></p>
           <p className="flex items-end justify-between pt-1"><span className="font-bold">Total</span><span className="font-heading text-4xl font-extrabold">{formatoPesos(total)}</span></p>
           <p className="text-base text-tinta-suave">🍟 Cada burrito viene con papas fritas</p>
         </section>

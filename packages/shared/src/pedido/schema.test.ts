@@ -34,9 +34,14 @@ describe('pedidoSchema', () => {
     expect(r.cliente.email).toBeUndefined();
   });
 
-  it('delivery exige dirección y zona', () => {
+  it('delivery exige dirección', () => {
     const r = pedidoSchema.safeParse({ ...pedidoBase, entrega: { tipoEntrega: 'delivery' } });
     expect(r.success).toBe(false);
+  });
+
+  it('delivery no pide zona: si llega una, se descarta', () => {
+    const r = pedidoSchema.parse({ ...pedidoBase, entrega: { tipoEntrega: 'delivery', direccion: 'Mitre 123', zonaEnvioId: IDS.comboClasico } });
+    expect(r.entrega).toEqual({ tipoEntrega: 'delivery', direccion: 'Mitre 123' });
   });
 
   it('"¿Con cuánto pagás?" solo vale para efectivo', () => {
