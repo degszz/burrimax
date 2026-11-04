@@ -31,6 +31,7 @@ interface PaymentProvider {
 - Probar con Stripe CLI (`stripe listen --forward-to`).
 
 ## Transferencia
+- En el checkout, Transferencia lleva adentro el alias para copiar y el botón **Pagar con Mercado Pago** (Checkout Pro). No son dos opciones aparte: el pedido se guarda como `transferencia` o `mercadopago` según el botón que toca. Lógica de qué se muestra: `apps/web/src/lib/mediosDePago.ts`.
 - Mostrar alias/CVU/titular desde `config_negocio`, botón **Copiar** y botón **Enviar comprobante por WhatsApp** (mensaje prearmado con número de pedido y total).
 - El local verifica en su cuenta y toca **"Marcar pagado"** en el admin.
 - Pedido queda `pendiente_pago`; si no se confirma en X minutos `[A CONFIRMAR]`, alerta en el admin.

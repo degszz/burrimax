@@ -55,6 +55,8 @@ total = Σ (precio_item × cantidad)          (el envío no suma nada)
 | Transferencia | El local verifica y marca pagado | `pendiente_pago` |
 | Efectivo | Se paga al recibir. Se pregunta "¿Con cuánto pagás?" para el vuelto | `confirmado` |
 
+En el checkout se ven solo **Transferencia** y **Efectivo**. Al elegir Transferencia aparece el alias para copiar y, debajo, el botón "Pagar con Mercado Pago" (si MP está activo). Ese botón manda el pedido como `mercadopago`. Si MP está activo y la transferencia no, Mercado Pago aparece como opción aparte.
+
 ## Estados del pedido
 `pendiente_pago → confirmado → en_preparacion → listo → en_camino → entregado`
 Rama: `cancelado` (desde cualquier estado anterior a `entregado`).

@@ -1,12 +1,14 @@
-import { calcularPedido, pedidoSchema, precioVistaPrevia, type Catalogo, type MetodoPago } from '@burritos/shared';
+import { calcularPedido, pedidoSchema, precioVistaPrevia, type Catalogo } from '@burritos/shared';
 import { ArrowLeft, Banknote, Bike, CircleAlert, CreditCard, Landmark, Store } from 'lucide-react';
-import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from 'react';
 import { describir } from '@/lib/armador/reglas';
 import { DATOS_VACIOS, guardarDatosCliente, leerDatosCliente, olvidarDatosCliente, type DatosCliente } from '@/lib/datosCliente';
 import { formatoPesos } from '@/lib/formato';
+import { mediosDePago, type MetodoVisible } from '@/lib/mediosDePago';
 import { linkWhatsapp, mensajePedido } from '@/lib/mensajeWhatsapp';
 import { cn } from '@/lib/utils';
 import { useCarrito } from '@/stores/carrito';
+import { FilaCopiar } from './checkout/FilaCopiar';
 import { PedidoEnviado, type DatosTransferencia } from './checkout/PedidoEnviado';
 import { IconoWhatsapp } from './tienda/IconosRedes';
 
@@ -20,13 +22,11 @@ interface Props {
   transferencia: { alias: string | null; cvu: string | null; titular: string | null };
 }
 
-type MetodoVisible = Exclude<MetodoPago, 'stripe'>;
-
-const METODOS: { id: MetodoVisible; titulo: string; detalle: string; icono: ReactNode }[] = [
-  { id: 'mercadopago', titulo: 'Mercado Pago', detalle: 'Tarjeta, débito o dinero en cuenta', icono: <CreditCard aria-hidden className="size-7" /> },
-  { id: 'transferencia', titulo: 'Transferencia', detalle: 'Te pasamos el alias para transferir', icono: <Landmark aria-hidden className="size-7" /> },
-  { id: 'efectivo', titulo: 'Efectivo', detalle: 'Pagás cuando lo recibís', icono: <Banknote aria-hidden className="size-7" /> },
-];
+const METODOS: Record<MetodoVisible, { titulo: string; detalle: string; icono: ReactNode }> = {
+  mercadopago: { titulo: 'Mercado Pago', detalle: 'Tarjeta, débito o dinero en cuenta', icono: <CreditCard aria-hidden className="size-7" /> },
+  transferencia: { titulo: 'Transferencia', detalle: 'Te pasamos el alias para transferir', icono: <Landmark aria-hidden className="size-7" /> },
+  efectivo: { titulo: 'Efectivo', detalle: 'Pagás cuando lo recibís', icono: <Banknote aria-hidden className="size-7" /> },
+};
 
 // Mensajes en lenguaje humano para cada campo (los de Zod son genéricos).
 const MENSAJES: Record<string, string> = {
@@ -48,16 +48,18 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
   const [notas, setNotas] = useState('');
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
-  const [enviando, setEnviando] = useState(false);
+  /** Con qué se está mandando el pedido (null: no se está mandando). */
+  const [enviando, setEnviando] = useState<MetodoVisible | null>(null);
   const [enviado, setEnviado] = useState<{ numero: number | null; link: string; url: string | null; transferencia: DatosTransferencia | null } | null>(null);
+  const formulario = useRef<HTMLFormElement>(null);
 
-  const metodosActivos = METODOS.filter((m) => pagos[m.id]);
+  const { opciones, mercadoPagoEnTransferencia } = mediosDePago(pagos);
 
   useEffect(() => {
     useCarrito.persist.rehydrate()?.then?.(() => setListo(true)) ?? setListo(true);
     const guardados = leerDatosCliente();
     if (guardados) setDatos(guardados);
-    if (metodosActivos.length === 1) setMetodo(metodosActivos[0]!.id);
+    if (opciones.length === 1) setMetodo(opciones[0]!);
   }, []);
 
   const cambiar = <K extends keyof DatosCliente>(campo: K, valor: DatosCliente[K]) => setDatos((d) => ({ ...d, [campo]: valor }));
@@ -69,22 +71,32 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
   // Efectivo y transferencia se mandan por WhatsApp; Mercado Pago va a pagar.
   const porWhatsapp = !!whatsapp && metodo !== 'mercadopago';
 
-  function armarEntrada() {
+  function armarEntrada(elegido: MetodoVisible | null) {
     return {
       cliente: { nombre: datos.nombre, telefono: datos.telefono, email: datos.email },
       entrega: delivery
         ? { tipoEntrega: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined }
         : { tipoEntrega: 'retiro' },
-      pago: { metodoPago: metodo, ...(metodo === 'efectivo' && pagaCon ? { pagaCon: Number(pagaCon.replace(/\D/g, '')) } : {}) },
+      pago: { metodoPago: elegido, ...(elegido === 'efectivo' && pagaCon ? { pagaCon: Number(pagaCon.replace(/\D/g, '')) } : {}) },
       items,
       notas: notas.trim() || undefined,
     };
   }
 
-  async function confirmar(e: SubmitEvent<HTMLFormElement>) {
+  function confirmar(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+    void enviar(metodo);
+  }
+
+  /**
+   * Valida y manda el pedido. `elegido` es la opción marcada, salvo cuando
+   * toca "Pagar con Mercado Pago" dentro de Transferencia: ahí va como Mercado Pago.
+   */
+  async function enviar(elegido: MetodoVisible | null) {
+    if (enviando) return;
     setErrorGeneral(null);
-    const entrada = armarEntrada();
+    const porWhatsapp = !!whatsapp && elegido !== 'mercadopago';
+    const entrada = armarEntrada(elegido);
     const validado = pedidoSchema.safeParse(entrada);
     const nuevos: Record<string, string> = {};
     if (!validado.success) {
@@ -94,7 +106,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
         nuevos[campo] ??= MENSAJES[campo] ?? issue.message;
       }
     }
-    if (metodo === 'efectivo' && pagaCon && Number(pagaCon.replace(/\D/g, '')) < total) {
+    if (elegido === 'efectivo' && pagaCon && Number(pagaCon.replace(/\D/g, '')) < total) {
       nuevos['pago.pagaCon'] = `Con eso no alcanza: el total es ${formatoPesos(total)}`;
     }
     setErrores(nuevos);
@@ -114,13 +126,13 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
     if (recordar) guardarDatosCliente(datos);
     else olvidarDatosCliente();
 
-    setEnviando(true);
+    setEnviando(elegido);
     try {
-      const formulario = new FormData(e.currentTarget);
+      const campos = new FormData(formulario.current ?? undefined);
       const respuesta = await fetch('/api/pedidos', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...entrada, web: formulario.get('web') }),
+        body: JSON.stringify({ ...entrada, web: campos.get('web') }),
       });
       const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string; numero?: number; url?: string; redirectUrl?: string };
       const guardado = respuesta.ok && !!cuerpo.url;
@@ -141,7 +153,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
             entrega: delivery
               ? { tipo: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined }
               : { tipo: 'retiro' },
-            pago: { metodo: metodo ?? '', pagaCon: metodo === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined },
+            pago: { metodo: elegido ?? '', pagaCon: elegido === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined },
             total,
             notas: entrada.notas,
             urlSeguimiento: url,
@@ -153,7 +165,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
           numero,
           link: linkWhatsapp(whatsapp, mensaje),
           url: url ? `${url}&nuevo=1` : null,
-          transferencia: metodo === 'transferencia' ? { ...transferencia, total } : null,
+          transferencia: elegido === 'transferencia' ? { ...transferencia, total } : null,
         });
         return;
       }
@@ -161,7 +173,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
     } catch {
       setErrorGeneral('Parece que no hay conexión. Revisá tu internet y probá de nuevo.');
     } finally {
-      setEnviando(false);
+      setEnviando(null);
     }
   }
 
@@ -220,7 +232,7 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
         </ul>
       </section>
 
-      <form noValidate onSubmit={confirmar} className="mt-6 space-y-6">
+      <form ref={formulario} noValidate onSubmit={confirmar} className="mt-6 space-y-6">
         {/* Trampa para bots: invisible para las personas */}
         <input type="text" name="web" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] size-px opacity-0" />
 
@@ -255,23 +267,49 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
           )}
         </Seccion>
 
+        {/* Antes del pago: "Pagar con Mercado Pago" manda el pedido en el acto. */}
+        <Campo etiqueta="¿Algo más?" opcional ayuda="Ej. sin picante para el chico">
+          {(props) => <textarea {...props} rows={2} maxLength={300} value={notas} onChange={(e) => setNotas(e.target.value)} />}
+        </Campo>
+
         <Seccion titulo="¿Cómo pagás?">
           <div role="radiogroup" aria-label="Forma de pago" aria-invalid={!!errores['pago.metodoPago']} className="grid gap-3">
-            {metodosActivos.map((m) => (
-              <Opcion key={m.id} elegida={metodo === m.id} onElegir={() => setMetodo(m.id)} icono={m.icono} titulo={m.titulo} detalle={m.detalle} horizontal />
+            {opciones.map((id) => (
+              <Opcion
+                key={id}
+                elegida={metodo === id}
+                onElegir={() => setMetodo(id)}
+                icono={METODOS[id].icono}
+                titulo={METODOS[id].titulo}
+                detalle={id === 'transferencia' && mercadoPagoEnTransferencia ? 'Copiás el alias o pagás con Mercado Pago' : METODOS[id].detalle}
+                horizontal
+              />
             ))}
           </div>
           {errores['pago.metodoPago'] && <Error texto={errores['pago.metodoPago']} />}
+          {metodo === 'transferencia' && <BloqueAlias datos={transferencia} conWhatsapp={!!whatsapp} />}
+          {metodo === 'transferencia' && mercadoPagoEnTransferencia && (
+            <div className="space-y-2">
+              <p className="flex items-center gap-3 font-heading text-lg font-extrabold text-tinta-suave before:h-0.5 before:flex-1 before:bg-tinta/20 after:h-0.5 after:flex-1 after:bg-tinta/20">
+                o si preferís
+              </p>
+              <button
+                type="button"
+                onClick={() => void enviar('mercadopago')}
+                disabled={!!enviando || !abierto}
+                className="juguete flex min-h-16 w-full flex-col items-center justify-center rounded-2xl bg-[#00B1EA] px-3 py-2 font-heading text-xl leading-tight font-extrabold text-tinta disabled:border-tinta/40 disabled:bg-beige disabled:text-tinta-suave disabled:shadow-none"
+              >
+                {enviando === 'mercadopago' ? 'Abriendo Mercado Pago…' : `Pagar ${formatoPesos(total)} con Mercado Pago`}
+                <span className="font-sans text-base font-semibold">Tarjeta, débito o dinero en cuenta</span>
+              </button>
+            </div>
+          )}
           {metodo === 'efectivo' && (
             <Campo etiqueta="¿Con cuánto pagás?" opcional ayuda="Así te llevamos el vuelto justo" error={errores['pago.pagaCon']}>
               {(props) => <input {...props} inputMode="numeric" placeholder={formatoPesos(Math.ceil(total / 1000) * 1000)} value={pagaCon} onChange={(e) => setPagaCon(e.target.value)} />}
             </Campo>
           )}
         </Seccion>
-
-        <Campo etiqueta="¿Algo más?" opcional ayuda="Ej. sin picante para el chico">
-          {(props) => <textarea {...props} rows={2} maxLength={300} value={notas} onChange={(e) => setNotas(e.target.value)} />}
-        </Campo>
 
         <section aria-label="Total" className="space-y-1 border-t-2 border-dashed border-tinta/30 pt-4 text-lg">
           <p className="flex items-end justify-between pt-1"><span className="font-bold">Total</span><span className="font-heading text-4xl font-extrabold">{formatoPesos(total)}</span></p>
@@ -291,13 +329,14 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
 
         <button
           type="submit"
-          disabled={enviando || !abierto}
+          disabled={!!enviando || !abierto}
           className={cn(
             'juguete flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl px-3 font-heading font-extrabold text-white disabled:border-tinta/40 disabled:bg-beige disabled:text-tinta-suave disabled:shadow-none',
             porWhatsapp ? 'bg-verde text-xl leading-tight shadow-[0_4px_0_var(--tinta)]' : 'bg-rojo text-2xl shadow-[0_4px_0_var(--rojo-oscuro)]',
           )}
         >
-          {enviando ? (
+          {/* Si salió por "Pagar con Mercado Pago", este botón solo se apaga. */}
+          {enviando && enviando === metodo ? (
             'Mandando…'
           ) : metodo === 'mercadopago' ? (
             `Ir a pagar · ${formatoPesos(total)}`
@@ -373,6 +412,31 @@ function Opcion({ elegida, onElegir, icono, titulo, detalle, horizontal }: { ele
         <span className="block text-base text-tinta-suave">{detalle}</span>
       </span>
     </button>
+  );
+}
+
+/** Transferencia elegida: el alias a la vista, con su botón para copiarlo. */
+function BloqueAlias({ datos, conWhatsapp }: { datos: Props['transferencia']; conWhatsapp: boolean }) {
+  const hayDatos = !!(datos.alias || datos.cvu);
+  return (
+    <div className="juguete rounded-3xl bg-white p-4">
+      <p className="font-heading text-xl font-extrabold">{hayDatos ? 'Transferí a este alias' : 'Transferencia'}</p>
+      {hayDatos ? (
+        <dl className="mt-2 space-y-2">
+          {datos.alias && <FilaCopiar etiqueta="Alias" valor={datos.alias} />}
+          {datos.cvu && <FilaCopiar etiqueta="CVU" valor={datos.cvu} />}
+          {datos.titular && (
+            <div>
+              <dt className="text-sm text-tinta-suave">Titular</dt>
+              <dd className="font-heading text-lg font-extrabold">{datos.titular}</dd>
+            </div>
+          )}
+        </dl>
+      ) : (
+        <p className="mt-1 text-base text-tinta-suave">Te pasamos el alias por WhatsApp.</p>
+      )}
+      {conWhatsapp && <p className="mt-2 text-base text-tinta-suave">Mandás el pedido y después el comprobante por WhatsApp.</p>}
+    </div>
   );
 }
 

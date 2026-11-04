@@ -13,15 +13,15 @@ Lee: `docs/02 Reglas de negocio.md` (datos, pagos, estados) y `docs/03 Flujo del
 
 ## Formulario de datos
 - react-hook-form + Zod (`pedidoSchema` de `shared`).
-- Campos: nombre*, teléfono* (normalizar a formato AR, aceptar con o sin 0/15), tipo de entrega*, dirección* y referencias (solo delivery), zona de envío (si delivery), email (opcional), notas.
-- Forma de pago: botones grandes; solo mostrar las activas en `config_publica`. Efectivo → "¿Con cuánto pagás?" (opcional, ≥ total).
+- Campos: nombre*, teléfono* (normalizar a formato AR, aceptar con o sin 0/15), tipo de entrega*, dirección* y referencias (solo delivery; **no hay zona**: el envío no suma nada), email (opcional), notas.
+- Forma de pago: botones grandes; solo mostrar las activas en `config_publica` (`lib/mediosDePago.ts`). Efectivo → "¿Con cuánto pagás?" (opcional, ≥ total). Con transferencia y MP activos, MP no es opción aparte: Transferencia muestra el alias con Copiar y el botón "Pagar con Mercado Pago", que manda el pedido como `mercadopago`.
 - Recordar nombre/teléfono/dirección en el dispositivo (con aviso y opción de borrar).
 - Errores en lenguaje humano, al lado del campo.
 
 ## POST /api/pedidos (Astro endpoint, `prerender = false`)
 1. Rechazar si `config.abierto = false`.
 2. Validar body con `pedidoSchema`.
-3. Traer de la base los ingredientes/productos/tamaños/zona involucrados (service role).
+3. Traer de la base los ingredientes/productos/tamaños involucrados (service role).
 4. Validar límites con `armadoSchema` y que todo esté activo.
 5. **Recalcular precios con `pricing.ts`**; ignorar cualquier total del cliente.
 6. Insertar pedido + ítems + ingredientes con snapshots, en una transacción (función RPC `crear_pedido(jsonb)` security definer, o inserción secuencial con rollback manual).

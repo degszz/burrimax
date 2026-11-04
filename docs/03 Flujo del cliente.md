@@ -11,9 +11,10 @@ flowchart TD
   C --> D
   D --> E[Tus datos]
   E --> F{¿Cómo pagás?}
-  F -->|Mercado Pago| G[Checkout MP] --> H[Seguimiento]
+  F -->|Transferencia| J[Alias para copiar + botón Pagar con Mercado Pago]
+  J -->|Copia el alias| K[Pedido y comprobante por WhatsApp] --> H[Seguimiento]
+  J -->|Pagar con Mercado Pago| G[Checkout MP] --> H
   F -->|Tarjeta Stripe| I[Checkout Stripe] --> H
-  F -->|Transferencia| J[Alias/CVU + copiar + enviar comprobante] --> H
   F -->|Efectivo| H
 ```
 
@@ -34,15 +35,16 @@ flowchart TD
 
 ### 3. Carrito
 - Lista de ítems con detalle de ingredientes plegable, cantidad +/-, editar (vuelve al armador con todo cargado), eliminar.
-- Subtotal, envío (cuando ya eligió zona), total.
+- Total (el envío no suma nada: no se elige zona).
 
 ### 4. Tus datos
 - Nombre, teléfono, ¿Delivery o retiro?, dirección + referencias, email (opcional, con texto "solo si querés el comprobante").
 - Se recuerdan en el dispositivo para el próximo pedido.
 
 ### 5. Pago
-- 4 botones grandes con ícono. Efectivo pregunta "¿Con cuánto pagás?".
-- Transferencia muestra alias/CVU con botón **Copiar** y botón **Enviar comprobante por WhatsApp**.
+- Botones grandes con ícono: **Transferencia** y **Efectivo**. Efectivo pregunta "¿Con cuánto pagás?".
+- Transferencia muestra ahí mismo el alias/CVU con botón **Copiar** y, debajo, "o si preferís" → botón **Pagar con Mercado Pago** (tarjeta, débito o dinero en cuenta). El botón de abajo de todo manda el pedido por WhatsApp; el de Mercado Pago lo manda y lleva a pagar.
+- "¿Algo más?" (notas) va antes del pago, porque el botón de Mercado Pago manda el pedido en el acto.
 
 ### 6. Seguimiento
 - URL privada `/pedido/[id]?t=[token]`.
