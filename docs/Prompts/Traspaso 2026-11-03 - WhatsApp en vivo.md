@@ -16,10 +16,16 @@ Repo `C:\dev\burritos`, rama `main`; push a `main` = deploy automático de la ti
 ## 0. Al arrancar
 1. Leé `CLAUDE.md` y estos, en orden: `docs/Bitácora/2026-11-02.md`, `docs/Bitácora/2026-11-03.md`, `docs/Guías/WhatsApp - pasos de Max.md`, `docs/superpowers/specs/2026-11-02-whatsapp-bot-design.md`, `docs/Planes/WhatsApp automático.md`, `docs/10 Preguntas abiertas.md`, `docs/08 Roadmap por fases.md`. Los trucos de las sesiones anteriores están en `docs/Prompts/Traspaso 2026-10-30.md` y `docs/Prompts/Traspaso 2026-10-30 - WhatsApp y AR.md` (sección 5).
 2. Skills: `panel-admin` y `checkout-pedido` (WhatsApp y admin), `pagos-mercadopago`, `supabase-datos`, **`notas-obsidian` al cerrar cada tarea**.
-3. **Cambios sin commitear del 2026-11-03** (`git status`): "Tu zona" fuera del checkout y Mercado Pago dentro de Transferencia. Max ya los aprobó. Corré `pnpm typecheck && pnpm test`; si pasan, hacé dos commits (`feat(web): checkout sin zona de envío` y `feat(web): Mercado Pago dentro de Transferencia con alias para copiar`) y push a `main`. La migración `20261103120000_delivery_sin_zona.sql` ya está aplicada en la base.
+3. ~~Cambios sin commitear del 2026-11-03~~ **Hecho** (2026-11-03 noche): commits `9438043` (sin zona) y `da383cb` (MP dentro de Transferencia), push a `main` y deploy en vivo verificado.
 
 ## 1. WhatsApp Business con Meta (tarea principal)
-**Estado (2026-11-03):** el bot está programado y deployado (commit `e2ec68f`), pero **nunca recibió un mensaje**: `whatsapp_mensajes` está vacía y `config_negocio.whatsapp` sigue siendo el número de Max (`5492271468521`). Max eligió un **chip nuevo** para el bot; su número queda como "Hablar con Max" (`config_negocio.whatsapp_atencion`).
+**Estado (2026-11-03, noche):** el bot está programado y deployado (commit `e2ec68f`), pero **nunca recibió un mensaje**: `whatsapp_mensajes` está vacía y `config_negocio.whatsapp` sigue siendo el número de Max (`5492271468521`). En Vercel (proyecto `burrimax`) **no hay ninguna variable `WHATSAPP_*`** todavía, así que Max está entre los pasos 1 y 6 de la guía. Max eligió un **chip nuevo** para el bot; su número queda como "Hablar con Max" (`config_negocio.whatsapp_atencion`).
+
+La guía ya se corrigió contra la doc de Meta del 2026-11-03 (pasos 2 a 5 y 8). Falta verificar el paso 6 (dónde se carga la tarjeta en el Administrador de WhatsApp) y el paso 9 cuando lleguen.
+
+Para ver las variables sin valores: `MSYS_NO_PATHCONV=1 vercel api "/v10/projects/burrimax/env" --scope degs-projects` y quedate solo con `key`, `type` y `target` (en Git Bash, sin `MSYS_NO_PATHCONV` la ruta se rompe; `vercel env ls` no sirve porque el repo no está linkeado).
+
+Max puede pasarte por el chat el número del chip, el Phone number ID y el ID de la cuenta (no son secretos): con eso podés cargar vos `WHATSAPP_PHONE_NUMBER_ID` en Vercel. El token, la clave secreta de la app, el PIN y la clave de Anthropic **nunca** por el chat.
 
 **Lo que hace Max** → la guía `docs/Guías/WhatsApp - pasos de Max.md` (pasos 1 a 10 + plantillas):
 1. Preguntale **en qué paso de la guía quedó** y seguí desde ahí, de a un paso. Antes de cada paso, confirmá con la documentación de Meta que el menú sigue llamándose igual (cambia seguido). Si algo cambió, corregí la guía.

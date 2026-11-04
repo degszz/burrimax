@@ -1,14 +1,16 @@
 ---
 tags: [burritos, guia, whatsapp]
-actualizado: 2026-11-02
+actualizado: 2026-11-03
 ---
 # WhatsApp: los pasos que hace Max
 
 > [!info] Qué vas a lograr
 > Un número **nuevo** solo para el bot. Tu número de siempre (+54 9 2271 468521) sigue en tu celular para hablar vos: cuando el bot no sabe algo, le pasa ese número al cliente y a vos te llega un aviso.
-> Verificado con la documentación de Meta el 2026-11-02 ([[superpowers/specs/2026-11-02-whatsapp-bot-design|diseño]]). Si una pantalla no coincide, sacale una captura y mandámela.
+> Verificado con la documentación de Meta el 2026-11-03 ([[superpowers/specs/2026-11-02-whatsapp-bot-design|diseño]]). Meta muestra los menús en inglés en su documentación: si en tu pantalla dicen otra cosa, o no coinciden, sacale una captura y mandámela.
 
-> [!warning] Nunca pegues claves ni tokens en el chat con Claude. Van directo a Vercel.
+> [!warning] Qué podés pasarle a Claude por el chat y qué no
+> - ✅ **Sí**: el número del chip, el **Identificador del número de teléfono** (Phone number ID), el **ID de la cuenta de WhatsApp Business**, mensajes de error y capturas. No son secretos.
+> - ❌ **Nunca**: el **token** (paso 4), la **clave secreta de la app** (paso 7), el **PIN** de 6 números ni la clave de Anthropic. Van directo a Vercel o a tu anotador. Si mandás una captura donde se ve un token, tapalo antes.
 
 ## Antes de empezar
 - [ ] Un **chip nuevo** (prepago sirve) en cualquier celular, para recibir un SMS. Ese número **no tiene que tener WhatsApp**. Si alguna vez lo tuvo: WhatsApp → Ajustes → Cuenta → Eliminar cuenta.
@@ -22,21 +24,25 @@ actualizado: 2026-11-02
 1. Entrá a https://developers.facebook.com/apps → **Crear app**.
 2. Nombre: `Burrimax Bot` y tu email → **Siguiente**.
 3. Caso de uso: **Conectarte con clientes a través de WhatsApp** ("Connect with customers through WhatsApp") → **Siguiente**.
-4. Elegí el portfolio del paso 1 → **Crear app**.
-5. En la app: **Empezar a usar la API** → elegí o creá la cuenta de WhatsApp Business. Meta te da un número de prueba: no lo uses para los clientes.
-6. Anotá el **ID de la cuenta de WhatsApp Business** (lo vas a usar en el paso 5).
+4. Elegí el portfolio del paso 1 → **Siguiente** (te muestra los requisitos para publicar) → **Crear app**.
+5. Quedás en **Personalizar caso de uso → Conectar en WhatsApp → Inicio rápido** ("Customize use case → Connect on WhatsApp → Quickstart"). Tocá **Empezar a usar la API** ("Start using the API"): te lleva a **Configuración de la API** ("API Setup").
+6. Ahí elegí la cuenta en el desplegable o tocá **Crear una cuenta de WhatsApp Business**. Meta ahora la llama a veces "cuenta de mensajería" ("Messaging account"): es lo mismo. Meta te da un número de prueba: no lo uses para los clientes.
+7. Anotá el **ID de la cuenta** que aparece en ese panel (lo vas a usar en el paso 5).
 
 ## 3. El número del chip
-1. En **WhatsApp → Configuración de la API** (API Setup) → **Agregar número de teléfono**.
+1. En **Configuración de la API** (API Setup), en el desplegable **De** ("From") → **agregar uno nuevo** ("add a new one"). Si no aparece: en el **Administrador de WhatsApp** (https://business.facebook.com/wa/manage) → **Herramientas de la cuenta → Números de teléfono** ("Account tools → Phone numbers") → **Agregar**.
 2. **Nombre visible**: el de la marca (`Burrimax`). Meta lo revisa: tiene que ser el nombre del negocio.
 3. Categoría: Restaurante. Poné el número del chip y confirmá con el código que llega por SMS.
 4. Anotá el **Identificador del número de teléfono** (Phone number ID). Es `WHATSAPP_PHONE_NUMBER_ID`.
 
 ## 4. Token permanente (no el de 24 h)
-1. Entrá a https://business.facebook.com/settings → **Usuarios del sistema** → **Agregar**.
+1. Entrá a https://business.facebook.com/latest/settings → en la columna de la izquierda, **Usuarios del sistema** ("System users") → **Agregar +** (arriba a la derecha).
 2. Nombre: `bot-burrimax`, rol **Administrador**.
-3. **Asignar activos**: la app `Burrimax Bot` con **Control total** y la cuenta de WhatsApp con **Control total**.
-4. **Generar token**: elegí la app, vencimiento **Nunca**, y marcá `whatsapp_business_messaging`, `whatsapp_business_management` y `business_management`.
+3. Elegilo en la lista → **Asignar activos** ("Assign assets"):
+   - La app `Burrimax Bot`: en **Control total**, prendé **Administrar app** ("Manage app").
+   - La cuenta de WhatsApp: en **Control total**, prendé **Administrar cuentas de WhatsApp Business** ("Manage WhatsApp Business accounts").
+   - **Asignar activos**.
+4. **Generar token**: elegí la app; si te pregunta el vencimiento, **Nunca**; y marcá `business_management`, `whatsapp_business_messaging` y `whatsapp_business_management`.
 5. Copialo y guardalo en un lugar seguro: no se vuelve a mostrar. Es `WHATSAPP_TOKEN`.
 
 ## 5. Registrar el número (Meta solo deja hacerlo por la API)
@@ -46,8 +52,8 @@ actualizado: 2026-11-02
 4. En **Parámetros** agregá:
    - `messaging_product` = `whatsapp`
    - `pin` = 6 números que inventes. **Anotalo**: es la verificación en dos pasos del número.
-5. **Enviar**. Tiene que decir `"success": true`.
-6. Ahora la ruta `<ID de la cuenta de WhatsApp Business>/subscribed_apps`, POST, sin parámetros → **Enviar** → `"success": true`. Así los mensajes de ese número llegan a la app.
+5. **Enviar**. Tiene que decir `"success": true`. Si da error, **no lo repitas**: copiame el mensaje (sin el token). Meta deja solo 10 intentos cada 72 horas.
+6. Ahora la ruta `<ID de la cuenta de WhatsApp Business>/subscribed_apps`, POST, sin parámetros → **Enviar** → `"success": true`. Así los mensajes de ese número llegan a la app (si ya estaba conectada, igual dice `success`).
 
 ## 6. Medio de pago
 En el **Administrador de WhatsApp** (https://business.facebook.com/wa/manage) → configuración de la cuenta → **Pagos** → agregá la tarjeta.
@@ -68,7 +74,7 @@ Después: **Deployments** → el último → **⋯** → **Redeploy**. (Astro gr
 Cuando publiquemos el admin, `WHATSAPP_TOKEN` y `WHATSAPP_PHONE_NUMBER_ID` van también en ese proyecto (para los avisos de "en la plancha", "en camino"…).
 
 ## 8. Conectar el webhook
-1. En la app de Meta: **WhatsApp → Configuración** (o **Casos de uso → Personalizar → Configuración**).
+1. En la app de Meta: **Casos de uso → Personalizar → Configuración** ("Use cases → Customize → Configuration"). En apps viejas está en **WhatsApp → Configuración**.
 2. **URL de devolución de llamada**: `https://burrimax.vercel.app/api/webhooks/whatsapp`
 3. **Token de verificación**: el mismo `WHATSAPP_VERIFY_TOKEN` del paso 7 → **Verificar y guardar**.
 4. En **Campos del webhook**, buscá `messages` → **Suscribirse**.
