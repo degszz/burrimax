@@ -167,3 +167,9 @@ Max: "no importa en la zona que viva, el precio va a ser el mismo". El checkout 
 
 ### 2026-11-03 · Mercado Pago va dentro de Transferencia
 Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, que haya un bloque con el alias para copiar y si no un botón para usar la integración de Mercado Pago". El checkout muestra Transferencia y Efectivo. Transferencia despliega el alias con **Copiar** y el botón "Pagar con Mercado Pago", que manda el pedido como `mercadopago` (mismo camino de siempre: preferencia, webhook). No cambia el servidor, la base ni el admin. Descartado: una sola opción "Mercado Pago o transferencia" con la elección en la pantalla final, porque obligaba a cambiar cómo se guarda el método de pago y el webhook.
+
+## 2026-11-05 — Selector de 2 lados cuando el paso tiene 2 opciones
+- Sin cerdo ni pescado, la carne queda en 2 opciones (pollo/vaca), igual que la tortilla (maíz/trigo).
+- En esos pasos, debajo del carrusel va una pastilla partida en dos ("Maíz **o** Harina de trigo") en lugar de los puntitos: se elige de un toque, sin deslizar, y el carrusel se centra en la que se tocó. En carne, cada toque suma una porción y aparece un "−".
+- Reemplaza los puntitos (no se suma abajo) para no quitarle alto al plato. Con 3 o más opciones todo sigue igual.
+- Cerdo, pescado y el combo "Del Mar" se **desactivan** (migración `20261105120000_sin_cerdo_ni_pescado.sql`), no se borran: los pedidos viejos los siguen nombrando.

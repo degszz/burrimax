@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { BarraPasos } from './armador/BarraPasos';
 import { BarraSiguiente } from './armador/BarraSiguiente';
 import { Carrusel } from './armador/Carrusel';
+import { SelectorDosLados, type LadoSelector } from './armador/SelectorDosLados';
 import { DialogoCambioTamano } from './armador/DialogoCambioTamano';
 import { Escenario } from './armador/Escenario';
 import { PasoListo } from './armador/PasoListo';
@@ -525,6 +526,10 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes, vista = 'car
   const lleno = categoria !== 'tortilla' && elegidos >= maximo;
   const porciones = catalogo.categorias[categoria].permiteRepetir;
 
+  // El selector de 2 lados le pide al carrusel que centre la que se tocó.
+  // Lleva el paso: al cambiar de paso el carrusel nuevo arranca desde el principio.
+  const [enfocar, setEnfocar] = useState<{ indice: number; vez: number; paso: PasoDeCategoria } | null>(null);
+
   // El paso nuevo entra desde el lado hacia donde vas (adelante: derecha).
   const pasoAnterior = useRef(paso);
   const haciaAtras = paso < pasoAnterior.current;
@@ -603,6 +608,30 @@ function PasoActual({ paso, armado, catalogo, tamano, ingredientes, vista = 'car
         etiqueta={TITULOS[paso]}
         pista={lleno ? (porciones ? 'Podés repetir la misma' : 'Sacá uno para cambiarlo') : 'Deslizá para ver más'}
         render={tarjeta}
+        enfocar={enfocar?.paso === paso ? enfocar : null}
+        pie={
+          // Solo 2 opciones (tortilla, carne): también se eligen de un toque, sin deslizar.
+          ingredientes.length === 2 ? (
+            <SelectorDosLados
+              etiqueta={TITULOS[paso]}
+              porciones={porciones}
+              puedeSumar={puedeAgregar(armado, categoria, catalogo)}
+              onEnfocar={(indice) => setEnfocar((e) => ({ indice, vez: (e?.vez ?? 0) + 1, paso }))}
+              lados={
+                ingredientes.map((ingrediente) => {
+                  const cantidad = cuantas(armado, categoria, ingrediente.id);
+                  return {
+                    ingrediente,
+                    cantidad,
+                    apagado: lleno && cantidad === 0,
+                    onTocar: () => (porciones ? sumarPorcion(ingrediente.id, catalogo) : alternar(categoria, ingrediente.id, catalogo)),
+                    onRestar: () => restarPorcion(ingrediente.id),
+                  };
+                }) as [LadoSelector, LadoSelector]
+              }
+            />
+          ) : undefined
+        }
       />
     </section>
   );

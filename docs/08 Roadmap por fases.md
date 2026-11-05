@@ -20,7 +20,7 @@ tags: [burritos, roadmap]
 - [x] Carrito persistente y **Mis combos** guardados en el celular
 - [x] Combos de la casa en la home (con "Agregar" y "Cambiarle algo")
 - [x] Imágenes de las 14 salsas
-- [ ] Imagen real de cerdo (hoy SVG provisorio)
+- [x] ~~Imagen real de cerdo~~ — ya no hace falta: cerdo desactivado (2026-11-05)
 
 ## Fase 2 — Checkout y pedidos
 - [x] Formulario de datos con validación (`/checkout`)

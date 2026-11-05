@@ -17,7 +17,7 @@ tags: [burritos, pendientes]
 - [ ] Doble tapa con tortilla que tenga costo extra: ¿se cobra una vez o dos? (hoy: una vez)
 - [x] Salsas: las 14 de las imágenes de Max (2026-10-29)
 - [ ] Imágenes de salsas en más resolución: hoy son de ~146 px; para pantallas de alta densidad conviene 512×512
-- [ ] Imagen de cerdo (`apps/web/public/armador/cerdo.avif`)
+- [x] ~~Imagen de cerdo~~ — cerdo desactivado (2026-11-05)
 - [ ] **¿Qué salsas son sin TACC?** Por precaución hoy están todas como NO confirmadas (`sin_tacc = false`)
 - [ ] Foto definitiva del burrito cerrado: la actual tiene **marca de agua de banco de fotos** (no se puede publicar). Idea: generarla en Firefly como las papas
 - [ ] Foto del burrito cerrado **doble tapa** (`burrito-cerrado-doble.avif`)
