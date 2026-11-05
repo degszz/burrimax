@@ -8,10 +8,6 @@ interface Props<T> {
   render: (item: T, enCentro: boolean) => ReactNode;
   pista: string;
   etiqueta: string;
-  /** Reemplaza los puntitos y la pista de abajo (p. ej. el selector de 2 lados). */
-  pie?: ReactNode;
-  /** Centra esa tarjeta; `vez` cambia en cada pedido para repetir el mismo índice. */
-  enfocar?: { indice: number; vez: number } | null;
 }
 
 /**
@@ -19,7 +15,7 @@ interface Props<T> {
  * se agranda y las de los costados se achican y se desenfocan. Con
  * reduced-motion se mantiene igual pero sin el giro en perspectiva.
  */
-export function Carrusel<T>({ items, clave, render, pista, etiqueta, pie, enfocar }: Props<T>) {
+export function Carrusel<T>({ items, clave, render, pista, etiqueta }: Props<T>) {
   const pista_ = useRef<HTMLDivElement>(null);
   const [centro, setCentro] = useState(0);
 
@@ -69,20 +65,10 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta, pie, enfoca
     };
   }, [items.length]);
 
-  // Desde afuera (selector de 2 lados): centra la que se tocó.
-  useEffect(() => {
-    if (enfocar) centrar(enfocar.indice);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enfocar?.vez]);
-
   // Centra la tarjeta de al lado (flechas en PC).
   function mover(direccion: 1 | -1) {
-    centrar(centro + direccion);
-  }
-
-  function centrar(indice: number) {
     const contenedor = pista_.current;
-    const destino = contenedor?.children[indice] as HTMLElement | undefined;
+    const destino = contenedor?.children[centro + direccion] as HTMLElement | undefined;
     if (!contenedor || !destino) return;
     const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     contenedor.scrollTo({
@@ -105,7 +91,6 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta, pie, enfoca
           </div>
         ))}
       </div>
-      {pie ?? (
       <div className="flex items-center justify-center gap-3 px-4 text-tinta-suave">
         {/* Con mouse no se puede deslizar con el dedo: flechas (solo en PC) */}
         <Flecha lado="izq" onClick={() => mover(-1)} disabled={centro === 0} />
@@ -120,7 +105,6 @@ export function Carrusel<T>({ items, clave, render, pista, etiqueta, pie, enfoca
         </span>
         <Flecha lado="der" onClick={() => mover(1)} disabled={centro === items.length - 1} />
       </div>
-      )}
     </div>
   );
 }

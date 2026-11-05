@@ -178,3 +178,7 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 - Original en `docs/Marca/logo-burrimax.png` (1200×1220, fondo transparente). De ahí salen todos los íconos (sharp): favicons 32/48/192, `apple-touch-icon` (180, fondo crema), `icono-192/512` (fondo crema, logo al 80% = zona segura "maskable"), `logo.webp` (256) para encabezado, admin y pie.
 - Mismos íconos en tienda y admin. Imagen para compartir rehecha con el logo redondo (`og.png?v=3`, el `v` fuerza a WhatsApp a no usar la vieja guardada).
 - Pie de página discreto en la portada (`PieDePagina.tsx`): logo chico, nombre, bajada, redes y año. No se muestra mientras se arma (abajo va la barra).
+
+## 2026-11-05 — Se saca el selector de 2 lados
+- Probado en el celular de Max (360 px de ancho, menos alto útil por la barra de Chrome): sumaba alto y el plato, el cartel de papas y los pasos quedaban encimados. Max pidió sacarlo; tortilla y carne vuelven al carrusel con puntitos como el resto.
+- Lección: probar el armador también a 360×700, no solo a 375×812.
