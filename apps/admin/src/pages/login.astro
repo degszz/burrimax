@@ -11,7 +11,8 @@ const mensajes: Record<string, string> = {
 <Base titulo="Ingresar">
   <main class="grid min-h-dvh place-items-center px-4">
     <form method="post" action="/api/auth/login" class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-sm">
-      <h1 class="text-2xl font-bold">🌯 Panel del negocio</h1>
+      <img src="/logo.webp" alt="Burrimax" width="112" height="112" class="mx-auto size-28" />
+      <h1 class="text-center text-2xl font-bold">Panel del negocio</h1>
       {error && <p role="alert" class="rounded-lg bg-red-50 p-3 font-medium text-red-700">{mensajes[error] ?? 'No se pudo ingresar.'}</p>}
       <label class="block">
         <span class="font-semibold">Email</span>

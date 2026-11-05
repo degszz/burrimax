@@ -173,3 +173,8 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 - En esos pasos, debajo del carrusel va una pastilla partida en dos ("Maíz **o** Harina de trigo") en lugar de los puntitos: se elige de un toque, sin deslizar, y el carrusel se centra en la que se tocó. En carne, cada toque suma una porción y aparece un "−".
 - Reemplaza los puntitos (no se suma abajo) para no quitarle alto al plato. Con 3 o más opciones todo sigue igual.
 - Cerdo, pescado y el combo "Del Mar" se **desactivan** (migración `20261105120000_sin_cerdo_ni_pescado.sql`), no se borran: los pedidos viejos los siguen nombrando.
+
+## 2026-11-05 — Logo definitivo "Burritos Burrimax"
+- Original en `docs/Marca/logo-burrimax.png` (1200×1220, fondo transparente). De ahí salen todos los íconos (sharp): favicons 32/48/192, `apple-touch-icon` (180, fondo crema), `icono-192/512` (fondo crema, logo al 80% = zona segura "maskable"), `logo.webp` (256) para encabezado, admin y pie.
+- Mismos íconos en tienda y admin. Imagen para compartir rehecha con el logo redondo (`og.png?v=3`, el `v` fuerza a WhatsApp a no usar la vieja guardada).
+- Pie de página discreto en la portada (`PieDePagina.tsx`): logo chico, nombre, bajada, redes y año. No se muestra mientras se arma (abajo va la barra).

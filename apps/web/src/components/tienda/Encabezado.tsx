@@ -12,8 +12,8 @@ interface Props {
 export function Encabezado({ abierto, textoApertura, cantidadEnCarrito, onAbrirCarrito }: Props) {
   return (
     <header className="flex items-center gap-3 px-4 pt-4 pb-2">
-      {/* Logo de la marca (public/logo.webp, fondo transparente) */}
-      <img src="/logo.webp" alt="" width={1520} height={860} className="h-11 w-auto shrink-0" />
+      {/* Logo de la marca (public/logo.webp, redondo con fondo transparente) */}
+      <img src="/logo.webp" alt="" width={256} height={256} className="size-14 shrink-0 drop-shadow-[0_3px_0_var(--tinta)]" />
 
       <div className="min-w-0 flex-1">
         {/* [A CONFIRMAR] nombre del emprendimiento: se cambia en lib/marca.ts */}

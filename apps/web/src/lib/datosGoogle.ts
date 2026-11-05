@@ -19,7 +19,7 @@ export function datosRestaurante({ sitio, whatsapp, precioDesde }: Entrada): Rec
     name: MARCA.nombre,
     description: MARCA.descripcion,
     url: `${sitio}/`,
-    image: `${sitio}/og.png?v=2`,
+    image: `${sitio}/og.png?v=3`,
     logo: `${sitio}/icono-512.png`,
     servesCuisine: ['Mexicana', 'Tex-Mex', 'Burritos'],
     priceRange: '$$',

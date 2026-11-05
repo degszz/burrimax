@@ -14,7 +14,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.usuario = null;
 
   // Archivos públicos de la app (íconos, manifest, service worker de avisos).
-  if (/^\/(_astro\/|favicon|icono-|apple-touch-icon|sw\.js$|site\.webmanifest$)/.test(pathname)) return next();
+  if (/^\/(_astro\/|favicon|icono-|apple-touch-icon|logo\.webp$|sw\.js$|site\.webmanifest$)/.test(pathname)) return next();
   if (SIN_SESION.has(pathname)) return next();
 
   const supabase = context.locals.supabase;

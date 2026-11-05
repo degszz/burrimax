@@ -15,6 +15,7 @@ import { CombosCasa } from './tienda/CombosCasa';
 import { Encabezado } from './tienda/Encabezado';
 import { HeroArmar } from './tienda/HeroArmar';
 import { MisCombos } from './tienda/MisCombos';
+import { PieDePagina } from './tienda/PieDePagina';
 import { PanelCarrito } from './tienda/PanelCarrito';
 import {
   CATEGORIA_DEL_PASO,
@@ -452,6 +453,9 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
           />
         )}
       </main>
+
+      {/* Pie discreto, solo en la portada (mientras se arma, abajo va la barra) */}
+      {!armadorAbierto && <PieDePagina whatsapp={whatsapp} />}
 
 
       <PanelCarrito
