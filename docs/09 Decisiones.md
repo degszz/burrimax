@@ -182,3 +182,13 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 ## 2026-11-05 — Se saca el selector de 2 lados
 - Probado en el celular de Max (360 px de ancho, menos alto útil por la barra de Chrome): sumaba alto y el plato, el cartel de papas y los pasos quedaban encimados. Max pidió sacarlo; tortilla y carne vuelven al carrusel con puntitos como el resto.
 - Lección: probar el armador también a 360×700, no solo a 375×812.
+
+## 2026-11-10 — Admin en el celular: menú abajo
+- En pantallas de menos de 768 px el menú de secciones va **fijo abajo** (5 botones con ícono, al alcance del pulgar) y la barra de arriba (logo y Salir) se va con el scroll. Desde 768 px sigue el menú de arriba, fijo.
+- Las alturas viven en `--alto-menu` y `--alto-nav` (`apps/admin/src/styles/global.css`): lo que queda pegado arriba usa `top-(--alto-menu)` y las barras de "Guardar" `bottom-(--alto-nav)`, así no se encima nada.
+- `viewport-fit=cover` + `env(safe-area-inset-*)` para que el menú no quede debajo de la rayita del iPhone en la app instalada.
+- Descartado: menú arriba en dos renglones (con las pestañas de cada pantalla se comía casi un cuarto del alto en 360×700).
+
+## 2026-11-13 — Mercado Pago sin Rapipago ni Pago Fácil
+- La preferencia excluye el tipo `ticket` (doc oficial: "Excluir medios de pago"). Dinero en cuenta no se puede excluir.
+- Motivo: el efectivo ya es una opción propia de la web y se arregla al entregar; con un ticket el pedido quedaría días en "esperando pago".

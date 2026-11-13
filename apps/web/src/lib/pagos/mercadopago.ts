@@ -46,6 +46,9 @@ export async function crearCobro({ pedidoId, numero, urlSeguimiento, sitio, item
       external_reference: pedidoId,
       statement_descriptor: 'BURRITOS',
       metadata: { pedido_numero: numero },
+      // Sin "Efectivo" de Mercado Pago (Rapipago, Pago Fácil): quien quiere pagar
+      // en efectivo elige "Efectivo" en la web y paga al recibir el pedido.
+      payment_methods: { excluded_payment_types: [{ id: 'ticket' }] },
       ...(email ? { payer: { email } } : {}),
       ...(publico
         ? {
