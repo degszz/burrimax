@@ -96,7 +96,7 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
   return (
     <div className="relative mt-3 min-h-56 flex-1 overflow-hidden lg:mt-0 lg:h-[min(36rem,78dvh)] lg:flex-none lg:rounded-3xl">
       {/* Fuera del flujo: la zona mide lo que queda de pantalla y la grilla se corta */}
-      <ul aria-hidden className="absolute inset-x-0 top-0 grid grid-cols-3 gap-2.5 px-3 pt-1 select-none">
+      <ul aria-hidden className="absolute inset-x-0 top-0 grid grid-cols-3 gap-2.5 px-3 pt-3 select-none">
         {ingredientes.map((ingrediente, i) => (
           <li
             key={ingrediente.id}

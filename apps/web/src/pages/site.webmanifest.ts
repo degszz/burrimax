@@ -16,8 +16,8 @@ export const GET: APIRoute = () =>
       background_color: MARCA.colorFondo,
       theme_color: MARCA.colorFondo,
       icons: [
-        { src: '/icono-192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/icono-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+        { src: '/icono-192.png?v=3', sizes: '192x192', type: 'image/png' },
+        { src: '/icono-512.png?v=3', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
       ],
     }),
     { headers: { 'content-type': 'application/manifest+json; charset=utf-8' } },

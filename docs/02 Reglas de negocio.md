@@ -25,6 +25,7 @@ tags: [burritos, negocio]
 
 ## Ingredientes `[A CONFIRMAR nombres]`
 - **Tortillas:** maíz (sin TACC) · harina de trigo
+- **Salsas:** sin salsa roja casera, mil islas, alioli ni golf (desactivadas el 2026-11-13; "Clásico" quedó sin salsa)
 - **Carnes:** pollo · vaca (cerdo y pescado desactivados el 2026-11-05 por pedido de Max; se reactivan desde el admin → Stock)
 - **Salsas (14, con imagen):** guacamole · salsa roja casera · picante roja · queso cheddar · queso crema · barbacoa · alioli · ranch · César · salsa golf · mil islas · mayonesa · ketchup · mostaza
 - **Vegetales:** lechuga · tomate · cebolla · cebolla morada · cebolla de verdeo · choclo · morrones · repollo · zanahoria · huevo
