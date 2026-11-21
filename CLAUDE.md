@@ -41,7 +41,7 @@ pnpm db:types       # regenera tipos de Supabase en packages/shared
 1. **El precio se calcula SIEMPRE en el servidor** con `packages/shared/pricing.ts` y datos de la base. El total que manda el cliente se ignora.
 2. **Los límites de ingredientes se validan en cliente Y servidor** (mismo schema Zod de `shared`).
 3. **El cliente nunca escribe directo en `pedidos`.** Los pedidos se crean desde `POST /api/pedidos` con service role, después de validar.
-4. **Un pedido online solo pasa a "pagado" por webhook verificado** (firma de MP o Stripe), nunca por la URL de retorno.
+4. **Un pedido online solo pasa a "pagado" por webhook verificado** (firma de MP o Stripe), nunca por la URL de retorno. Excepción aprobada por Max (2026-11-21, el panel de MP no deja ver la firma de prueba): en MP, sin firma válida solo vale lo que confirma la consulta del pago a la API con nuestra clave (ver `docs/09 Decisiones.md`). Volver a exigir la firma cuando MP lo permita.
 5. Webhooks **idempotentes**: registrar cada evento en `pagos_eventos` y no procesar dos veces el mismo.
 6. Secretos solo en variables de entorno del servidor. Nada de claves privadas con prefijo `PUBLIC_`.
 7. El admin es otra app, otro dominio, con login + MFA y rol `admin` en `app_metadata`. RLS en todas las tablas.

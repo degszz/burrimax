@@ -192,3 +192,9 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 ## 2026-11-13 — Mercado Pago sin Rapipago ni Pago Fácil
 - La preferencia excluye el tipo `ticket` (doc oficial: "Excluir medios de pago"). Dinero en cuenta no se puede excluir.
 - Motivo: el efectivo ya es una opción propia de la web y se arregla al entregar; con un ticket el pedido quedaría días en "esperando pago".
+
+## 2026-11-21 — Mercado Pago: confirmar el pago aunque la firma no coincida
+- El panel de MP no deja ver ni restablecer la firma secreta de Prueba (ojito desactivado, restablecer responde 424). Sin firma, los pagos se cobraban pero el pedido quedaba en "esperando pago".
+- Max aprobó la excepción a la regla 4: sin firma válida, el aviso no se cree. La web consulta el pago a la API de MP con nuestra clave y, antes de guardar nada, exige que exista y sea de un pedido.
+- Sin firma solo se aplica un pago **aprobado** con monto exacto, o la devolución del mismo pago; nunca "rechazado" (evita reenviar un intento viejo). El id del evento sale de MP.
+- Pendiente: cuando MP deje ver la firma, cargarla en `MP_WEBHOOK_SECRET` y volver a exigirla.

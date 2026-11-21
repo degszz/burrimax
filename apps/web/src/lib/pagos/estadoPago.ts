@@ -14,6 +14,7 @@ export interface PedidoActual {
   total: number;
   estado: EstadoPedido;
   estado_pago: EstadoPago;
+  pago_proveedor_id?: string | null;
 }
 
 export type Decision =
@@ -40,4 +41,15 @@ export function decidirPorPago(pago: PagoInformado, pedido: PedidoActual): Decis
       // pending, in_process, authorized…: todavía no hay nada que cambiar.
       return { tipo: 'ignorar', motivo: `pago en estado ${pago.status}` };
   }
+}
+
+/**
+ * Aviso sin firma válida: el dato viene de consultar a Mercado Pago, pero
+ * cualquiera podría reenviar el id de un pago viejo. Por eso solo puede aprobar
+ * o registrar la devolución del mismo pago, nunca marcar "rechazado".
+ */
+export function decidirSinFirma(pago: PagoInformado & { id: string }, pedido: PedidoActual): Decision {
+  const devolucion = pago.status === 'refunded' || pago.status === 'charged_back';
+  if (pago.status === 'approved' || (devolucion && pedido.pago_proveedor_id === pago.id)) return decidirPorPago(pago, pedido);
+  return { tipo: 'ignorar', motivo: `sin firma: no se aplica el estado ${pago.status}` };
 }

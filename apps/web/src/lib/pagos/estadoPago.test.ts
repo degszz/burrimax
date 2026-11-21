@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decidirPorPago, type PedidoActual } from './estadoPago';
+import { decidirPorPago, decidirSinFirma, type PedidoActual } from './estadoPago';
 
 const pedido: PedidoActual = { id: 'p1', total: 18000, estado: 'pendiente_pago', estado_pago: 'pendiente' };
 
@@ -43,5 +43,29 @@ describe('decidirPorPago', () => {
       estado_pago: 'aprobado',
       estado: 'en_preparacion',
     });
+  });
+});
+
+describe('decidirSinFirma', () => {
+  const pago = { id: '123', external_reference: 'p1', transaction_amount: 18000 };
+
+  it('un pago aprobado con el monto justo confirma el pedido', () => {
+    expect(decidirSinFirma({ ...pago, status: 'approved' }, pedido)).toEqual({ tipo: 'actualizar', estado_pago: 'aprobado', estado: 'confirmado' });
+  });
+
+  it('no aprueba si el monto no coincide ni si es de otro pedido', () => {
+    expect(decidirSinFirma({ ...pago, status: 'approved', transaction_amount: 1 }, pedido).tipo).toBe('ignorar');
+    expect(decidirSinFirma({ ...pago, status: 'approved', external_reference: 'otro' }, pedido).tipo).toBe('ignorar');
+  });
+
+  it('reenviar un intento rechazado no tira abajo un pedido pagado', () => {
+    const pagado: PedidoActual = { ...pedido, estado: 'confirmado', estado_pago: 'aprobado', pago_proveedor_id: '999' };
+    expect(decidirSinFirma({ ...pago, status: 'rejected' }, pagado).tipo).toBe('ignorar');
+  });
+
+  it('la devolución solo vale si es del mismo pago', () => {
+    const pagado: PedidoActual = { ...pedido, estado: 'confirmado', estado_pago: 'aprobado', pago_proveedor_id: '123' };
+    expect(decidirSinFirma({ ...pago, status: 'refunded' }, pagado)).toMatchObject({ tipo: 'actualizar', estado_pago: 'reembolsado' });
+    expect(decidirSinFirma({ ...pago, status: 'refunded' }, { ...pagado, pago_proveedor_id: '999' }).tipo).toBe('ignorar');
   });
 });
