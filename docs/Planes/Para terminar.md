@@ -11,7 +11,7 @@ Estado real revisado en Vercel, Supabase y el repo. Orden = prioridad.
 
 | # | Qué | Quién | Detalle |
 |---|---|---|---|
-| 1 | **Webhook de Mercado Pago** | Max + Claude | Claves cargadas en Vercel (`MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`) y el cobro se crea bien (pedido #0009). Pero nunca llegó un aviso: `pagos_eventos` vacío. Revisar en el panel de MP → la app → Webhooks: URL `https://burrimax.vercel.app/api/webhooks/mercadopago`, evento **Pagos**, y que la clave secreta sea la misma que `MP_WEBHOOK_SECRET`. Después, pago de prueba nuevo y leer los registros de Vercel **en la misma hora** (Hobby guarda 1 h). |
+| 1 | **Pago de prueba de Mercado Pago** | Max | Webhook de Prueba ya configurado y la web confirma los pagos con la API de MP (2026-11-21). Falta pagar el #0010 desde Edge InPrivate: ver [[Bitácora/2026-11-21]]. |
 | 2 | Credenciales de **producción** de MP | Max | Cuando la prueba pase a "pagado" solo por webhook. |
 | 3 | **`VAPID_PRIVATE_KEY`** en Vercel (tienda) | Max | No está cargada: los avisos de pedido nuevo al celular no salen. Está en `apps/web/.env`. |
 | 4 | **Publicar el admin** | Max | No existe el proyecto en Vercel. Nuevo proyecto, Root Directory `apps/admin`, con las variables de Supabase (y las de WhatsApp cuando estén). |
