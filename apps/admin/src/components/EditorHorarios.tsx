@@ -21,6 +21,9 @@ const MODOS: { id: ModoApertura; titulo: string; detalle: string }[] = [
   { id: 'cerrado', titulo: 'Cerrado ahora', detalle: 'No toma pedidos (feriado, se llenó la cocina…)' },
 ];
 
+// Celular: sin el relojito (en 360 px cortaba la hora); tocando el campo se abre el selector igual.
+const CLASE_HORA = 'h-12 w-full min-w-0 rounded-lg border px-2 text-lg sm:w-auto max-sm:[&::-webkit-calendar-picker-indicator]:hidden';
+
 /** Horarios de la semana y modo de apertura. Muestra en vivo lo que ve el cliente. */
 export default function EditorHorarios({ modoInicial, horariosIniciales }: Props) {
   const [modo, setModo] = useState<ModoApertura>(modoInicial);
@@ -149,13 +152,14 @@ export default function EditorHorarios({ modoInicial, horariosIniciales }: Props
             ) : (
               <ul className="mt-2 space-y-2">
                 {horarios[dia].map((turno, i) => (
-                  <li key={i} className="flex flex-wrap items-center gap-2">
+                  // Celular: "desde a hasta Quitar" en un renglón; la aclaración, abajo.
+                  <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap">
                     <input
                       type="time"
                       aria-label={`${NOMBRE_DIA[dia]}: abre`}
                       value={turno.desde}
                       onChange={(e) => editarTurno(dia, i, 'desde', e.target.value)}
-                      className="h-12 rounded-lg border px-2 text-lg"
+                      className={CLASE_HORA}
                     />
                     <span>a</span>
                     <input
@@ -163,17 +167,17 @@ export default function EditorHorarios({ modoInicial, horariosIniciales }: Props
                       aria-label={`${NOMBRE_DIA[dia]}: cierra`}
                       value={turno.hasta}
                       onChange={(e) => editarTurno(dia, i, 'hasta', e.target.value)}
-                      className="h-12 rounded-lg border px-2 text-lg"
+                      className={CLASE_HORA}
                     />
-                    {turno.hasta < turno.desde && <span className="text-sm font-semibold text-zinc-500">(hasta el día siguiente)</span>}
                     <button
                       type="button"
                       onClick={() => quitarTurno(dia, i)}
                       aria-label={`Quitar turno de ${NOMBRE_DIA[dia]}`}
-                      className="ml-auto h-10 rounded-lg px-3 font-semibold text-red-700 hover:bg-red-50"
+                      className="h-12 rounded-lg px-3 font-semibold text-red-700 hover:bg-red-50 sm:order-last sm:ml-auto"
                     >
                       Quitar
                     </button>
+                    {turno.hasta < turno.desde && <span className="col-span-full text-sm font-semibold text-zinc-500">(hasta el día siguiente)</span>}
                   </li>
                 ))}
               </ul>
@@ -182,7 +186,8 @@ export default function EditorHorarios({ modoInicial, horariosIniciales }: Props
         ))}
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 border-t bg-white/95 p-3 backdrop-blur">
+      {/* En el celular va encima del menú de abajo. */}
+      <div className="fixed inset-x-0 bottom-(--alto-nav) z-30 border-t bg-white/95 p-3 backdrop-blur md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <span className="text-sm font-semibold" aria-live="polite">
             {estado === 'guardado' && <span className="text-green-700">✓ Guardado. La tienda ya lo muestra.</span>}

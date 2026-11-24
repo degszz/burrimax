@@ -40,7 +40,7 @@ Falta:
 
 ## 4. Datos y contenido de Max
 
-13. Alias, CVU y titular; horarios reales en modo Automático; precios y zonas reales; qué salsas son sin TACC.
+13. ~~Alias~~ (`maxilmnz`, cargado 2026-11-24; también va en el mensaje de WhatsApp del pedido). Falta titular y CVU (opcional); horarios reales en modo Automático; precios y zonas reales; qué salsas son sin TACC.
 14. Fotos: burrito doble, maíz y un burrito **sin marca de agua** (el actual es provisorio).
 15. Marca: ciudad, Instagram, dominio propio. Nombre legal y CUIT para los textos legales.
 

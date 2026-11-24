@@ -85,7 +85,7 @@ export default function PanelStock({ ingredientes }: { ingredientes: FilaIngredi
         )}
       </div>
 
-      <div className="sticky top-[60px] z-20 -mx-4 mt-4 flex flex-wrap items-center gap-2 bg-zinc-100 px-4 py-2">
+      <div className="sticky top-(--alto-menu) z-20 -mx-4 mt-4 flex flex-wrap items-center gap-2 bg-zinc-100 px-4 py-2">
         <input
           type="search"
           value={busqueda}

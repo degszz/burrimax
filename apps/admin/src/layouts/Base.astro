@@ -1,9 +1,10 @@
 ---
 import '@/styles/global.css';
+import { BookOpen, Boxes, Clock, LogOut, Receipt, Wallet } from 'lucide-react';
 
 interface Props {
   titulo: string;
-  /** Muestra la barra de arriba (Pedidos · Horarios · Salir). */
+  /** Muestra el menú de secciones (arriba en tablet/PC, abajo en el celular). */
   conMenu?: boolean;
   activo?: 'pedidos' | 'stock' | 'catalogo' | 'horarios' | 'pagos';
 }
@@ -11,11 +12,11 @@ interface Props {
 const { titulo, conMenu = false, activo } = Astro.props;
 const usuario = Astro.locals.usuario;
 const SECCIONES = [
-  { id: 'pedidos', href: '/', texto: 'Pedidos' },
-  { id: 'stock', href: '/stock', texto: 'Stock' },
-  { id: 'catalogo', href: '/catalogo', texto: 'Catálogo' },
-  { id: 'horarios', href: '/horarios', texto: 'Horarios' },
-  { id: 'pagos', href: '/pagos', texto: 'Pagos' },
+  { id: 'pedidos', href: '/', texto: 'Pedidos', Icono: Receipt },
+  { id: 'stock', href: '/stock', texto: 'Stock', Icono: Boxes },
+  { id: 'catalogo', href: '/catalogo', texto: 'Catálogo', Icono: BookOpen },
+  { id: 'horarios', href: '/horarios', texto: 'Horarios', Icono: Clock },
+  { id: 'pagos', href: '/pagos', texto: 'Pagos', Icono: Wallet },
 ] as const;
 ---
 
@@ -23,7 +24,7 @@ const SECCIONES = [
 <html lang="es-AR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#18181b" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -36,30 +37,59 @@ const SECCIONES = [
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>{titulo} · Admin</title>
   </head>
-  <body class="min-h-dvh bg-zinc-100 text-zinc-900 antialiased">
+  <body class:list={['min-h-dvh bg-zinc-100 text-zinc-900 antialiased', conMenu && 'pb-(--alto-nav)']}>
     {
       conMenu && (
-        <header class="sticky top-0 z-30 border-b bg-zinc-900 text-white print:hidden">
-          <nav class="mx-auto flex max-w-[1600px] items-center gap-2 overflow-x-auto px-4 py-2">
-            <span class="mr-2 flex shrink-0 items-center gap-2 text-lg font-bold">
-              <img src="/logo.webp" alt="" width="36" height="36" class="size-9" /> Admin
-            </span>
-            {
-              SECCIONES.map((s) => (
-                <a
-                  href={s.href}
-                  class:list={['shrink-0 rounded-lg px-4 py-2.5 text-base font-semibold', activo === s.id ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
-                >
-                  {s.texto}
-                </a>
-              ))
-            }
-            <span class="ml-auto hidden text-sm text-zinc-400 sm:inline">{usuario?.email}</span>
-            <form method="post" action="/api/auth/salir">
-              <button class="rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-zinc-800">Salir</button>
-            </form>
+        <>
+          <header class="border-b border-zinc-800 bg-zinc-900 text-white print:hidden md:sticky md:top-0 md:z-30 md:h-(--alto-menu)">
+            <div class="mx-auto flex h-14 max-w-[1600px] items-center gap-2 px-4 md:h-full">
+              <a href="/" class="mr-2 flex shrink-0 items-center gap-2 text-lg font-bold">
+                <img src="/logo.webp" alt="" width="36" height="36" class="size-9" /> Admin
+              </a>
+              {/* Tablet/PC: secciones arriba */}
+              <nav aria-label="Secciones" class="hidden min-w-0 items-center gap-2 overflow-x-auto md:flex">
+                {SECCIONES.map((s) => (
+                  <a
+                    href={s.href}
+                    aria-current={activo === s.id ? 'page' : undefined}
+                    class:list={['shrink-0 rounded-lg px-4 py-2.5 text-base font-semibold', activo === s.id ? 'bg-white text-zinc-900' : 'hover:bg-zinc-800']}
+                  >
+                    {s.texto}
+                  </a>
+                ))}
+              </nav>
+              <span class="ml-auto hidden truncate text-sm text-zinc-400 lg:inline">{usuario?.email}</span>
+              <form method="post" action="/api/auth/salir" class="ml-auto shrink-0 lg:ml-0">
+                <button class="flex h-11 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold hover:bg-zinc-800">
+                  <LogOut className="size-4" aria-hidden="true" /> Salir
+                </button>
+              </form>
+            </div>
+          </header>
+
+          {/* Celular: secciones abajo, fijas */}
+          <nav
+            aria-label="Secciones"
+            class="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-800 bg-zinc-900 pb-[env(safe-area-inset-bottom)] text-white print:hidden md:hidden"
+          >
+            <ul class="grid grid-cols-5">
+              {SECCIONES.map(({ id, href, texto, Icono }) => (
+                <li>
+                  <a
+                    href={href}
+                    aria-current={activo === id ? 'page' : undefined}
+                    class:list={['flex h-16 flex-col items-center justify-center gap-1 text-xs font-semibold', activo === id ? 'text-white' : 'text-zinc-400']}
+                  >
+                    <span class:list={['flex h-7 w-12 items-center justify-center rounded-full', activo === id && 'bg-white text-zinc-900']}>
+                      <Icono className="size-5" strokeWidth={2.25} aria-hidden="true" />
+                    </span>
+                    {texto}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
-        </header>
+        </>
       )
     }
     <slot />

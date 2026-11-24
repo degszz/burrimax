@@ -11,11 +11,11 @@ interface Props {
 
 type Pestana = 'ingredientes' | 'tamanos' | 'combos' | 'zonas';
 
-const PESTANAS: { id: Pestana; titulo: string }[] = [
-  { id: 'ingredientes', titulo: 'Ingredientes' },
-  { id: 'tamanos', titulo: 'Tamaños' },
-  { id: 'combos', titulo: 'Combos de la casa' },
-  { id: 'zonas', titulo: 'Zonas de envío' },
+const PESTANAS: { id: Pestana; titulo: string; corto: string }[] = [
+  { id: 'ingredientes', titulo: 'Ingredientes', corto: 'Ingredientes' },
+  { id: 'tamanos', titulo: 'Tamaños', corto: 'Tamaños' },
+  { id: 'combos', titulo: 'Combos de la casa', corto: 'Combos' },
+  { id: 'zonas', titulo: 'Zonas de envío', corto: 'Zonas de envío' },
 ];
 
 const CATEGORIAS: CategoriaSlug[] = ['tortilla', 'salsa', 'carne', 'vegetal'];
@@ -32,7 +32,12 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
       <h1 className="text-2xl font-bold">Catálogo</h1>
       <p className="text-zinc-600">Los cambios se ven en la tienda apenas se guardan (en la próxima carga de la página).</p>
 
-      <div role="tablist" aria-label="Secciones del catálogo" className="sticky top-[60px] z-20 -mx-4 mt-4 flex gap-2 overflow-x-auto bg-zinc-100 px-4 py-2">
+      {/* Celular: las 4 a la vista en dos filas. Tablet/PC: una fila que queda pegada arriba. */}
+      <div
+        role="tablist"
+        aria-label="Secciones del catálogo"
+        className="mt-4 grid grid-cols-2 gap-2 sm:sticky sm:top-(--alto-menu) sm:z-20 sm:-mx-4 sm:flex sm:overflow-x-auto sm:bg-zinc-100 sm:px-4 sm:py-2"
+      >
         {PESTANAS.map((p) => (
           <button
             key={p.id}
@@ -40,10 +45,16 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
             type="button"
             aria-selected={pestana === p.id}
             onClick={() => setPestana(p.id)}
-            className={`h-11 shrink-0 rounded-full px-4 font-semibold ${pestana === p.id ? 'bg-zinc-900 text-white' : 'bg-white'}`}
+            className={`flex h-12 shrink-0 items-center justify-center rounded-full px-4 font-semibold sm:h-11 ${pestana === p.id ? 'bg-zinc-900 text-white' : 'bg-white'}`}
           >
-            {p.titulo}
-            {p.id === 'ingredientes' && sinStock > 0 && <span className="ml-1.5 rounded-full bg-red-600 px-2 text-xs text-white">{sinStock} sin stock</span>}
+            <span className="sm:hidden">{p.corto}</span>
+            <span className="hidden sm:inline">{p.titulo}</span>
+            {p.id === 'ingredientes' && sinStock > 0 && (
+              <span className="ml-1.5 rounded-full bg-red-600 px-2 text-xs text-white">
+                {sinStock}
+                <span className="sr-only sm:not-sr-only"> sin stock</span>
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -182,11 +193,12 @@ function Interruptor({ encendido, onCambiar, etiqueta, deshabilitado, textos = [
   );
 }
 
+/** Etiqueta arriba y caja abajo: así queda alineada con el interruptor de al lado. */
 function CampoPesos({ valor, onCambiar, etiqueta, opcional = false }: { valor: number; onCambiar: (n: number) => void; etiqueta: string; opcional?: boolean }) {
   return (
-    <label className="flex items-center gap-1">
-      <span className="text-sm text-zinc-500">{etiqueta}</span>
-      <span className="flex h-11 items-center rounded-lg border bg-white px-2 focus-within:ring-2 focus-within:ring-zinc-900">
+    <label className="flex flex-col gap-1">
+      <span className="text-sm text-zinc-600">{etiqueta}</span>
+      <span className="flex h-11 w-fit items-center rounded-lg border bg-white px-2 focus-within:ring-2 focus-within:ring-zinc-900">
         <span className="text-zinc-500">$</span>
         {/* Sin puntos mientras se escribe (el formato movería el cursor). */}
         <input
@@ -212,11 +224,33 @@ function CampoNumero({ valor, onCambiar, etiqueta, min, max }: { valor: number; 
         max={max}
         value={valor}
         onChange={(e) => onCambiar(Number(e.target.value))}
-        className="h-11 w-24 rounded-lg border bg-white px-2 text-lg font-semibold"
+        className="h-11 w-full rounded-lg border bg-white px-2 text-lg font-semibold sm:w-24"
       />
     </label>
   );
 }
+
+/** Nombre a lo ancho en el celular; en tablet/PC, todo en una línea. */
+function FilaDatos({ nombre, controles }: { nombre: ReactNode; controles: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div className="flex min-w-0 flex-1 items-center gap-3">{nombre}</div>
+      <div className="flex flex-wrap items-end justify-between gap-3">{controles}</div>
+    </div>
+  );
+}
+
+function CasillaSinTacc({ marcada, onCambiar }: { marcada: boolean; onCambiar: () => void }) {
+  // Celular: en su propio renglón, debajo del precio y el interruptor.
+  return (
+    <label className="order-last flex h-11 basis-full items-center gap-2 text-sm font-semibold sm:order-none sm:basis-auto">
+      <input type="checkbox" checked={marcada} onChange={onCambiar} className="size-5" /> Sin TACC
+    </label>
+  );
+}
+
+// Corta a propósito: más ancha que la caja empuja el interruptor abajo en 360 px. Vacío = "Sin cargo".
+const etiquetaPrecioExtra = (categoria: CategoriaSlug) => (categoria === 'carne' ? 'Extra por porción' : 'Precio extra');
 
 function BotonesGuardar({ sucio, estado, error, onGuardar, onDescartar }: { sucio: boolean; estado: Estado; error: string | null; onGuardar: () => void; onDescartar: () => void }) {
   return (
@@ -249,25 +283,26 @@ function Ingrediente({ inicial }: { inicial: FilaIngrediente }) {
   return (
     <li>
       <Tarjeta apagada={!i.activo}>
-        <div className="flex flex-wrap items-center gap-3">
-          <FotoIngrediente imagen={i.imagen_url} color={i.color_hex} />
-          <input
-            aria-label="Nombre"
-            value={i.nombre}
-            onChange={(e) => f.cambiar('nombre', e.target.value)}
-            className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold"
-          />
-          <div className="flex flex-col items-end">
-            <CampoPesos etiqueta="Precio extra" opcional valor={i.precio_extra} onCambiar={(n) => f.cambiar('precio_extra', n)} />
-            <span className="text-xs text-zinc-500">{i.categoria === 'carne' ? 'opcional · se suma por porción' : 'opcional'}</span>
-          </div>
-          {i.categoria === 'tortilla' && (
-            <label className="flex h-11 items-center gap-2 text-sm font-semibold">
-              <input type="checkbox" checked={i.sin_tacc} onChange={() => f.cambiar('sin_tacc', !i.sin_tacc)} className="size-5" /> Sin TACC
-            </label>
-          )}
-          <Interruptor encendido={i.activo} etiqueta={`${i.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
-        </div>
+        <FilaDatos
+          nombre={
+            <>
+              <FotoIngrediente imagen={i.imagen_url} color={i.color_hex} />
+              <input
+                aria-label="Nombre"
+                value={i.nombre}
+                onChange={(e) => f.cambiar('nombre', e.target.value)}
+                className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-semibold"
+              />
+            </>
+          }
+          controles={
+            <>
+              <CampoPesos etiqueta={etiquetaPrecioExtra(i.categoria)} opcional valor={i.precio_extra} onCambiar={(n) => f.cambiar('precio_extra', n)} />
+              {i.categoria === 'tortilla' && <CasillaSinTacc marcada={i.sin_tacc} onCambiar={() => f.cambiar('sin_tacc', !i.sin_tacc)} />}
+              <Interruptor encendido={i.activo} etiqueta={`${i.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
+            </>
+          }
+        />
         <div className="mt-2 flex justify-end empty:hidden">
           <BotonesGuardar sucio={f.sucio} estado={f.estado} error={f.error} onGuardar={f.guardar} onDescartar={f.descartar} />
         </div>
@@ -281,17 +316,21 @@ function Tamano({ inicial }: { inicial: FilaTamano }) {
   const t = f.fila;
   return (
     <Tarjeta apagada={!t.activo}>
-      <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre" value={t.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-bold" />
-        <CampoPesos etiqueta="Precio" valor={t.precio_base} onCambiar={(n) => f.cambiar('precio_base', n)} />
-        <Interruptor encendido={t.activo} etiqueta={`${t.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
-      </div>
-      <div className="mt-3 flex flex-wrap gap-3">
+      <FilaDatos
+        nombre={<input aria-label="Nombre" value={t.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-bold" />}
+        controles={
+          <>
+            <CampoPesos etiqueta="Precio" valor={t.precio_base} onCambiar={(n) => f.cambiar('precio_base', n)} />
+            <Interruptor encendido={t.activo} etiqueta={`${t.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
+          </>
+        }
+      />
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
         <CampoNumero etiqueta="Carne mín." min={1} max={10} valor={t.min_carnes} onCambiar={(n) => f.cambiar('min_carnes', n)} />
         <CampoNumero etiqueta="Carne máx." min={1} max={10} valor={t.max_carnes} onCambiar={(n) => f.cambiar('max_carnes', n)} />
         <CampoNumero etiqueta="Vegetales máx." min={0} max={20} valor={t.max_vegetales} onCambiar={(n) => f.cambiar('max_vegetales', n)} />
         <CampoNumero etiqueta="Salsas máx." min={0} max={10} valor={t.max_salsas} onCambiar={(n) => f.cambiar('max_salsas', n)} />
-        <p className="self-end pb-2 text-sm text-zinc-600">
+        <p className="col-span-2 text-sm text-zinc-600 sm:self-end sm:pb-2">
           Relleno total: <b>{t.max_carnes + t.max_vegetales}</b>
         </p>
       </div>
@@ -308,13 +347,17 @@ function Combo({ inicial }: { inicial: FilaCombo }) {
   const c = f.fila;
   return (
     <Tarjeta apagada={!c.activo}>
-      <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre" value={c.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-bold" />
-        <label className="flex h-11 items-center gap-2 font-semibold">
-          <input type="checkbox" checked={c.destacado} onChange={() => f.alternar('destacado')} className="size-5" /> Recomendado
-        </label>
-        <Interruptor encendido={c.activo} etiqueta={`${c.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
-      </div>
+      <FilaDatos
+        nombre={<input aria-label="Nombre" value={c.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-bold" />}
+        controles={
+          <>
+            <label className="flex h-11 items-center gap-2 font-semibold">
+              <input type="checkbox" checked={c.destacado} onChange={() => f.alternar('destacado')} className="size-5" /> Recomendado
+            </label>
+            <Interruptor encendido={c.activo} etiqueta={`${c.nombre}: disponible`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
+          </>
+        }
+      />
       <p className="mt-2 text-sm text-zinc-600">{c.receta}</p>
       <textarea
         aria-label="Descripción"
@@ -336,11 +379,17 @@ function Zona({ inicial }: { inicial: FilaZona }) {
   const z = f.fila;
   return (
     <Tarjeta apagada={!z.activo}>
-      <div className="flex flex-wrap items-center gap-3">
-        <input aria-label="Nombre de la zona" value={z.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold" />
-        <CampoPesos etiqueta="Envío" valor={z.costo} onCambiar={(n) => f.cambiar('costo', n)} />
-        <Interruptor encendido={z.activo} textos={["Activa", "Pausada"]} etiqueta={`${z.nombre}: activa`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
-      </div>
+      <FilaDatos
+        nombre={
+          <input aria-label="Nombre de la zona" value={z.nombre} onChange={(e) => f.cambiar('nombre', e.target.value)} className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-semibold" />
+        }
+        controles={
+          <>
+            <CampoPesos etiqueta="Costo de envío" valor={z.costo} onCambiar={(n) => f.cambiar('costo', n)} />
+            <Interruptor encendido={z.activo} textos={['Activa', 'Pausada']} etiqueta={`${z.nombre}: activa`} deshabilitado={f.estado === 'guardando'} onCambiar={() => f.alternar('activo')} />
+          </>
+        }
+      />
       <div className="mt-2 flex justify-end empty:hidden">
         <BotonesGuardar sucio={f.sucio} estado={f.estado} error={f.error} onGuardar={f.guardar} onDescartar={f.descartar} />
       </div>
@@ -412,29 +461,32 @@ function AgregarIngrediente({ categoria, onAgregado }: { categoria: CategoriaSlu
   return (
     <div className="mt-2 rounded-xl border-2 border-zinc-900 bg-white p-3">
       <p className="font-bold">Nuevo: {NOMBRE_SINGULAR[categoria]}</p>
-      <div className="mt-2 flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2" title="Color mientras no haya foto">
-          <span className="sr-only">Color</span>
-          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="size-12 cursor-pointer rounded-full border-2" />
-        </label>
-        <input
-          autoFocus
-          aria-label="Nombre"
-          placeholder={EJEMPLO[categoria]}
-          value={nombre}
-          maxLength={60}
-          onChange={(e) => setNombre(e.target.value)}
-          className="h-11 min-w-[10rem] flex-1 rounded-lg border px-3 text-lg font-semibold"
+      <div className="mt-2">
+        <FilaDatos
+          nombre={
+            <>
+              <label className="flex shrink-0 items-center" title="Color mientras no haya foto">
+                <span className="sr-only">Color</span>
+                <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="size-12 cursor-pointer rounded-full border-2" />
+              </label>
+              <input
+                autoFocus
+                aria-label="Nombre"
+                placeholder={EJEMPLO[categoria]}
+                value={nombre}
+                maxLength={60}
+                onChange={(e) => setNombre(e.target.value)}
+                className="h-11 min-w-0 flex-1 rounded-lg border px-3 text-lg font-semibold"
+              />
+            </>
+          }
+          controles={
+            <>
+              <CampoPesos etiqueta={etiquetaPrecioExtra(categoria)} opcional valor={precio} onCambiar={setPrecio} />
+              {categoria === 'tortilla' && <CasillaSinTacc marcada={sinTacc} onCambiar={() => setSinTacc((v) => !v)} />}
+            </>
+          }
         />
-        <div className="flex flex-col items-end">
-          <CampoPesos etiqueta="Precio extra" opcional valor={precio} onCambiar={setPrecio} />
-          <span className="text-xs text-zinc-500">{categoria === 'carne' ? 'opcional · se suma por porción' : 'opcional'}</span>
-        </div>
-        {categoria === 'tortilla' && (
-          <label className="flex h-11 items-center gap-2 text-sm font-semibold">
-            <input type="checkbox" checked={sinTacc} onChange={() => setSinTacc((v) => !v)} className="size-5" /> Sin TACC
-          </label>
-        )}
       </div>
       <p className="mt-2 text-sm text-zinc-600">Se agrega disponible. Sin foto, la tienda lo muestra con un círculo de este color.</p>
       {error && <p className="mt-1 font-semibold text-red-700">{error}</p>}

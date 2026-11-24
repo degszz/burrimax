@@ -31,6 +31,15 @@ export default function TableroPedidos() {
   const [ahora, setAhora] = useState(() => Date.now());
   const conocidos = useRef<Set<string> | null>(null);
   const audio = useRef<AudioContext | null>(null);
+  const pestanas = useRef<HTMLDivElement>(null);
+  const tablero = useRef<HTMLDivElement>(null);
+
+  // Si estaba más abajo, vuelve al principio de la otra lista (si no, se ve el medio o nada).
+  function elegirColumna(estado: EstadoPedido) {
+    setColumnaMovil(estado);
+    const arriba = pestanas.current?.getBoundingClientRect().bottom ?? 0;
+    if (tablero.current && tablero.current.getBoundingClientRect().top < arriba) tablero.current.scrollIntoView({ block: 'start' });
+  }
 
   const sonar = useCallback(() => {
     const ctx = audio.current;
@@ -180,14 +189,19 @@ export default function TableroPedidos() {
           </p>
         )}
         {aviso && (
-          <p role="status" className="fixed inset-x-4 top-16 z-50 mx-auto max-w-md rounded-xl bg-zinc-900 p-3 text-center font-semibold text-white shadow-lg">
+          <p role="status" className="fixed inset-x-4 top-[calc(var(--alto-menu)+0.75rem)] z-50 mx-auto max-w-md rounded-xl bg-zinc-900 p-3 text-center font-semibold text-white shadow-lg">
             ✓ {aviso}
           </p>
         )}
 
         {/* Celular: pestañas por estado (una lista a la vez) */}
         {pedidos && (
-          <div role="tablist" aria-label="Estados" className="sticky top-[60px] z-20 -mx-4 mb-3 flex gap-2 overflow-x-auto bg-zinc-100 px-4 py-2 md:hidden">
+          <div
+            ref={pestanas}
+            role="tablist"
+            aria-label="Estados"
+            className="sticky top-(--alto-menu) z-20 -mx-4 mb-3 flex gap-2 overflow-x-auto bg-zinc-100 px-4 py-2 md:hidden"
+          >
             {COLUMNAS.map((col) => {
               const n = pedidos.filter((p) => p.estado === col.estado).length;
               const hayNuevo = pedidos.some((p) => p.estado === col.estado && nuevos.has(p.id));
@@ -197,7 +211,7 @@ export default function TableroPedidos() {
                   role="tab"
                   type="button"
                   aria-selected={columnaMovil === col.estado}
-                  onClick={() => setColumnaMovil(col.estado)}
+                  onClick={() => elegirColumna(col.estado)}
                   className={`relative flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 font-semibold ${columnaMovil === col.estado ? 'bg-zinc-900 text-white' : 'bg-white'}`}
                 >
                   {col.titulo}
@@ -212,7 +226,7 @@ export default function TableroPedidos() {
         {pedidos === null ? (
           <p className="py-20 text-center text-lg text-zinc-500">Cargando pedidos…</p>
         ) : (
-          <div className="pb-4 md:flex md:gap-4 md:overflow-x-auto xl:grid xl:grid-cols-5 xl:overflow-visible">
+          <div ref={tablero} className="scroll-mt-16 pb-4 md:flex md:gap-4 md:overflow-x-auto xl:grid xl:grid-cols-5 xl:overflow-visible">
             {COLUMNAS.map((col) => {
               const lista = pedidos.filter((p) => p.estado === col.estado);
               return (
@@ -341,14 +355,14 @@ function Tarjeta({ pedido: p, nuevo, ocupado, minutos, onAvanzar, onPagado, onCa
       </ul>
       {p.notas && <p className="mt-2 rounded-lg bg-amber-50 p-2 text-sm font-semibold">📝 {p.notas}</p>}
 
-      <div className="mt-3 flex items-center justify-between border-t pt-3">
+      <div className="mt-3 flex items-center justify-between gap-3 border-t pt-3">
         <span className="text-sm">
           {NOMBRE_PAGO[p.metodoPago]} ·{' '}
           <b className={p.estadoPago === 'aprobado' ? 'text-green-700' : 'text-amber-700'}>{p.estadoPago === 'aprobado' ? 'Pagado' : 'Sin pagar'}</b>
           {p.metodoPago === 'efectivo' && p.pagaCon ? (
             <>
               <br />
-              Paga con {pesos(p.pagaCon)} · <b>vuelto {pesos(p.pagaCon - p.total)}</b>
+              Paga con {pesos(p.pagaCon)} · <b className="whitespace-nowrap">vuelto {pesos(p.pagaCon - p.total)}</b>
             </>
           ) : null}
         </span>

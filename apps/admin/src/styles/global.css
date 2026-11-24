@@ -117,12 +117,31 @@
     --sidebar-ring: oklch(0.556 0 0);
 }
 
+/*
+ * Barras fijas del panel. Celular: menú abajo (al alcance del pulgar) y la
+ * barra de arriba se va con el scroll. Tablet/PC: menú arriba, fijo.
+ */
+:root {
+    --alto-menu: 0px;
+    --alto-nav: calc(4rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 48rem) {
+    :root {
+        --alto-menu: 3.75rem;
+        --alto-nav: 0px;
+    }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
     }
   body {
     @apply bg-background text-foreground;
+    /* Celular acostado: que nada quede debajo de la cámara. */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     }
   html {
     @apply font-sans;

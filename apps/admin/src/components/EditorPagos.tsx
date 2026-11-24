@@ -205,7 +205,8 @@ export default function EditorPagos({ pagosIniciales, transferenciaInicial }: Pr
         )}
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 border-t bg-white/95 p-3 backdrop-blur">
+      {/* En el celular va encima del menú de abajo. */}
+      <div className="fixed inset-x-0 bottom-(--alto-nav) z-30 border-t bg-white/95 p-3 backdrop-blur md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <span className="text-sm font-semibold" aria-live="polite">
             {estado === 'guardado' && <span className="text-green-700">✓ Guardado. La tienda ya lo muestra.</span>}
