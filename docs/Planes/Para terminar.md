@@ -50,7 +50,7 @@ Falta:
 
 ## 5. Lanzamiento
 
-16. Textos legales (términos, celíacos; `/privacidad` ya está).
+16. ~~Textos legales~~: `/terminos` (con aviso para celíacos en `#celiacos`) y `/privacidad`, enlazados en el pie (2026-11-24). Falta nombre legal y CUIT. El alias `maxilmnz` es de Lemon: da igual, las transferencias por alias andan entre bancos y billeteras.
 17. Lighthouse mobile > 85.
 18. Prueba con 5 personas (al menos una mayor de 60).
 19. Opcional después: render del burrito enrollado, "Así hacemos tu burrito", AR con escaneo 3D.
