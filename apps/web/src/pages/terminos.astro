@@ -1,0 +1,54 @@
+---
+import Base from '@/layouts/Base.astro';
+import { MARCA } from '@/lib/marca';
+
+// Términos y condiciones de compra, con el aviso para celíacos.
+// Falta el nombre legal y el CUIT del responsable (docs/10 Preguntas abiertas.md).
+export const prerender = true;
+const actualizada = '24 de noviembre de 2026';
+---
+
+<Base titulo="Términos y condiciones" descripcion={`Cómo funcionan los pedidos, pagos y envíos de ${MARCA.nombre}.`}>
+  <main class="mx-auto max-w-2xl px-4 py-10 text-lg leading-relaxed">
+    <a href="/" class="font-heading font-extrabold text-rojo underline">← Volver a la tienda</a>
+    <h1 class="mt-4 text-4xl font-extrabold">Términos y condiciones</h1>
+    <p class="mt-2 text-tinta-suave">Última actualización: {actualizada}</p>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Pedidos</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Tomamos pedidos solo en el horario que muestra la tienda. Fuera de ese horario no se pueden enviar.</li>
+      <li>Al enviar tu pedido te damos un número y un link para seguirlo. Si algo no se puede preparar, te avisamos por WhatsApp antes de cocinar.</li>
+      <li>Cada burrito incluye papas fritas. Las fotos son ilustrativas.</li>
+    </ul>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Precios y pagos</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Los precios están en pesos argentinos e incluyen impuestos. El total que vale es el que te mostramos al confirmar.</li>
+      <li>Podés pagar en efectivo al recibir, por transferencia o, cuando esté disponible, con Mercado Pago.</li>
+      <li>Con transferencia, empezamos a preparar el pedido cuando recibimos el pago.</li>
+    </ul>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Envíos y retiro</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Enviamos solo a las zonas que ofrece la tienda, con el costo que se muestra antes de confirmar.</li>
+      <li>Los tiempos de entrega son aproximados y pueden cambiar en horarios de mucha demanda o por el clima.</li>
+      <li>Si nadie recibe el pedido, te escribimos por WhatsApp para coordinar.</li>
+    </ul>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Cancelaciones y reclamos</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-6">
+      <li>Podés cancelar sin costo mientras el pedido no esté en preparación. Si ya pagaste, te devolvemos el total por el mismo medio.</li>
+      <li>Si algo llegó mal o falta algo, escribinos por WhatsApp el mismo día y lo resolvemos.</li>
+      <li>Tenés derecho a arrepentirte según la Ley 24.240 de Defensa del Consumidor, salvo en comida ya preparada o entregada, por ser un producto perecedero.</li>
+    </ul>
+
+    <h2 id="celiacos" class="mt-8 text-2xl font-extrabold">Aviso para celíacos y alergias</h2>
+    <p class="mt-2">
+      Cocinamos en una cocina compartida donde se usan harina de trigo y otros ingredientes con TACC. Aunque un ingrediente no tenga TACC, <b>no podemos garantizar
+      que no haya contaminación cruzada</b>. Si sos celíaco o tenés una alergia, consultanos por WhatsApp antes de pedir.
+    </p>
+
+    <h2 class="mt-8 text-2xl font-extrabold">Tus datos</h2>
+    <p class="mt-2">Cómo usamos tus datos está en la <a href="/privacidad" class="font-bold underline">política de privacidad</a>.</p>
+  </main>
+</Base>

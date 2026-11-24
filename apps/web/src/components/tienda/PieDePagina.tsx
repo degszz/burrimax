@@ -37,6 +37,11 @@ export function PieDePagina({ whatsapp }: { whatsapp: string | null }) {
       <p className="mt-3 text-center text-xs opacity-80 sm:text-left">
         © {new Date().getFullYear()} {MARCA.nombre} · Papas fritas incluidas en cada burrito
       </p>
+      <nav aria-label="Legales" className="mt-1 flex justify-center gap-1 text-xs sm:justify-start">
+        <a href="/terminos" className="inline-flex min-h-12 items-center px-2 underline hover:text-tinta">Términos</a>
+        <a href="/terminos#celiacos" className="inline-flex min-h-12 items-center px-2 underline hover:text-tinta">Celíacos</a>
+        <a href="/privacidad" className="inline-flex min-h-12 items-center px-2 underline hover:text-tinta">Privacidad</a>
+      </nav>
     </footer>
   );
 }
