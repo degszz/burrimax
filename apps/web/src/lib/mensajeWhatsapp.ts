@@ -8,7 +8,8 @@ export interface DatosMensaje {
   nombre: string;
   items: { armado: Armado; precio: number }[];
   entrega: { tipo: 'delivery'; direccion: string; referencias?: string } | { tipo: 'retiro' };
-  pago: { metodo: string; pagaCon?: number };
+  /** alias: solo en transferencia, para que quede a mano en el chat. */
+  pago: { metodo: string; pagaCon?: number; alias?: string | null };
   total: number;
   notas?: string;
   urlSeguimiento: string | null;
@@ -51,6 +52,7 @@ export function mensajePedido(datos: DatosMensaje, catalogo: Catalogo): string {
   }
   const pagaCon = datos.pago.pagaCon ? ` (pago con ${formatoPesos(datos.pago.pagaCon)})` : '';
   lineas.push(`💵 Pago: ${NOMBRES_PAGO[datos.pago.metodo] ?? datos.pago.metodo}${pagaCon}`);
+  if (datos.pago.metodo === 'transferencia' && datos.pago.alias) lineas.push(`   Alias: ${datos.pago.alias}`);
   if (datos.notas) lineas.push(`📝 ${datos.notas}`);
   lineas.push(`*Total: ${formatoPesos(datos.total)}*`);
   if (datos.urlSeguimiento) lineas.push('', `Seguimiento: ${datos.urlSeguimiento}`);

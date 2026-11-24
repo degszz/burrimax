@@ -42,6 +42,14 @@ describe('mensaje de WhatsApp', () => {
     expect(texto).not.toContain('Envío a');
   });
 
+  it('transferencia: el alias queda en el mensaje', () => {
+    const texto = mensajePedido(
+      { numero: 1, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'transferencia', alias: 'maxilmnz' }, total: 18000, urlSeguimiento: 'u' },
+      catalogoEjemplo,
+    );
+    expect(texto).toContain('Alias: maxilmnz');
+  });
+
   it('sin número ni seguimiento (la web no pudo guardarlo) igual arma el mensaje', () => {
     const texto = mensajePedido(
       { numero: null, nombre: 'Leo', items: [{ armado, precio: 9000 }], entrega: { tipo: 'retiro' }, pago: { metodo: 'efectivo' }, total: 18000, urlSeguimiento: null },

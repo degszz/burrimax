@@ -153,7 +153,11 @@ export default function Checkout({ catalogo, pagos, abierto, whatsapp, transfere
             entrega: delivery
               ? { tipo: 'delivery', direccion: datos.direccion, referencias: datos.referencias || undefined }
               : { tipo: 'retiro' },
-            pago: { metodo: elegido ?? '', pagaCon: elegido === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined },
+            pago: {
+              metodo: elegido ?? '',
+              pagaCon: elegido === 'efectivo' && pagaCon ? Number(pagaCon.replace(/\D/g, '')) : undefined,
+              alias: elegido === 'transferencia' ? transferencia.alias : null,
+            },
             total,
             notas: entrada.notas,
             urlSeguimiento: url,
