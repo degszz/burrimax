@@ -14,8 +14,12 @@ Estado real revisado en Vercel, Supabase y el repo. Orden = prioridad.
 | 1 | **Pago de prueba de Mercado Pago** | Max | Webhook de Prueba ya configurado y la web confirma los pagos con la API de MP (2026-11-21). Falta pagar el #0010 desde Edge InPrivate: ver [[Bitácora/2026-11-21]]. |
 | 2 | Credenciales de **producción** de MP | Max | Cuando la prueba pase a "pagado" solo por webhook. |
 | 3 | **`VAPID_PRIVATE_KEY`** en Vercel (tienda) | Max | No está cargada: los avisos de pedido nuevo al celular no salen. Está en `apps/web/.env`. |
-| 4 | **Publicar el admin** | Max | No existe el proyecto en Vercel. Nuevo proyecto, Root Directory `apps/admin`, con las variables de Supabase (y las de WhatsApp cuando estén). |
-| 5 | Cambios del admin sin subir | Claude | Hay cambios de otra sesión en `apps/admin` (catálogo, horarios, pagos, stock, tablero, estilos) y `docs/Bitácora/2026-11-10.md`. Revisarlos, probarlos y subirlos o descartarlos con Max. |
+| 4 | ~~Publicar el admin~~ | Claude | Hecho 2026-11-24: proyecto `burrimax-admin` en Vercel, https://burrimax-admin.vercel.app (Root `apps/admin`, variables públicas de Supabase). |
+| 5 | ~~Cambios del admin sin subir~~ | Claude | Revisados y subidos 2026-11-24 (panel cómodo en el celular). |
+
+**Mercado Pago (2026-11-24):** los avisos llegan con firma válida y se procesan una vez; en revisión y rechazado no marcan pagado. Las tarjetas de prueba salen rechazadas (la clave parece de la cuenta real). Se confirma con un pedido real chico de Max en producción. Mientras tanto Max decide con el interruptor de **Pagos** en el admin; efectivo y transferencia (alias `maxilmnz`) quedan siempre.
+
+**WhatsApp automático: en pausa** (2026-11-24) hasta que Max tenga otro chip. La sección 2 queda para después del lanzamiento.
 
 ## 2. WhatsApp automático con IA
 
