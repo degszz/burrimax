@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { TIENDA } from '@/lib/catalogo';
-import { achicarFoto, quitarArchivo, subirArchivo, type DestinoSubida } from '@/lib/subir';
+import { achicarFoto, quitarArchivo, subirArchivo } from '@/lib/subir';
 
 type Estado = { tipo: 'quieto' } | { tipo: 'subiendo' } | { tipo: 'listo' } | { tipo: 'error'; mensaje: string };
 
@@ -79,42 +79,40 @@ export function FotoCombo({ id, nombre, inicial }: { id: string; nombre: string;
   );
 }
 
-/** El burrito escaneado en 3D: uno solo, para todos los combos. */
-export function Modelo3D({ glb, usdz }: { glb: string | null; usdz: string | null }) {
-  return (
-    <section className="rounded-2xl border-2 border-zinc-900 bg-white p-4">
-      <h2 className="text-lg font-bold">Burrito en 3D</h2>
-      <p className="text-sm text-zinc-600">
-        Uno solo para todos los combos. Con el .glb la tienda muestra el botón "Verlo en 3D" (girarlo, acercarlo y, en Android, verlo en tu
-        mesa). El .usdz es para ver en tu mesa desde iPhone.
-      </p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <ArchivoModelo destino="glb" titulo="Modelo .glb (web y Android)" inicial={glb} />
-        <ArchivoModelo destino="usdz" titulo="Modelo .usdz (iPhone, opcional)" inicial={usdz} />
-      </div>
-    </section>
-  );
-}
-
-function ArchivoModelo({ destino, titulo, inicial }: { destino: Extract<DestinoSubida, 'glb' | 'usdz'>; titulo: string; inicial: string | null }) {
-  const [url, setUrl] = useState(inicial);
+/**
+ * El burrito escaneado en 3D: uno solo, para todos los combos. Antes de subirlo
+ * se pone en tamaño real con el largo que mide Max (las apps de escaneo no
+ * siempre lo guardan bien) y se apoya en la mesa.
+ */
+export function Modelo3D({ glb }: { glb: string | null }) {
+  const [url, setUrl] = useState(glb);
+  const [largo, setLargo] = useState('');
   const [estado, setEstado] = useState<Estado>({ tipo: 'quieto' });
+  const [nota, setNota] = useState<string | null>(null);
   const entrada = useRef<HTMLInputElement>(null);
+  const cm = Number(largo.replace(',', '.'));
+  const largoOk = cm >= 5 && cm <= 100;
 
   async function elegir(archivo: File | undefined) {
     if (!archivo) return;
-    const extension = archivo.name.split('.').pop()?.toLowerCase() ?? '';
-    if (extension !== destino) {
-      setEstado({ tipo: 'error', mensaje: `Elegí un archivo .${destino}` });
+    setNota(null);
+    if (!archivo.name.toLowerCase().endsWith('.glb')) {
+      setEstado({ tipo: 'error', mensaje: 'Elegí el archivo .glb que exporta la app de escaneo' });
       return;
     }
     if (archivo.size > 50 * 1024 * 1024) {
-      setEstado({ tipo: 'error', mensaje: 'Pesa más de 50 MB: exportalo más liviano' });
+      setEstado({ tipo: 'error', mensaje: 'Pesa más de 50 MB: exportalo en calidad media' });
       return;
     }
     setEstado({ tipo: 'subiendo' });
     try {
-      setUrl(await subirArchivo(destino, archivo, destino));
+      const { ajustarModelo } = await import('@/lib/modelo');
+      const ajustado = await ajustarModelo(archivo, cm).catch(() => null);
+      if (!ajustado) setNota('No pudimos ajustar el tamaño de este archivo: se subió tal cual.');
+      else if (Math.abs(ajustado.largoOriginalCm - cm) > cm * 0.15) {
+        setNota(`El escaneo medía ${Math.round(ajustado.largoOriginalCm)} cm: lo dejamos en ${cm} cm, el tamaño real.`);
+      }
+      setUrl(await subirArchivo('glb', ajustado?.archivo ?? archivo, 'glb'));
       setEstado({ tipo: 'listo' });
     } catch (e) {
       setEstado({ tipo: 'error', mensaje: mensaje(e) });
@@ -126,7 +124,8 @@ function ArchivoModelo({ destino, titulo, inicial }: { destino: Extract<DestinoS
   async function quitar() {
     setEstado({ tipo: 'subiendo' });
     try {
-      await quitarArchivo(destino);
+      await quitarArchivo('glb');
+      await quitarArchivo('usdz');
       setUrl(null);
       setEstado({ tipo: 'listo' });
     } catch (e) {
@@ -135,21 +134,43 @@ function ArchivoModelo({ destino, titulo, inicial }: { destino: Extract<DestinoS
   }
 
   return (
-    <div className="space-y-2 rounded-xl bg-zinc-50 p-3">
-      <p className="font-semibold">{titulo}</p>
-      <p className="text-sm text-zinc-600">{url ? '✓ Cargado' : 'Sin cargar'}</p>
-      <div className="flex flex-wrap gap-2">
-        <label className={`flex h-11 cursor-pointer items-center rounded-xl border-2 border-zinc-900 bg-white px-4 font-semibold hover:bg-zinc-100 ${estado.tipo === 'subiendo' ? 'pointer-events-none opacity-50' : ''}`}>
-          {url ? 'Cambiar archivo' : 'Subir archivo'}
-          <input ref={entrada} type="file" accept={`.${destino}`} className="sr-only" onChange={(e) => elegir(e.target.files?.[0])} />
+    <section className="rounded-2xl border-2 border-zinc-900 bg-white p-4">
+      <h2 className="text-lg font-bold">Burrito en 3D</h2>
+      <p className="text-sm text-zinc-600">
+        Uno solo para todos los combos. Con el modelo cargado, la tienda muestra "Verlo en 3D" (girarlo, acercarlo y ponerlo en la mesa
+        en tamaño real) en los combos y al terminar de armar. Cómo escanearlo: docs, guía "Escaneo 3D del burrito".
+      </p>
+      <p className="mt-2 font-semibold">{url ? '✓ Modelo cargado' : 'Todavía no hay modelo'}</p>
+
+      <div className="mt-3 flex flex-wrap items-end gap-3">
+        <label className="block">
+          <span className="block font-semibold">Largo real (cm)</span>
+          <span className="block text-sm text-zinc-500">Medí con una regla lo más largo de lo que escaneaste</span>
+          <input
+            inputMode="decimal"
+            value={largo}
+            onChange={(e) => setLargo(e.target.value)}
+            placeholder="Ej. 22"
+            className="mt-1 h-12 w-32 rounded-lg border px-3 text-lg"
+          />
+        </label>
+        <label
+          className={`flex h-12 cursor-pointer items-center rounded-xl border-2 border-zinc-900 bg-white px-4 font-semibold hover:bg-zinc-100 ${!largoOk || estado.tipo === 'subiendo' ? 'pointer-events-none opacity-40' : ''}`}
+        >
+          {url ? 'Cambiar modelo (.glb)' : 'Subir modelo (.glb)'}
+          <input ref={entrada} type="file" accept=".glb" disabled={!largoOk} className="sr-only" onChange={(e) => elegir(e.target.files?.[0])} />
         </label>
         {url && (
-          <button type="button" onClick={quitar} disabled={estado.tipo === 'subiendo'} className="h-11 rounded-xl px-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50">
-            Quitar
+          <button type="button" onClick={quitar} disabled={estado.tipo === 'subiendo'} className="h-12 rounded-xl px-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50">
+            Quitar modelo
           </button>
         )}
       </div>
-      <Aviso estado={estado} />
-    </div>
+      {!largoOk && <p className="mt-1 text-sm text-zinc-500">Primero poné el largo (entre 5 y 100 cm).</p>}
+      {nota && <p className="mt-2 text-sm font-semibold text-amber-700">{nota}</p>}
+      <div className="mt-1">
+        <Aviso estado={estado} />
+      </div>
+    </section>
   );
 }

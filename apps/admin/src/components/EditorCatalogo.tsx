@@ -97,7 +97,7 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas, m
           <p className="text-sm text-zinc-600">
             Los combos aparecen en la tienda debajo de la portada. El precio sale solo de su tamaño + ingredientes.
           </p>
-          <Modelo3D glb={modelo.glb} usdz={modelo.usdz} />
+          <Modelo3D glb={modelo.glb} />
           {editandoCombo === 'nuevo' ? (
             <EditorCombo tamanos={tamanos} ingredientes={listaIngredientes} onCerrar={() => setEditandoCombo(null)} />
           ) : (
