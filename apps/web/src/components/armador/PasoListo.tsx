@@ -20,11 +20,13 @@ interface Props {
   onNombre: (nombre: string) => void;
   onAgregar: () => void;
   onGuardar: () => void;
+  /** El burrito en 3D cargado en el admin. */
+  modeloSubido?: { glb: string; usdz: string | null } | null;
 }
 
 const ETIQUETAS: Record<CategoriaSlug, string> = { tortilla: 'Tortilla', salsa: 'Salsas', carne: 'Carne', vegetal: 'Vegetales' };
 
-export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCantidad, onNombre, onAgregar, onGuardar }: Props) {
+export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCantidad, onNombre, onAgregar, onGuardar, modeloSubido }: Props) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const buscar = (id: string) => catalogo.ingredientes.find((i) => i.id === id);
   const tortilla = armado.seleccion.tortilla[0] ? buscar(armado.seleccion.tortilla[0]) : undefined;
@@ -36,11 +38,11 @@ export function PasoListo({ armado, catalogo, nombre, editando, onCambiar, onCan
   const [modelo, setModelo] = useState<Modelo3D | null>(null);
   useEffect(() => {
     let vivo = true;
-    modelo3D(doble ? 'doble' : 'simple').then((m) => vivo && setModelo(m));
+    modelo3D(doble ? 'doble' : 'simple', modeloSubido).then((m) => vivo && setModelo(m));
     return () => {
       vivo = false;
     };
-  }, [doble]);
+  }, [doble, modeloSubido]);
 
   return (
     <section aria-labelledby="titulo-listo" className="animate-aparecer px-4 pb-8">

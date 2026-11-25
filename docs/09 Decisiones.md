@@ -202,6 +202,6 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 ## 2026-11-25 · Fotos de combos y burrito en 3D desde el admin
 - **Fotos de combos:** Catálogo → Combos → "Subir foto". Se achica en el navegador (WebP 900 px) y va al bucket público `combos`; la URL queda en `productos.imagen_url`. La tienda pone las papas de siempre al lado.
 - **Burrito en 3D:** uno solo para todos los combos. `.glb` (web y Android) y `.usdz` opcional (iPhone) en el bucket público `modelos`; URLs en `config_negocio.modelo_burrito_glb/usdz`. Con el .glb la tienda muestra "Verlo en 3D" en Combos de la casa.
-- **Visor:** `@google/model-viewer` 4.4.0, cargado recién al abrir (la portada no baja nada de 3D). `ar-scale="fixed"`: en "Verlo en tu mesa" se ve en tamaño real, así que el modelo tiene que estar en metros.
+- **Visor:** el mismo de "Verlo en mi mesa" del último paso (`VerEnMiMesa3D`, `@google/model-viewer` 4.4.0, se baja recién al abrir). El modelo del admin tiene prioridad sobre los archivos fijos de `public/modelos/`. `ar-scale="fixed"`: en "Verlo en tu mesa" se ve en tamaño real, así que el modelo tiene que estar en metros.
 - **Subida directa a Storage** con URL firmada (`/api/subidas`): Vercel no acepta archivos grandes en sus funciones. Solo el admin (rol + MFA) puede subir o borrar.
 - El armador sigue sin WebGL (decisión anterior): el 3D es un visor aparte y opcional.

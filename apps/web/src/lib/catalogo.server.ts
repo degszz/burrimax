@@ -31,12 +31,13 @@ export interface ConfigTienda {
   /** Número de Max para hablar con una persona (solo dígitos). */
   whatsappAtencion: string | null;
   /** El burrito escaneado en 3D (cargado en el admin), o null si todavía no hay. */
-  modelo3d: Modelo3D | null;
+  modelo3d: ModeloSubido | null;
 }
 
-export interface Modelo3D {
+/** El burrito en 3D cargado en el admin (uno para todos los tamaños y combos). */
+export interface ModeloSubido {
   glb: string;
-  /** Para "ver en tu mesa" en iPhone. */
+  /** Para "ver en tu mesa" en iPhone (si falta, model-viewer lo arma desde el .glb). */
   usdz: string | null;
 }
 

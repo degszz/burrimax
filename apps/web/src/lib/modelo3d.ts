@@ -1,4 +1,6 @@
 // Modelos 3D del burrito para "Verlo en mi mesa" con realidad aumentada.
+// Primero el que Max sube desde el admin (Catálogo → Combos → Burrito en 3D);
+// si no hay, los archivos fijos de abajo.
 // Uno por tamaño, en apps/web/public/modelos/:
 //   burrito-simple.glb · burrito-doble.glb  → Android (Scene Viewer) y el visor 3D
 //   burrito-simple.usdz · burrito-doble.usdz → iPhone (Quick Look). OPCIONALES:
@@ -33,7 +35,8 @@ function hayArchivo(url: string): Promise<boolean> {
 }
 
 /** El modelo para ese tamaño, el del otro tamaño, el genérico viejo (`burrito.glb`) o null. */
-export async function modelo3D(tamano: TamanoModelo): Promise<Modelo3D | null> {
+export async function modelo3D(tamano: TamanoModelo, subido?: { glb: string; usdz: string | null } | null): Promise<Modelo3D | null> {
+  if (subido) return { glb: subido.glb, usdz: subido.usdz, tamano: 'generico' };
   const otro: TamanoModelo = tamano === 'simple' ? 'doble' : 'simple';
   const candidatos: [string, Modelo3D['tamano']][] = [
     [`burrito-${tamano}`, tamano],

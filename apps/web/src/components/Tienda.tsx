@@ -10,7 +10,7 @@ import { PasoListo } from './armador/PasoListo';
 import { ResumenFlotante } from './armador/ResumenFlotante';
 import { SelectorTamano } from './armador/SelectorTamano';
 import { TarjetaIngrediente } from './armador/TarjetaIngrediente';
-import type { Modelo3D } from '@/lib/catalogo.server';
+import type { ModeloSubido } from '@/lib/catalogo.server';
 import { CombosCasa } from './tienda/CombosCasa';
 import { Encabezado } from './tienda/Encabezado';
 import { HeroArmar } from './tienda/HeroArmar';
@@ -44,7 +44,7 @@ interface Props {
   /** Solo dígitos, o null si todavía no está cargado. */
   whatsapp: string | null;
   /** El burrito en 3D cargado en el admin (null: no se muestra el botón). */
-  modelo3d: Modelo3D | null;
+  modelo3d: ModeloSubido | null;
 }
 
 // Ingredientes de la mini demostración del hero: alcanzan para llenar la zona
@@ -410,6 +410,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
           <section id="armador" aria-label="Tu burrito está listo" className="space-y-2 pt-1 lg:mx-auto lg:max-w-xl">
             <BarraPasos actual={5} alcanzable={5} onIr={irAPaso} />
             <PasoListo
+              modeloSubido={modelo3d}
               armado={armado}
               catalogo={catalogo}
               nombre={estado.nombre}

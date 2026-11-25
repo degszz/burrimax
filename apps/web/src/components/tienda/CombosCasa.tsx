@@ -3,7 +3,7 @@ import { ChevronDown, Pencil, ShoppingBag, Sparkles } from 'lucide-react';
 import { formatoPesos } from '@/lib/formato';
 import type { ComboCasa } from '@/lib/catalogo.server';
 import { cn } from '@/lib/utils';
-import type { Modelo3D } from '@/lib/catalogo.server';
+import type { ModeloSubido } from '@/lib/catalogo.server';
 import { BurritoConPapas } from '../armador/BurritoConPapas';
 import { BotonVer3D } from './Visor3D';
 import { resumenCorto } from './MisCombos';
@@ -14,7 +14,7 @@ interface Props {
   /** El último burrito que armó la persona (aunque no lo haya guardado). */
   tuBurrito: Armado | null;
   /** El burrito en 3D (uno para todos los combos). */
-  modelo3d: Modelo3D | null;
+  modelo3d: ModeloSubido | null;
   /** Cuántos combos tiene guardados en el celular. */
   guardados: number;
   guardadosAbiertos: boolean;
