@@ -15,7 +15,10 @@ interface Props {
   /** Ingredientes para la mini demostración (6). */
   demo: IngredienteCatalogo[];
   whatsapp: string | null;
+  /** Seguir con el burrito a medio armar (botón rojo, solo si hay uno). */
   onArmar: () => void;
+  /** Armar uno nuevo desde cero (botón amarillo y la muestra de ingredientes). */
+  onEmpezar: () => void;
   className?: string;
 }
 
@@ -25,8 +28,7 @@ interface Props {
  * desenfoca hacia abajo, con el botón encima. No ocupa toda la pantalla: abajo
  * asoman los combos de la casa.
  */
-export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, className }: Props) {
-  const textoBoton = enCurso ? 'Seguir armando el mío' : 'Armá tu burrito';
+export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, onEmpezar, className }: Props) {
   const instagram = urlInstagram();
 
   return (
@@ -45,7 +47,8 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
         </div>
 
         <div className="mx-auto mt-3 flex max-w-sm flex-col gap-2.5 lg:mx-0 lg:mt-6">
-          <BotonArmar texto={textoBoton} onArmar={onArmar} />
+          {/* Solo si dejó uno a medio armar: para empezar de cero está el amarillo de abajo */}
+          {enCurso && <BotonArmar texto="Seguir armando el mío" onArmar={onArmar} />}
           {/* Instagram se ve aunque todavía no tenga link (Max lo crea y lo pasa). */}
           <div className="grid grid-cols-2 gap-2.5">
             <BotonRed href={instagram} etiqueta="Instagram" icono={<IconoInstagram className="size-5" />} />
@@ -55,7 +58,7 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
       </div>
 
       {/* El armador asoma a todo el ancho y se desenfoca hacia abajo */}
-      <DemoArmador ingredientes={demo} textoBoton={textoBoton} onArmar={onArmar} />
+      <DemoArmador ingredientes={demo} textoBoton="Empezar a armar" onArmar={onEmpezar} />
     </section>
   );
 }

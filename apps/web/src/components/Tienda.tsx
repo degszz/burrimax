@@ -175,6 +175,12 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
     estado.seleccion.tortilla.length + estado.seleccion.salsa.length + estado.seleccion.carne.length + estado.seleccion.vegetal.length >
       0 || !!estado.editandoItemId;
 
+  /** Botón amarillo: un burrito nuevo desde cero (el que estaba a medio armar se descarta). */
+  function empezarDeCero() {
+    if (enCurso) estado.reset(armado.tamanoId);
+    abrirArmador();
+  }
+
   function borrarArmado() {
     const previo = useArmador.getState();
     const copia = {
@@ -334,6 +340,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
             demo={ingredientesDemo}
             whatsapp={whatsapp}
             onArmar={abrirArmador}
+            onEmpezar={empezarDeCero}
           />
         )}
         {armando && (
