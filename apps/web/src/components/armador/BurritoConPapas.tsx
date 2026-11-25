@@ -5,6 +5,8 @@ interface Props {
   doble: boolean;
   /** Slug de la tortilla elegida (`tortilla-maiz`, `tortilla-trigo`…). */
   tortilla?: string;
+  /** Foto propia del burrito (combos cargados en el admin). Las papas van igual. */
+  foto?: string | null;
   className?: string;
 }
 
@@ -15,9 +17,10 @@ const BASE = '/armador/burrito-cerrado';
  * Busca primero la foto específica (doble y/o maíz) y, si todavía no existe,
  * usa la misma foto base para todos (pedido de Max, hasta tener las fotos).
  */
-export function BurritoConPapas({ doble, tortilla, className }: Props) {
+export function BurritoConPapas({ doble, tortilla, foto, className }: Props) {
   const maiz = tortilla === 'tortilla-maiz';
   const candidatos = [
+    foto,
     doble && maiz && `${BASE}-doble-maiz.avif`,
     doble && `${BASE}-doble.avif`,
     maiz && `${BASE}-maiz.avif`,

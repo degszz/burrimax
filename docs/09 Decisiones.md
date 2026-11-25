@@ -198,3 +198,10 @@ Max: "obviamente está efectivo o transferencia; cuando elegís transferencia, q
 - Max aprobó la excepción a la regla 4: sin firma válida, el aviso no se cree. La web consulta el pago a la API de MP con nuestra clave y, antes de guardar nada, exige que exista y sea de un pedido.
 - Sin firma solo se aplica un pago **aprobado** con monto exacto, o la devolución del mismo pago; nunca "rechazado" (evita reenviar un intento viejo). El id del evento sale de MP.
 - Pendiente: cuando MP deje ver la firma, cargarla en `MP_WEBHOOK_SECRET` y volver a exigirla.
+
+## 2026-11-25 · Fotos de combos y burrito en 3D desde el admin
+- **Fotos de combos:** Catálogo → Combos → "Subir foto". Se achica en el navegador (WebP 900 px) y va al bucket público `combos`; la URL queda en `productos.imagen_url`. La tienda pone las papas de siempre al lado.
+- **Burrito en 3D:** uno solo para todos los combos. `.glb` (web y Android) y `.usdz` opcional (iPhone) en el bucket público `modelos`; URLs en `config_negocio.modelo_burrito_glb/usdz`. Con el .glb la tienda muestra "Verlo en 3D" en Combos de la casa.
+- **Visor:** `@google/model-viewer` 4.4.0, cargado recién al abrir (la portada no baja nada de 3D). `ar-scale="fixed"`: en "Verlo en tu mesa" se ve en tamaño real, así que el modelo tiene que estar en metros.
+- **Subida directa a Storage** con URL firmada (`/api/subidas`): Vercel no acepta archivos grandes en sus funciones. Solo el admin (rol + MFA) puede subir o borrar.
+- El armador sigue sin WebGL (decisión anterior): el 3D es un visor aparte y opcional.

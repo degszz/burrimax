@@ -10,6 +10,7 @@ import { PasoListo } from './armador/PasoListo';
 import { ResumenFlotante } from './armador/ResumenFlotante';
 import { SelectorTamano } from './armador/SelectorTamano';
 import { TarjetaIngrediente } from './armador/TarjetaIngrediente';
+import type { Modelo3D } from '@/lib/catalogo.server';
 import { CombosCasa } from './tienda/CombosCasa';
 import { Encabezado } from './tienda/Encabezado';
 import { HeroArmar } from './tienda/HeroArmar';
@@ -42,6 +43,8 @@ interface Props {
   textoApertura?: string;
   /** Solo dígitos, o null si todavía no está cargado. */
   whatsapp: string | null;
+  /** El burrito en 3D cargado en el admin (null: no se muestra el botón). */
+  modelo3d: Modelo3D | null;
 }
 
 // Ingredientes de la mini demostración del hero: alcanzan para llenar la zona
@@ -66,7 +69,7 @@ const TITULOS: Record<PasoDeCategoria, string> = {
   4: 'Elegí tus vegetales',
 };
 
-export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, whatsapp }: Props) {
+export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, whatsapp, modelo3d }: Props) {
   const estado = useArmador();
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
@@ -432,6 +435,7 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
           combos={combosCasa}
           catalogo={catalogo}
           tuBurrito={listo ? tuBurrito : null}
+          modelo3d={modelo3d}
           guardados={combos.length}
           guardadosAbiertos={guardadosAbiertos}
           onAgregar={agregarComboCasa}

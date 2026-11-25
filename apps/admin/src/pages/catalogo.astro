@@ -5,7 +5,7 @@ import type { CategoriaSlug, FilaCombo, FilaIngrediente, FilaTamano, FilaZona } 
 
 // El admin (rol + MFA) ve también lo desactivado: lo permite la RLS.
 const db = Astro.locals.supabase;
-const [ingredientes, tamanos, combos, zonas] = await Promise.all([
+const [ingredientes, tamanos, combos, zonas, config] = await Promise.all([
   db
     .from('ingredientes')
     .select('id, slug, nombre, precio_extra, activo, sin_tacc, vegetariano, orden, imagen_url, color_hex, categorias_ingrediente(slug)')
@@ -13,10 +13,11 @@ const [ingredientes, tamanos, combos, zonas] = await Promise.all([
   db.from('tamanos').select('id, slug, nombre, precio_base, min_carnes, max_carnes, max_salsas, max_vegetales, activo').order('orden'),
   db
     .from('productos')
-    .select('id, nombre, descripcion, activo, destacado, orden, tamano_id, tamanos(nombre), producto_ingredientes(ingrediente_id, porciones, ingredientes(nombre, orden, categorias_ingrediente(paso)))')
+    .select('id, nombre, descripcion, activo, destacado, orden, imagen_url, tamano_id, tamanos(nombre), producto_ingredientes(ingrediente_id, porciones, ingredientes(nombre, orden, categorias_ingrediente(paso)))')
     .eq('tipo', 'burrito')
     .order('orden'),
   db.from('zonas_envio').select('id, nombre, costo, activo').order('costo'),
+  db.from('config_negocio').select('modelo_burrito_glb, modelo_burrito_usdz').maybeSingle(),
 ]);
 
 const error = ingredientes.error ?? tamanos.error ?? combos.error ?? zonas.error;
@@ -47,6 +48,7 @@ const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {
     destacado: c.destacado,
     orden: c.orden,
     receta: [c.tamanos?.nombre, partes.join(', ')].filter(Boolean).join(' · '),
+    imagen_url: c.imagen_url,
     tamano_id: c.tamano_id,
     items: (c.producto_ingredientes ?? []).map((p) => ({ ingrediente_id: p.ingrediente_id, porciones: p.porciones })),
   };
@@ -66,6 +68,7 @@ const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {
         tamanos={(tamanos.data ?? []) as FilaTamano[]}
         combos={filasCombos}
         zonas={(zonas.data ?? []) as FilaZona[]}
+        modelo={{ glb: config.data?.modelo_burrito_glb ?? null, usdz: config.data?.modelo_burrito_usdz ?? null }}
       />
     )
   }

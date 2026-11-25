@@ -11,6 +11,8 @@ export interface ComboCasa {
   nombre: string;
   descripcion: string | null;
   destacado: boolean;
+  /** Foto propia del burrito (cargada en el admin); null = la de siempre. */
+  imagenUrl: string | null;
   armado: Armado;
 }
 
@@ -28,6 +30,14 @@ export interface ConfigTienda {
   horarios: Horarios;
   /** Número de Max para hablar con una persona (solo dígitos). */
   whatsappAtencion: string | null;
+  /** El burrito escaneado en 3D (cargado en el admin), o null si todavía no hay. */
+  modelo3d: Modelo3D | null;
+}
+
+export interface Modelo3D {
+  glb: string;
+  /** Para "ver en tu mesa" en iPhone. */
+  usdz: string | null;
 }
 
 export interface DatosTienda {
@@ -58,7 +68,7 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
     db.from('config_publica').select('*').maybeSingle(),
     db
       .from('productos')
-      .select('id, nombre, descripcion, destacado, orden, tamano_id, producto_ingredientes(ingrediente_id, porciones)')
+      .select('id, nombre, descripcion, destacado, orden, imagen_url, tamano_id, producto_ingredientes(ingrediente_id, porciones)')
       .eq('activo', true)
       .eq('tipo', 'burrito')
       .order('orden'),
@@ -138,6 +148,7 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       avisoCeliacos: c?.aviso_celiacos ?? null,
       horarios,
       whatsappAtencion: atencion.length >= 10 ? atencion : null,
+      modelo3d: c?.modelo_burrito_glb ? { glb: c.modelo_burrito_glb, usdz: c.modelo_burrito_usdz ?? null } : null,
     },
   };
 }
@@ -147,6 +158,7 @@ type FilaBurrito = {
   nombre: string;
   descripcion: string | null;
   destacado: boolean;
+  imagen_url: string | null;
   tamano_id: string | null;
   producto_ingredientes: { ingrediente_id: string; porciones: number }[];
 };
@@ -164,6 +176,6 @@ function armarCombosCasa(filas: FilaBurrito[], catalogo: Catalogo): ComboCasa[] 
     }
     const armado: Armado = { tamanoId: fila.tamano_id, seleccion, cantidad: 1, nombrePersonalizado: fila.nombre };
     if (validarArmado(armado, catalogo).length) return [];
-    return [{ id: fila.id, nombre: fila.nombre, descripcion: fila.descripcion, destacado: fila.destacado, armado }];
+    return [{ id: fila.id, nombre: fila.nombre, descripcion: fila.descripcion, destacado: fila.destacado, imagenUrl: fila.imagen_url, armado }];
   });
 }

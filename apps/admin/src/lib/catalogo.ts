@@ -41,6 +41,8 @@ export interface FilaCombo {
   orden: number;
   /** "Simple · Maíz, Pollo ×2, Guacamole…" (solo lectura). */
   receta: string;
+  /** Foto propia del burrito (Storage) o null para la de siempre. */
+  imagen_url: string | null;
   /** Para editar la receta. */
   tamano_id: string | null;
   items: ItemReceta[];

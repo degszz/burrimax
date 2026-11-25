@@ -3,7 +3,9 @@ import { ChevronDown, Pencil, ShoppingBag, Sparkles } from 'lucide-react';
 import { formatoPesos } from '@/lib/formato';
 import type { ComboCasa } from '@/lib/catalogo.server';
 import { cn } from '@/lib/utils';
+import type { Modelo3D } from '@/lib/catalogo.server';
 import { BurritoConPapas } from '../armador/BurritoConPapas';
+import { BotonVer3D } from './Visor3D';
 import { resumenCorto } from './MisCombos';
 
 interface Props {
@@ -11,6 +13,8 @@ interface Props {
   catalogo: Catalogo;
   /** El último burrito que armó la persona (aunque no lo haya guardado). */
   tuBurrito: Armado | null;
+  /** El burrito en 3D (uno para todos los combos). */
+  modelo3d: Modelo3D | null;
   /** Cuántos combos tiene guardados en el celular. */
   guardados: number;
   guardadosAbiertos: boolean;
@@ -23,7 +27,7 @@ interface Props {
  * Grilla de burritos listos para pedir. Si la persona ya armó uno, va primero
  * y bien marcado como suyo; después los recomendados de la casa.
  */
-export function CombosCasa({ combos, catalogo, tuBurrito, guardados, guardadosAbiertos, onAgregar, onPersonalizar, onVerGuardados }: Props) {
+export function CombosCasa({ combos, catalogo, tuBurrito, modelo3d, guardados, guardadosAbiertos, onAgregar, onPersonalizar, onVerGuardados }: Props) {
   if (combos.length === 0 && !tuBurrito) return null;
 
   // Recomendados primero, después el resto en su orden.
@@ -31,10 +35,15 @@ export function CombosCasa({ combos, catalogo, tuBurrito, guardados, guardadosAb
 
   return (
     <section id="combos-casa" aria-labelledby="titulo-combos-casa" className="scroll-mt-4 px-4 pt-6">
-      <h2 id="titulo-combos-casa" className="text-3xl font-extrabold">
-        Combos de la casa
-      </h2>
-      <p className="text-tinta-suave">Listos para pedir, con papas fritas incluidas</p>
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <div>
+          <h2 id="titulo-combos-casa" className="text-3xl font-extrabold">
+            Combos de la casa
+          </h2>
+          <p className="text-tinta-suave">Listos para pedir, con papas fritas incluidas</p>
+        </div>
+        {modelo3d && <BotonVer3D modelo={modelo3d} />}
+      </div>
 
       <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-6">
         {tuBurrito && (
@@ -55,6 +64,7 @@ export function CombosCasa({ combos, catalogo, tuBurrito, guardados, guardadosAb
             nombre={combo.nombre}
             catalogo={catalogo}
             recomendado={combo.destacado}
+            foto={combo.imagenUrl}
             onAgregar={onAgregar}
             onPersonalizar={onPersonalizar}
             textoCambiar="Cambiarle algo"
@@ -83,12 +93,13 @@ interface TarjetaProps {
   catalogo: Catalogo;
   tuyo?: boolean;
   recomendado?: boolean;
+  foto?: string | null;
   textoCambiar: string;
   onAgregar: (armado: Armado, nombre: string) => void;
   onPersonalizar: (armado: Armado) => void;
 }
 
-function Tarjeta({ armado, nombre, catalogo, tuyo, recomendado, textoCambiar, onAgregar, onPersonalizar }: TarjetaProps) {
+function Tarjeta({ armado, nombre, catalogo, tuyo, recomendado, foto, textoCambiar, onAgregar, onPersonalizar }: TarjetaProps) {
   const tamano = catalogo.tamanos.find((t) => t.id === armado.tamanoId);
   const doble = (tamano?.cantTapas ?? 1) > 1;
 
@@ -112,8 +123,8 @@ function Tarjeta({ armado, nombre, catalogo, tuyo, recomendado, textoCambiar, on
             </span>
           )
         )}
-        {/* La misma foto para todos (también la doble) hasta tener las específicas */}
-        <BurritoConPapas doble={false} />
+        {/* La foto que cargó Max en el admin, o la de siempre */}
+        <BurritoConPapas doble={false} foto={foto} />
       </div>
       <div className="flex flex-1 flex-col p-3">
         <h3 className="text-xl leading-tight font-extrabold">{nombre}</h3>
