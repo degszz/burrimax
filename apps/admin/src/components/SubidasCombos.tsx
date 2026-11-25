@@ -174,3 +174,110 @@ export function Modelo3D({ glb }: { glb: string | null }) {
     </section>
   );
 }
+
+/** Tonos sacados del logo, todos claros para que el texto se lea bien. */
+const TONOS = [
+  { nombre: 'Arena', color: '#F7E4B9' },
+  { nombre: 'Mostaza suave', color: '#FCE3A0' },
+  { nombre: 'Durazno', color: '#FAD7C3' },
+  { nombre: 'Crema', color: '#FFF8EC' },
+  { nombre: 'Verde suave', color: '#E4F1D7' },
+  { nombre: 'Blanco', color: '#FFFFFF' },
+];
+const PORTADA = '#F7E4B9';
+const CATALOGO = '#FFF8EC';
+
+/** Qué tan clara es (0 negro, 1 blanco): con fondos oscuros el texto marrón no se lee. */
+function claridad(hex: string) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+}
+
+function ElegirColor({ titulo, ayuda, color, onCambiar }: { titulo: string; ayuda: string; color: string; onCambiar: (c: string) => void }) {
+  return (
+    <fieldset>
+      <legend className="font-bold">{titulo}</legend>
+      <p className="text-sm text-zinc-600">{ayuda}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {TONOS.map((t) => {
+          const elegido = color.toLowerCase() === t.color.toLowerCase();
+          return (
+            <button
+              key={t.color}
+              type="button"
+              aria-pressed={elegido}
+              onClick={() => onCambiar(t.color)}
+              className={`flex h-12 items-center gap-2 rounded-xl border-2 px-3 font-semibold ${elegido ? 'border-zinc-900' : 'border-zinc-200'}`}
+            >
+              <span aria-hidden className="size-6 rounded-full border border-zinc-400" style={{ backgroundColor: t.color }} />
+              {t.nombre}
+            </button>
+          );
+        })}
+        <label className="flex h-12 cursor-pointer items-center gap-2 rounded-xl border-2 border-zinc-200 px-3 font-semibold">
+          <input type="color" value={color} onChange={(e) => onCambiar(e.target.value)} className="size-7 cursor-pointer" />
+          Otro
+        </label>
+      </div>
+    </fieldset>
+  );
+}
+
+/** Colores de fondo de la tienda: la portada (arriba) y el catálogo de combos (abajo). */
+export function ColorPortada({ portada, catalogo }: { portada: string | null; catalogo: string | null }) {
+  const [guardados, setGuardados] = useState({ portada: portada ?? PORTADA, catalogo: catalogo ?? CATALOGO });
+  const [colores, setColores] = useState(guardados);
+  const [estado, setEstado] = useState<Estado>({ tipo: 'quieto' });
+  const muyOscuro = claridad(colores.portada) < 0.6 || claridad(colores.catalogo) < 0.6;
+  const sinCambios = colores.portada === guardados.portada && colores.catalogo === guardados.catalogo;
+
+  async function guardar() {
+    setEstado({ tipo: 'subiendo' });
+    try {
+      const r = await fetch('/api/config/portada', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(colores) });
+      const res = (await r.json().catch(() => ({}))) as { error?: string };
+      if (!r.ok) throw new Error(res.error ?? 'No se pudo guardar');
+      setGuardados(colores);
+      setEstado({ tipo: 'listo' });
+    } catch (e) {
+      setEstado({ tipo: 'error', mensaje: mensaje(e) });
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border-2 border-zinc-900 bg-white p-4">
+      <h2 className="text-lg font-bold">Colores de la tienda</h2>
+      <div className="mt-3">
+        <ElegirColor titulo="Portada (arriba)" ayuda="El fondo del título y la muestra para armar." color={colores.portada} onCambiar={(c) => setColores({ ...colores, portada: c })} />
+      </div>
+      <div className="mt-4 border-t border-zinc-200 pt-4">
+        <ElegirColor titulo="Catálogo (abajo)" ayuda="El fondo de los combos de la casa, debajo del borde de ticket." color={colores.catalogo} onCambiar={(c) => setColores({ ...colores, catalogo: c })} />
+      </div>
+
+      {/* Vista previa: portada, borde de ticket y catálogo */}
+      <div className="mt-4 overflow-hidden rounded-xl border">
+        <div className="px-4 pt-3 pb-5 font-bold text-[#2B1B12]" style={{ backgroundColor: colores.portada }}>
+          Burrito a tu Gusto
+        </div>
+        <div style={{ backgroundColor: colores.portada }}>
+          <div className="borde-ticket h-[10px]" style={{ backgroundColor: colores.catalogo }} />
+        </div>
+        <div className="px-4 pt-2 pb-3 text-sm font-semibold text-[#2B1B12]" style={{ backgroundColor: colores.catalogo }}>
+          Combos de la casa…
+        </div>
+      </div>
+      {muyOscuro && <p className="mt-2 text-sm font-semibold text-red-700">Hay un color muy oscuro: el texto no se leería. Elegí uno más claro.</p>}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={guardar}
+          disabled={muyOscuro || sinCambios || estado.tipo === 'subiendo'}
+          className="h-12 rounded-xl bg-zinc-900 px-6 text-lg font-bold text-white disabled:opacity-40"
+        >
+          {estado.tipo === 'subiendo' ? 'Guardando…' : 'Guardar colores'}
+        </button>
+        <Aviso estado={estado} />
+      </div>
+    </section>
+  );
+}

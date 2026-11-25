@@ -17,7 +17,7 @@ const [ingredientes, tamanos, combos, zonas, config] = await Promise.all([
     .eq('tipo', 'burrito')
     .order('orden'),
   db.from('zonas_envio').select('id, nombre, costo, activo').order('costo'),
-  db.from('config_negocio').select('modelo_burrito_glb, modelo_burrito_usdz').maybeSingle(),
+  db.from('config_negocio').select('modelo_burrito_glb, modelo_burrito_usdz, color_portada, color_catalogo').maybeSingle(),
 ]);
 
 const error = ingredientes.error ?? tamanos.error ?? combos.error ?? zonas.error;
@@ -68,6 +68,8 @@ const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {
         tamanos={(tamanos.data ?? []) as FilaTamano[]}
         combos={filasCombos}
         zonas={(zonas.data ?? []) as FilaZona[]}
+        colorPortada={config.data?.color_portada ?? null}
+        colorCatalogo={config.data?.color_catalogo ?? null}
         modelo={{ glb: config.data?.modelo_burrito_glb ?? null, usdz: config.data?.modelo_burrito_usdz ?? null }}
       />
     )

@@ -99,6 +99,8 @@ export type Database = {
           whatsapp_atencion: string | null
           modelo_burrito_glb: string | null
           modelo_burrito_usdz: string | null
+          color_portada: string | null
+          color_catalogo: string | null
         }
         Insert: {
           abierto?: boolean
@@ -118,6 +120,8 @@ export type Database = {
           whatsapp_atencion?: string | null
           modelo_burrito_glb?: string | null
           modelo_burrito_usdz?: string | null
+          color_portada?: string | null
+          color_catalogo?: string | null
         }
         Update: {
           abierto?: boolean
@@ -137,6 +141,8 @@ export type Database = {
           whatsapp_atencion?: string | null
           modelo_burrito_glb?: string | null
           modelo_burrito_usdz?: string | null
+          color_portada?: string | null
+          color_catalogo?: string | null
         }
         Relationships: []
       }
@@ -732,6 +738,8 @@ export type Database = {
           whatsapp_atencion: string | null
           modelo_burrito_glb: string | null
           modelo_burrito_usdz: string | null
+          color_portada: string | null
+          color_catalogo: string | null
         }
         Insert: {
           abierto?: boolean | null
@@ -749,6 +757,8 @@ export type Database = {
           whatsapp_atencion?: string | null
           modelo_burrito_glb?: string | null
           modelo_burrito_usdz?: string | null
+          color_portada?: string | null
+          color_catalogo?: string | null
         }
         Update: {
           abierto?: boolean | null
@@ -766,6 +776,8 @@ export type Database = {
           whatsapp_atencion?: string | null
           modelo_burrito_glb?: string | null
           modelo_burrito_usdz?: string | null
+          color_portada?: string | null
+          color_catalogo?: string | null
         }
         Relationships: []
       }

@@ -1,5 +1,5 @@
 import { contarRelleno, validarArmado, type Armado, type Catalogo, type TamanoCatalogo } from '@burritos/shared';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 import { BarraPasos } from './armador/BarraPasos';
 import { BarraSiguiente } from './armador/BarraSiguiente';
@@ -45,6 +45,10 @@ interface Props {
   whatsapp: string | null;
   /** El burrito en 3D cargado en el admin (null: no se muestra el botón). */
   modelo3d: ModeloSubido | null;
+  /** Fondo de la portada (se elige en el admin). */
+  colorPortada: string;
+  /** Fondo de abajo (combos de la casa), también del admin. */
+  colorCatalogo: string;
 }
 
 // Ingredientes de la mini demostración del hero: alcanzan para llenar la zona
@@ -69,7 +73,7 @@ const TITULOS: Record<PasoDeCategoria, string> = {
   4: 'Elegí tus vegetales',
 };
 
-export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, whatsapp, modelo3d }: Props) {
+export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, whatsapp, modelo3d, colorPortada, colorCatalogo }: Props) {
   const estado = useArmador();
   const carrito = useCarrito();
   const [listo, setListo] = useState(false);
@@ -316,10 +320,19 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
   const armando = armadorAbierto && paso < 5;
 
   return (
-    <div className={armando ? 'pb-48 lg:pb-10' : 'pb-10'}>
+    <div
+      className={armando ? 'pb-48 lg:pb-10' : 'pb-10'}
+      style={{ '--fondo-catalogo': colorCatalogo, backgroundColor: 'var(--fondo-catalogo)' } as CSSProperties}
+    >
       {/* Portada: no ocupa toda la pantalla, así asoman los combos de abajo.
+          Va sobre el color elegido en el admin, de borde a borde, y termina en
+          zigzag (como un ticket) donde empiezan los combos sobre crema.
           Armando: encabezado + armador ocupan la pantalla menos la barra de abajo
           (en PC la barra va dentro de la columna derecha). */}
+      <div
+        className={cn(!armadorAbierto && 'relative pb-5')}
+        style={!armadorAbierto ? ({ '--fondo-portada': colorPortada, backgroundColor: 'var(--fondo-portada)' } as CSSProperties) : undefined}
+      >
       <div
         className={cn(
           'mx-auto flex max-w-md flex-col lg:max-w-6xl',
@@ -399,6 +412,8 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
             </div>
           </section>
         )}
+      </div>
+      {!armadorAbierto && <span aria-hidden className="borde-ticket absolute inset-x-0 -bottom-px h-[10px] bg-(--fondo-catalogo)" />}
       </div>
 
       <main className="mx-auto max-w-md space-y-4 lg:max-w-6xl lg:px-2">

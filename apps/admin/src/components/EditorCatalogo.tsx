@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import EditorCombo from './EditorCombo';
 import { FotoIngrediente } from './FotoIngrediente';
-import { FotoCombo, Modelo3D } from './SubidasCombos';
+import { ColorPortada, FotoCombo, Modelo3D } from './SubidasCombos';
 import { TITULO_CATEGORIA, type CategoriaSlug, type FilaCombo, type FilaIngrediente, type FilaTamano, type FilaZona, type TablaCatalogo } from '@/lib/catalogo';
 
 interface Props {
@@ -11,6 +11,10 @@ interface Props {
   zonas: FilaZona[];
   /** El burrito en 3D (uno para todos los combos). */
   modelo: { glb: string | null; usdz: string | null };
+  /** Fondo de la portada de la tienda (null = el de siempre). */
+  colorPortada: string | null;
+  /** Fondo de abajo (combos de la casa). */
+  colorCatalogo: string | null;
 }
 
 type Pestana = 'ingredientes' | 'tamanos' | 'combos' | 'zonas';
@@ -25,7 +29,7 @@ const PESTANAS: { id: Pestana; titulo: string; corto: string }[] = [
 const CATEGORIAS: CategoriaSlug[] = ['tortilla', 'salsa', 'carne', 'vegetal'];
 
 /** Precios, disponibilidad y datos del catálogo. La tienda lo toma en la próxima visita. */
-export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas, modelo }: Props) {
+export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas, modelo, colorPortada, colorCatalogo }: Props) {
   const [pestana, setPestana] = useState<Pestana>('ingredientes');
   // Los nuevos se suman acá sin recargar la página.
   const [listaIngredientes, setListaIngredientes] = useState(ingredientes);
@@ -97,6 +101,7 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas, m
           <p className="text-sm text-zinc-600">
             Los combos aparecen en la tienda debajo de la portada. El precio sale solo de su tamaño + ingredientes.
           </p>
+          <ColorPortada portada={colorPortada} catalogo={colorCatalogo} />
           <Modelo3D glb={modelo.glb} />
           {editandoCombo === 'nuevo' ? (
             <EditorCombo tamanos={tamanos} ingredientes={listaIngredientes} onCerrar={() => setEditandoCombo(null)} />

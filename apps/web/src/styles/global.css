@@ -338,3 +338,51 @@
     transition: none;
   }
 }
+/* Portada: borde de ticket (zigzag) donde termina el color y empiezan los combos. */
+.borde-ticket {
+  mask-image: linear-gradient(-45deg, #000 10px, transparent 0), linear-gradient(45deg, #000 10px, transparent 0);
+  mask-size: 20px 20px;
+  mask-position: left bottom;
+  mask-repeat: repeat-x;
+}
+
+/* Portada: una sola secuencia de entrada al cargar (título, burrito, botones,
+   muestra) y el burrito que "respira" apenas. Nada se mueve con reduced-motion. */
+@keyframes entrada {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes entrada-burrito {
+  from { opacity: 0; transform: translateX(-28px) rotate(-10deg) scale(0.9); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-6px) rotate(-1deg); }
+}
+
+.animate-entrada { animation: entrada 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.animate-entrada-burrito { animation: entrada-burrito 850ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.animate-flotar { animation: flotar 4.8s ease-in-out 1s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-entrada,
+  .animate-entrada-burrito,
+  .animate-flotar {
+    animation: none;
+  }
+}
+
+/* Celular y ventanas angostas: sin la barra de scroll "de juguete" (ocupaba
+   16 px a la derecha y todo se veía corrido a la izquierda). Se sigue
+   pudiendo scrollear igual; en PC ancha queda la barra de la marca. */
+@media (max-width: 1023px) {
+  html {
+    scrollbar-width: none;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

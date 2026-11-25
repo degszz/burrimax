@@ -32,6 +32,10 @@ export interface ConfigTienda {
   whatsappAtencion: string | null;
   /** El burrito escaneado en 3D (cargado en el admin), o null si todavía no hay. */
   modelo3d: ModeloSubido | null;
+  /** Fondo de la portada elegido en el admin (hex). */
+  colorPortada: string;
+  /** Fondo de abajo, donde están los combos (hex). */
+  colorCatalogo: string;
 }
 
 /** El burrito en 3D cargado en el admin (uno para todos los tamaños y combos). */
@@ -149,6 +153,8 @@ export async function cargarDatosTienda(): Promise<DatosTienda> {
       avisoCeliacos: c?.aviso_celiacos ?? null,
       horarios,
       whatsappAtencion: atencion.length >= 10 ? atencion : null,
+      colorPortada: c?.color_portada ?? '#F7E4B9',
+      colorCatalogo: c?.color_catalogo ?? '#FFF8EC',
       modelo3d: c?.modelo_burrito_glb ? { glb: c.modelo_burrito_glb, usdz: c.modelo_burrito_usdz ?? null } : null,
     },
   };

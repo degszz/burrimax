@@ -30,23 +30,49 @@ interface Props {
  */
 export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, onEmpezar, className }: Props) {
   const instagram = urlInstagram();
+  // Inclinación del burrito según dónde está el puntero (máx. ±8°).
+  const [giro, setGiro] = useState({ x: 0, y: 0 });
+  const inclinar = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const caja = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - caja.left) / caja.width - 0.5;
+    const y = (e.clientY - caja.top) / caja.height - 0.5;
+    setGiro({ x: -y * 16, y: x * 16 });
+  };
+  const enderezar = () => setGiro({ x: 0, y: 0 });
 
   return (
     // PC: título, foto y botones a la izquierda; el armador de muestra a la derecha.
     <section aria-labelledby="titulo-hero" className={cn('flex flex-col lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-6', className)}>
       <div className="px-4 pt-2 text-center lg:px-0 lg:text-left">
-        <h1 id="titulo-hero" className="text-[2.3rem] leading-none font-extrabold lg:text-7xl">
+        <h1 id="titulo-hero" className="animate-entrada text-[2.3rem] leading-none font-extrabold lg:text-7xl">
           {MARCA.frase}
         </h1>
 
-        <div className="relative mx-auto mt-2 w-[64%] max-w-[15rem] lg:mx-0 lg:mt-6 lg:w-[78%] lg:max-w-[26rem]">
-          <span className="juguete absolute -top-1 -left-4 z-30 -rotate-6 rounded-lg bg-amarillo px-1.5 font-heading text-xs font-extrabold">
+        {/* Entra de costado, después flota apenas y se inclina hacia el dedo o el mouse */}
+        <div
+          onPointerMove={inclinar}
+          onPointerLeave={enderezar}
+          className="animate-entrada-burrito relative mx-auto mt-2 w-[64%] max-w-[15rem] [perspective:700px] lg:mx-0 lg:mt-6 lg:w-[78%] lg:max-w-[26rem]"
+          style={{ animationDelay: '120ms' }}
+        >
+          <span
+            className="animate-sello juguete absolute -top-1 -left-4 z-30 -rotate-6 rounded-lg bg-amarillo px-1.5 font-heading text-xs font-extrabold"
+            style={{ animationDelay: '750ms' }}
+          >
             desde {formatoPesos(precioDesde)}
           </span>
-          <BurritoConPapas doble={false} />
+          <div className="animate-flotar">
+            <div
+              className="transition-transform duration-300 ease-out"
+              style={{ transform: `rotateX(${giro.x}deg) rotateY(${giro.y}deg)` }}
+            >
+              <BurritoConPapas doble={false} />
+            </div>
+          </div>
         </div>
 
-        <div className="mx-auto mt-3 flex max-w-sm flex-col gap-2.5 lg:mx-0 lg:mt-6">
+        <div className="animate-entrada mx-auto mt-3 flex max-w-sm flex-col gap-2.5 lg:mx-0 lg:mt-6" style={{ animationDelay: '260ms' }}>
           {/* Solo si dejó uno a medio armar: para empezar de cero está el amarillo de abajo */}
           {enCurso && <BotonArmar texto="Seguir armando el mío" onArmar={onArmar} />}
           {/* Instagram se ve aunque todavía no tenga link (Max lo crea y lo pasa). */}
@@ -106,7 +132,7 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
   }, [visibles]);
 
   return (
-    <div className="relative mt-3 h-64 overflow-hidden lg:mt-0 lg:h-[min(32rem,62dvh)] lg:flex-none lg:rounded-3xl">
+    <div className="animate-entrada relative mt-3 h-64 overflow-hidden lg:mt-0 lg:h-[min(32rem,62dvh)] lg:flex-none lg:rounded-3xl">
       {/* Toda la muestra es un botón: se toque donde se toque, arranca el armador. */}
       <button
         type="button"
@@ -119,8 +145,9 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
           {ingredientes.map((ingrediente, i) => (
             <span
               key={ingrediente.id}
+              style={{ animationDelay: `${380 + i * 70}ms` }}
               className={cn(
-                'juguete relative flex min-w-0 flex-col items-center rounded-2xl px-1 pt-2 pb-1.5 transition-colors duration-500',
+                'animate-entrada juguete relative flex min-w-0 flex-col items-center rounded-2xl px-1 pt-2 pb-1.5 transition-colors duration-500',
                 i === elegida ? 'border-verde bg-verde-claro' : 'bg-white',
               )}
             >
@@ -138,7 +165,7 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
         {/* Desenfoque que sube desde abajo: deja nítida una fila y media */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 top-[22%] bg-gradient-to-b from-crema/0 via-crema/55 to-crema/90 backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,transparent,black_30%)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 top-[22%] bg-[linear-gradient(to_bottom,transparent,color-mix(in_srgb,var(--fondo-portada,var(--crema))_60%,transparent),color-mix(in_srgb,var(--fondo-portada,var(--crema))_92%,transparent))] backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,transparent,black_30%)]"
         />
 
         <span aria-hidden className="absolute inset-x-0 bottom-14 flex flex-col items-center gap-2 px-4">
