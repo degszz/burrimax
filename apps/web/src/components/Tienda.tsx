@@ -308,13 +308,13 @@ export default function Tienda({ catalogo, combosCasa, abierto, textoApertura, w
 
   return (
     <div className={armando ? 'pb-48 lg:pb-10' : 'pb-10'}>
-      {/* Encabezado + portada = una pantalla justa.
+      {/* Portada: no ocupa toda la pantalla, así asoman los combos de abajo.
           Armando: encabezado + armador ocupan la pantalla menos la barra de abajo
           (en PC la barra va dentro de la columna derecha). */}
       <div
         className={cn(
           'mx-auto flex max-w-md flex-col lg:max-w-6xl',
-          armando ? 'h-[calc(100dvh-var(--alto-barra,8.5rem))] lg:h-dvh' : !armadorAbierto && 'min-h-dvh',
+          armando ? 'h-[calc(100dvh-var(--alto-barra,8.5rem))] lg:h-dvh' : undefined,
         )}
       >
         {armadorAbierto ? (

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import EditorCombo from './EditorCombo';
 import { FotoIngrediente } from './FotoIngrediente';
 import { TITULO_CATEGORIA, type CategoriaSlug, type FilaCombo, type FilaIngrediente, type FilaTamano, type FilaZona, type TablaCatalogo } from '@/lib/catalogo';
 
@@ -26,6 +27,8 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
   // Los nuevos se suman acá sin recargar la página.
   const [listaIngredientes, setListaIngredientes] = useState(ingredientes);
   const sinStock = listaIngredientes.filter((i) => !i.activo).length;
+  // Combo abierto para editar la receta ('nuevo' = alta).
+  const [editandoCombo, setEditandoCombo] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -88,10 +91,27 @@ export default function EditorCatalogo({ ingredientes, tamanos, combos, zonas }:
 
       {pestana === 'combos' && (
         <section className="mt-5 space-y-3">
-          <p className="text-sm text-zinc-600">El precio de cada combo sale solo de su tamaño + ingredientes. La receta se cambia más adelante desde acá.</p>
-          {combos.map((c) => (
-            <Combo key={c.id} inicial={c} />
-          ))}
+          <p className="text-sm text-zinc-600">
+            Los combos aparecen en la tienda debajo de la portada. El precio sale solo de su tamaño + ingredientes.
+          </p>
+          {editandoCombo === 'nuevo' ? (
+            <EditorCombo tamanos={tamanos} ingredientes={listaIngredientes} onCerrar={() => setEditandoCombo(null)} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditandoCombo('nuevo')}
+              className="flex h-14 w-full items-center justify-center rounded-2xl border-2 border-dashed border-zinc-400 bg-white text-lg font-bold hover:border-zinc-900"
+            >
+              + Nuevo combo
+            </button>
+          )}
+          {combos.map((c) =>
+            editandoCombo === c.id ? (
+              <EditorCombo key={c.id} tamanos={tamanos} ingredientes={listaIngredientes} combo={c} onCerrar={() => setEditandoCombo(null)} />
+            ) : (
+              <Combo key={c.id} inicial={c} onCambiarReceta={() => setEditandoCombo(c.id)} />
+            ),
+          )}
         </section>
       )}
 
@@ -341,8 +361,8 @@ function Tamano({ inicial }: { inicial: FilaTamano }) {
   );
 }
 
-function Combo({ inicial }: { inicial: FilaCombo }) {
-  // receta es solo lectura: no se manda.
+function Combo({ inicial, onCambiarReceta }: { inicial: FilaCombo; onCambiarReceta: () => void }) {
+  // receta, tamaño e items no cambian acá (no se mandan): la receta se edita con EditorCombo.
   const f = useFila('productos', inicial);
   const c = f.fila;
   return (
@@ -358,7 +378,12 @@ function Combo({ inicial }: { inicial: FilaCombo }) {
           </>
         }
       />
-      <p className="mt-2 text-sm text-zinc-600">{c.receta}</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <p className="min-w-0 flex-1 text-sm text-zinc-600">{c.receta}</p>
+        <button type="button" onClick={onCambiarReceta} className="h-11 rounded-xl border-2 border-zinc-900 px-4 font-semibold hover:bg-zinc-100">
+          Cambiar receta
+        </button>
+      </div>
       <textarea
         aria-label="Descripción"
         placeholder="Descripción corta (opcional)"

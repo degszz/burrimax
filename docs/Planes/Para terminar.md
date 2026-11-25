@@ -39,7 +39,7 @@ Falta:
 
 | # | Qué | Quién |
 |---|---|---|
-| 11 | Fotos de ingredientes nuevos (Storage) y recetas de combos | Claude |
+| 11 | Fotos de ingredientes nuevos (Storage). ~~Recetas de combos~~: hecho 2026-11-25 (Catálogo → Combos: "+ Nuevo combo" y "Cambiar receta", RPC `guardar_combo`) | Claude |
 | 12 | Historial de pedidos con filtros | Claude |
 
 ## 4. Datos y contenido de Max

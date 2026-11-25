@@ -769,6 +769,17 @@ export type Database = {
       }
       crear_pedido: { Args: { p: Json }; Returns: Json }
       es_admin: { Args: never; Returns: boolean }
+      guardar_combo: {
+        Args: {
+          p_descripcion: string | null
+          p_id: string | null
+          p_nombre: string
+          p_precio: number
+          p_receta: Json
+          p_tamano_id: string
+        }
+        Returns: string
+      }
       marcar_pagado: {
         Args: { p_id: string }
         Returns: Database["public"]["Tables"]["pedidos"]["Row"]

@@ -22,8 +22,8 @@ interface Props {
 /**
  * Portada: el título de la marca, el producto y las acciones. Abajo, a todo
  * el ancho, asoma el armador (una fila y media de ingredientes) que se
- * desenfoca hacia abajo, con el botón encima. Junto con el encabezado ocupa
- * exactamente una pantalla.
+ * desenfoca hacia abajo, con el botón encima. No ocupa toda la pantalla: abajo
+ * asoman los combos de la casa.
  */
 export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, className }: Props) {
   const textoBoton = enCurso ? 'Seguir armando el mío' : 'Armá tu burrito';
@@ -103,7 +103,7 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
   }, [visibles]);
 
   return (
-    <div className="relative mt-3 min-h-56 flex-1 overflow-hidden lg:mt-0 lg:h-[min(36rem,78dvh)] lg:flex-none lg:rounded-3xl">
+    <div className="relative mt-3 h-64 overflow-hidden lg:mt-0 lg:h-[min(32rem,62dvh)] lg:flex-none lg:rounded-3xl">
       {/* Toda la muestra es un botón: se toque donde se toque, arranca el armador. */}
       <button
         type="button"

@@ -13,7 +13,7 @@ const [ingredientes, tamanos, combos, zonas] = await Promise.all([
   db.from('tamanos').select('id, slug, nombre, precio_base, min_carnes, max_carnes, max_salsas, max_vegetales, activo').order('orden'),
   db
     .from('productos')
-    .select('id, nombre, descripcion, activo, destacado, orden, tamanos(nombre), producto_ingredientes(porciones, ingredientes(nombre, orden, categorias_ingrediente(paso)))')
+    .select('id, nombre, descripcion, activo, destacado, orden, tamano_id, tamanos(nombre), producto_ingredientes(ingrediente_id, porciones, ingredientes(nombre, orden, categorias_ingrediente(paso)))')
     .eq('tipo', 'burrito')
     .order('orden'),
   db.from('zonas_envio').select('id, nombre, costo, activo').order('costo'),
@@ -47,6 +47,8 @@ const filasCombos: FilaCombo[] = (combos.data ?? []).map((c) => {
     destacado: c.destacado,
     orden: c.orden,
     receta: [c.tamanos?.nombre, partes.join(', ')].filter(Boolean).join(' · '),
+    tamano_id: c.tamano_id,
+    items: (c.producto_ingredientes ?? []).map((p) => ({ ingrediente_id: p.ingrediente_id, porciones: p.porciones })),
   };
 });
 ---
