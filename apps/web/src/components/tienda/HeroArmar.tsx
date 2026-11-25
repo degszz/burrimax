@@ -1,5 +1,5 @@
 import type { IngredienteCatalogo } from '@burritos/shared';
-import { ArrowDown, Check, ChefHat } from 'lucide-react';
+import { ArrowDown, ArrowRight, Check, ChefHat, Pointer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { formatoPesos } from '@/lib/formato';
 import { MARCA, urlInstagram } from '@/lib/marca';
@@ -44,18 +44,15 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
           <BurritoConPapas doble={false} />
         </div>
 
-        <div className="mx-auto mt-2 flex max-w-xs flex-col gap-2 lg:mx-0 lg:mt-6">
-          <button
-            type="button"
-            onClick={onArmar}
-            className="juguete flex min-h-12 items-center justify-center gap-2 rounded-xl bg-rojo font-heading text-lg font-extrabold text-white shadow-[0_4px_0_var(--rojo-oscuro)]"
-          >
-            <ChefHat aria-hidden className="size-5" strokeWidth={2.5} /> {textoBoton}
-          </button>
-          <div className="grid grid-cols-2 gap-2">
-            <BotonRed href={instagram} etiqueta="Instagram" icono={<IconoInstagram className="size-4" />} />
-            <BotonRed href={whatsapp ? `https://wa.me/${whatsapp}` : null} etiqueta="WhatsApp" icono={<IconoWhatsapp className="size-4" />} />
-          </div>
+        <div className="mx-auto mt-3 flex max-w-sm flex-col gap-2 lg:mx-0 lg:mt-6">
+          <BotonArmar texto={textoBoton} onArmar={onArmar} />
+          {/* Redes: secundarias y solo las que tienen link (sin botones apagados). */}
+          {(instagram || whatsapp) && (
+            <div className="flex justify-center gap-2 lg:justify-start">
+              {instagram && <BotonRed href={instagram} etiqueta="Instagram" icono={<IconoInstagram className="size-4" />} />}
+              {whatsapp && <BotonRed href={`https://wa.me/${whatsapp}`} etiqueta="WhatsApp" icono={<IconoWhatsapp className="size-4" />} />}
+            </div>
+          )}
         </div>
       </div>
 
@@ -65,18 +62,37 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
   );
 }
 
-function BotonRed({ href, etiqueta, icono }: { href: string | null; etiqueta: string; icono: React.ReactNode }) {
-  const clases = 'juguete flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-white font-heading text-base font-extrabold';
-  // Sin link cargado todavía: se ve, pero no lleva a ningún lado. [A CONFIRMAR]
-  if (!href) {
-    return (
-      <span aria-disabled="true" title="Pronto" className={cn(clases, 'opacity-50')}>
-        {icono} {etiqueta}
-      </span>
-    );
-  }
+/** El botón principal: grande, con qué vas a elegir y una flecha que invita a tocar. */
+function BotonArmar({ texto, onArmar }: { texto: string; onArmar: () => void }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={clases}>
+    <button
+      type="button"
+      onClick={onArmar}
+      className="juguete relative flex min-h-[4.5rem] w-full items-center gap-3 overflow-hidden rounded-2xl bg-rojo py-2 pr-3 pl-2.5 text-left text-white hover:brightness-110 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amarillo"
+    >
+      <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-xl border-2 border-tinta bg-amarillo text-tinta">
+        <ChefHat className="size-6" strokeWidth={2.5} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-heading text-xl leading-tight font-extrabold">{texto}</span>
+        <span className="block text-sm leading-snug font-semibold text-white/90">Tortilla, salsas y relleno</span>
+      </span>
+      <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-tinta bg-white text-rojo">
+        <ArrowRight className="animate-empujar size-5" strokeWidth={3} />
+      </span>
+      <span aria-hidden className="animate-brillo pointer-events-none absolute inset-y-0 -left-1/4 w-1/6 bg-white/25" />
+    </button>
+  );
+}
+
+function BotonRed({ href, etiqueta, icono }: { href: string; etiqueta: string; icono: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border-2 border-tinta/20 bg-white/70 px-4 font-heading text-base font-extrabold text-tinta-suave hover:border-tinta hover:text-tinta"
+    >
       {icono} {etiqueta}
     </a>
   );
@@ -95,45 +111,55 @@ function DemoArmador({ ingredientes, textoBoton, onArmar }: { ingredientes: Ingr
 
   return (
     <div className="relative mt-3 min-h-56 flex-1 overflow-hidden lg:mt-0 lg:h-[min(36rem,78dvh)] lg:flex-none lg:rounded-3xl">
-      {/* Fuera del flujo: la zona mide lo que queda de pantalla y la grilla se corta */}
-      <ul aria-hidden className="absolute inset-x-0 top-0 grid grid-cols-3 gap-2.5 px-3 pt-3 select-none">
-        {ingredientes.map((ingrediente, i) => (
-          <li
-            key={ingrediente.id}
-            className={cn(
-              'juguete relative flex flex-col items-center rounded-2xl px-1 pt-2 pb-1.5 transition-colors duration-500',
-              i === elegida ? 'border-verde bg-verde-claro' : 'bg-white',
-            )}
-          >
-            {i === elegida && (
-              <span className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border-2 border-tinta bg-verde text-white">
-                <Check className="size-3.5" strokeWidth={3.5} />
-              </span>
-            )}
-            <ImagenIngrediente ingrediente={ingrediente} className="w-[62%]" />
-            <span className="mt-0.5 w-full truncate text-center font-heading text-base font-extrabold">{ingrediente.nombre}</span>
-          </li>
-        ))}
-      </ul>
+      {/* Toda la muestra es un botón: se toque donde se toque, arranca el armador. */}
+      <button
+        type="button"
+        onClick={onArmar}
+        aria-label={textoBoton}
+        className="group absolute inset-0 cursor-pointer text-left focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-amarillo lg:rounded-3xl"
+      >
+        {/* Fuera del flujo: la zona mide lo que queda de pantalla y la grilla se corta */}
+        <span aria-hidden className="absolute inset-x-0 top-0 grid grid-cols-3 gap-2.5 px-3 pt-3 transition-transform duration-300 select-none group-hover:-translate-y-1">
+          {ingredientes.map((ingrediente, i) => (
+            <span
+              key={ingrediente.id}
+              className={cn(
+                'juguete relative flex min-w-0 flex-col items-center rounded-2xl px-1 pt-2 pb-1.5 transition-colors duration-500',
+                i === elegida ? 'border-verde bg-verde-claro' : 'bg-white',
+              )}
+            >
+              {i === elegida && (
+                <span className="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border-2 border-tinta bg-verde text-white">
+                  <Check className="size-3.5" strokeWidth={3.5} />
+                </span>
+              )}
+              <ImagenIngrediente ingrediente={ingrediente} className="w-[62%]" />
+              <span className="mt-0.5 w-full truncate text-center font-heading text-base font-extrabold">{ingrediente.nombre}</span>
+            </span>
+          ))}
+        </span>
 
-      {/* Desenfoque que sube desde abajo: deja nítida una fila y media */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 top-[22%] bg-gradient-to-b from-crema/0 via-crema/55 to-crema/90 backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,transparent,black_30%)]"
-      />
+        {/* Desenfoque que sube desde abajo: deja nítida una fila y media */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 top-[22%] bg-gradient-to-b from-crema/0 via-crema/55 to-crema/90 backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,transparent,black_30%)]"
+        />
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-4 pb-2">
-        <button
-          type="button"
-          onClick={onArmar}
-          className="juguete flex min-h-12 items-center gap-2 rounded-xl bg-amarillo px-5 font-heading text-lg font-extrabold"
-        >
-          <ChefHat aria-hidden className="size-5" strokeWidth={2.5} /> {textoBoton}
-        </button>
-        <a href="#combos-casa" className="flex min-h-11 items-center gap-1.5 font-bold text-tinta-suave underline underline-offset-4">
-          o elegí uno de la casa <ArrowDown aria-hidden className="size-4" />
-        </a>
-      </div>
+        <span aria-hidden className="absolute inset-x-0 bottom-14 flex flex-col items-center gap-2 px-4">
+          <span className="rounded-full bg-white/80 px-3 py-0.5 text-sm font-bold text-tinta-suave">Elegís todo vos, paso a paso</span>
+          <span className="juguete flex min-h-12 items-center gap-2 rounded-full bg-amarillo px-5 font-heading text-lg font-extrabold group-hover:-translate-y-0.5 group-active:translate-y-[3px] group-active:shadow-[0_1px_0_var(--tinta)]">
+            <Pointer className="size-5" strokeWidth={2.5} /> Empezar a armar <ArrowRight className="animate-empujar size-5" strokeWidth={3} />
+          </span>
+        </span>
+      </button>
+
+      {/* Fuera del botón (no se anidan links en botones). */}
+      <a
+        href="#combos-casa"
+        className="absolute inset-x-0 bottom-1 mx-auto flex min-h-12 w-fit items-center gap-1.5 px-2 font-bold text-tinta-suave underline underline-offset-4"
+      >
+        o elegí uno de la casa <ArrowDown aria-hidden className="size-4" />
+      </a>
     </div>
   );
 }

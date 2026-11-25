@@ -312,7 +312,23 @@
   animation: tilde 380ms 300ms ease-out both;
 }
 
+/* Portada: la flecha del botón principal "empuja" y un brillo lo cruza cada tanto. */
+@keyframes empujar {
+  0%, 55%, 100% { transform: translateX(0); }
+  25% { transform: translateX(4px); }
+}
+
+@keyframes brillo {
+  0%, 65% { transform: translateX(0) skewX(-20deg); }
+  100% { transform: translateX(700%) skewX(-20deg); }
+}
+
+.animate-empujar { animation: empujar 1.8s ease-in-out infinite; }
+.animate-brillo { animation: brillo 3.6s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
+  .animate-brillo { display: none; }
+  .animate-empujar,
   .animate-latido,
   .animate-pop,
   .animate-plato,
