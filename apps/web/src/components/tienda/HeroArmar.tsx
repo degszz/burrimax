@@ -44,15 +44,13 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
           <BurritoConPapas doble={false} />
         </div>
 
-        <div className="mx-auto mt-3 flex max-w-sm flex-col gap-2 lg:mx-0 lg:mt-6">
+        <div className="mx-auto mt-3 flex max-w-sm flex-col gap-2.5 lg:mx-0 lg:mt-6">
           <BotonArmar texto={textoBoton} onArmar={onArmar} />
-          {/* Redes: secundarias y solo las que tienen link (sin botones apagados). */}
-          {(instagram || whatsapp) && (
-            <div className="flex justify-center gap-2 lg:justify-start">
-              {instagram && <BotonRed href={instagram} etiqueta="Instagram" icono={<IconoInstagram className="size-4" />} />}
-              {whatsapp && <BotonRed href={`https://wa.me/${whatsapp}`} etiqueta="WhatsApp" icono={<IconoWhatsapp className="size-4" />} />}
-            </div>
-          )}
+          {/* Instagram se ve aunque todavía no tenga link (Max lo crea y lo pasa). */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <BotonRed href={instagram} etiqueta="Instagram" icono={<IconoInstagram className="size-5" />} />
+            <BotonRed href={whatsapp ? `https://wa.me/${whatsapp}` : null} etiqueta="WhatsApp" icono={<IconoWhatsapp className="size-5" />} />
+          </div>
         </div>
       </div>
 
@@ -62,37 +60,32 @@ export function HeroArmar({ precioDesde, enCurso, demo, whatsapp, onArmar, class
   );
 }
 
-/** El botón principal: grande, con qué vas a elegir y una flecha que invita a tocar. */
+/** El botón principal: mismo estilo y ancho que los de abajo, pero rojo y más alto. */
 function BotonArmar({ texto, onArmar }: { texto: string; onArmar: () => void }) {
   return (
     <button
       type="button"
       onClick={onArmar}
-      className="juguete relative flex min-h-[4.5rem] w-full items-center gap-3 overflow-hidden rounded-2xl bg-rojo py-2 pr-3 pl-2.5 text-left text-white hover:brightness-110 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amarillo"
+      className="juguete flex min-h-14 w-full items-center justify-center gap-2.5 rounded-2xl bg-rojo px-5 font-heading text-xl font-extrabold text-white hover:brightness-110 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amarillo"
     >
-      <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-xl border-2 border-tinta bg-amarillo text-tinta">
-        <ChefHat className="size-6" strokeWidth={2.5} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-heading text-xl leading-tight font-extrabold">{texto}</span>
-        <span className="block text-sm leading-snug font-semibold text-white/90">Tortilla, salsas y relleno</span>
-      </span>
-      <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-tinta bg-white text-rojo">
-        <ArrowRight className="animate-empujar size-5" strokeWidth={3} />
-      </span>
-      <span aria-hidden className="animate-brillo pointer-events-none absolute inset-y-0 -left-1/4 w-1/6 bg-white/25" />
+      <ChefHat aria-hidden className="size-6" strokeWidth={2.5} />
+      {texto}
     </button>
   );
 }
 
-function BotonRed({ href, etiqueta, icono }: { href: string; etiqueta: string; icono: React.ReactNode }) {
+function BotonRed({ href, etiqueta, icono }: { href: string | null; etiqueta: string; icono: React.ReactNode }) {
+  const clases = 'juguete flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-white px-3 font-heading text-lg font-extrabold hover:bg-panel';
+  // Sin link todavía: se ve igual, pero no lleva a ningún lado. [A CONFIRMAR]
+  if (!href) {
+    return (
+      <span title="Pronto" className={clases}>
+        {icono} {etiqueta}
+      </span>
+    );
+  }
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border-2 border-tinta/20 bg-white/70 px-4 font-heading text-base font-extrabold text-tinta-suave hover:border-tinta hover:text-tinta"
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className={clases}>
       {icono} {etiqueta}
     </a>
   );
